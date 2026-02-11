@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Card Rewards Tracker - Full Featured</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #581c87 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(79, 70, 229, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(124, 58, 237, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+        }
+
+        .tab.active {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+            color: #ffffff;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+            transition: all 0.3s;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.75);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+        }
+
+        .stat-sub {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.75);
+            margin-top: 0.25rem;
+        }
+
+        .card-section {
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+            transition: all 0.3s;
+        }
+
+        .card-header:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        .card-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+        }
+
+        .card-issuer {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .profile-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(236, 72, 153, 0.3);
+            border: 1px solid rgba(236, 72, 153, 0.5);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+
+        .card-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .card-stat {
+            text-align: right;
+        }
+
+        .card-stat-label {
+            font-size: 0.625rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .card-stat-value {
+            font-size: 0.875rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
+        }
+
+        .progress-circle {
+            width: 56px;
+            height: 56px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+        }
+
+        .progress-svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .progress-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.25);
+            stroke-width: 4;
+        }
+
+        .progress-bar {
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.3s;
+            filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.7));
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+        }
+
+        .toggle {
+            color: rgba(255, 255, 255, 0.8);
+            transition: transform 0.2s;
+            margin-left: 1rem;
+        }
+
+        .toggle.open { transform: rotate(180deg); }
+
+        .benefits-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .benefits-container.open {
+            max-height: 3000px;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+            padding: 1rem;
+        }
+
+        .benefit {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .benefit:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: translateY(-2px);
+        }
+
+        .benefit.used {
+            background: rgba(16, 185, 129, 0.25);
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+
+        .benefit.used::after {
+            content: '✓';
+            position: absolute;
+            top: 0.75rem; right: 0.75rem;
+            font-size: 1.25rem;
+            color: #10b981;
+            filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.8));
+        }
+
+        .benefit-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
+        }
+
+        .benefit-type {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: 0.25rem;
+        }
+
+        .benefit-value {
+            font-size: 1.125rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            margin-top: 0.5rem;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.625rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+        }
+
+        .actions-bar {
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: rgba(30, 27, 75, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal h2 {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .form-select option {
+            background: #1a1f2e;
+            color: #ffffff;
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .card-option {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .card-option:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .profile-list {
+            display: grid;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-item {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .spending-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .spending-input-group {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .spending-label {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .spending-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .benefit-list {
+            display: grid;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .benefit-list-item {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .stats { grid-template-columns: 1fr; }
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            .card-stats {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .benefits-grid, .spending-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const INITIAL_CARD_DATABASE = 
+
+{"Amex Platinum":{"issuer":"American Express","annualFee":695,"periodicBenefits":[{"name":"Uber Cash Jan","type":"Dining","frequency":"Monthly","value":15,"period":"M1"},{"name":"Uber Cash Feb","type":"Dining","frequency":"Monthly","value":15,"period":"M2"},{"name":"Uber Cash Mar","type":"Dining","frequency":"Monthly","value":15,"period":"M3"},{"name":"Uber Cash Apr","type":"Dining","frequency":"Monthly","value":15,"period":"M4"},{"name":"Uber Cash May","type":"Dining","frequency":"Monthly","value":15,"period":"M5"},{"name":"Uber Cash Jun","type":"Dining","frequency":"Monthly","value":15,"period":"M6"},{"name":"Uber Cash Jul","type":"Dining","frequency":"Monthly","value":15,"period":"M7"},{"name":"Uber Cash Aug","type":"Dining","frequency":"Monthly","value":15,"period":"M8"},{"name":"Uber Cash Sep","type":"Dining","frequency":"Monthly","value":15,"period":"M9"},{"name":"Uber Cash Oct","type":"Dining","frequency":"Monthly","value":15,"period":"M10"},{"name":"Uber Cash Nov","type":"Dining","frequency":"Monthly","value":15,"period":"M11"},{"name":"Uber Cash Dec","type":"Dining","frequency":"Monthly","value":20,"period":"M12"},{"name":"Digital Entertainment Jan","type":"Shop","frequency":"Monthly","value":25,"period":"M1"},{"name":"Digital Entertainment Feb","type":"Shop","frequency":"Monthly","value":25,"period":"M2"},{"name":"Digital Entertainment Mar","type":"Shop","frequency":"Monthly","value":25,"period":"M3"},{"name":"Digital Entertainment Apr","type":"Shop","frequency":"Monthly","value":25,"period":"M4"},{"name":"Digital Entertainment May","type":"Shop","frequency":"Monthly","value":25,"period":"M5"},{"name":"Digital Entertainment Jun","type":"Shop","frequency":"Monthly","value":25,"period":"M6"},{"name":"Digital Entertainment Jul","type":"Shop","frequency":"Monthly","value":25,"period":"M7"},{"name":"Digital Entertainment Aug","type":"Shop","frequency":"Monthly","value":25,"period":"M8"},{"name":"Digital Entertainment Sep","type":"Shop","frequency":"Monthly","value":25,"period":"M9"},{"name":"Digital Entertainment Oct","type":"Shop","frequency":"Monthly","value":25,"period":"M10"},{"name":"Digital Entertainment Nov","type":"Shop","frequency":"Monthly","value":25,"period":"M11"},{"name":"Digital Entertainment Dec","type":"Shop","frequency":"Monthly","value":25,"period":"M12"},{"name":"Lululemon Q1","type":"Shop","frequency":"Quarterly","value":75,"period":"Q1"},{"name":"Lululemon Q2","type":"Shop","frequency":"Quarterly","value":75,"period":"Q2"},{"name":"Lululemon Q3","type":"Shop","frequency":"Quarterly","value":75,"period":"Q3"},{"name":"Lululemon Q4","type":"Shop","frequency":"Quarterly","value":75,"period":"Q4"},{"name":"Resy Credit Q1","type":"Dining","frequency":"Quarterly","value":100,"period":"Q1"},{"name":"Resy Credit Q2","type":"Dining","frequency":"Quarterly","value":100,"period":"Q2"},{"name":"Resy Credit Q3","type":"Dining","frequency":"Quarterly","value":100,"period":"Q3"},{"name":"Resy Credit Q4","type":"Dining","frequency":"Quarterly","value":100,"period":"Q4"},{"name":"Saks Fifth Avenue H1","type":"Shop","frequency":"Semi-Annual","value":50,"period":"H1"},{"name":"Saks Fifth Avenue H2","type":"Shop","frequency":"Semi-Annual","value":50,"period":"H2"},{"name":"Hotel Credit (FHR/THC) H1","type":"Travel","frequency":"Semi-Annual","value":300,"period":"H1"},{"name":"Hotel Credit (FHR/THC) H2","type":"Travel","frequency":"Semi-Annual","value":300,"period":"H2"},{"name":"Airline Fee Credit","type":"Travel","frequency":"Annual","value":200},{"name":"Walmart+ Membership","type":"Shop","frequency":"Annual","value":155},{"name":"CLEAR Credit","type":"Travel","frequency":"Annual","value":209},{"name":"Oura Ring Credit","type":"Shop","frequency":"Annual","value":200}],"spendBenefits":[],"multipliers":{"AmexTravel Flights":5,"AmexTravel Hotels":5,"Everything Else":1}},"Business Platinum":{"issuer":"American Express","annualFee":895,"periodicBenefits":[{"name":"Dell Credit Jan","type":"Shop","frequency":"Monthly","value":16.67,"period":"M1"},{"name":"Dell Credit Feb","type":"Shop","frequency":"Monthly","value":16.67,"period":"M2"},{"name":"Dell Credit Mar","type":"Shop","frequency":"Monthly","value":16.67,"period":"M3"},{"name":"Dell Credit Apr","type":"Shop","frequency":"Monthly","value":16.67,"period":"M4"},{"name":"Dell Credit May","type":"Shop","frequency":"Monthly","value":16.67,"period":"M5"},{"name":"Dell Credit Jun","type":"Shop","frequency":"Monthly","value":16.67,"period":"M6"},{"name":"Dell Credit Jul","type":"Shop","frequency":"Monthly","value":16.67,"period":"M7"},{"name":"Dell Credit Aug","type":"Shop","frequency":"Monthly","value":16.67,"period":"M8"},{"name":"Dell Credit Sep","type":"Shop","frequency":"Monthly","value":16.67,"period":"M9"},{"name":"Dell Credit Oct","type":"Shop","frequency":"Monthly","value":16.67,"period":"M10"},{"name":"Dell Credit Nov","type":"Shop","frequency":"Monthly","value":16.67,"period":"M11"},{"name":"Dell Credit Dec","type":"Shop","frequency":"Monthly","value":16.67,"period":"M12"},{"name":"Adobe Credit Jan","type":"Shop","frequency":"Monthly","value":20.83,"period":"M1"},{"name":"Adobe Credit Feb","type":"Shop","frequency":"Monthly","value":20.83,"period":"M2"},{"name":"Adobe Credit Mar","type":"Shop","frequency":"Monthly","value":20.83,"period":"M3"},{"name":"Adobe Credit Apr","type":"Shop","frequency":"Monthly","value":20.83,"period":"M4"},{"name":"Adobe Credit May","type":"Shop","frequency":"Monthly","value":20.83,"period":"M5"},{"name":"Adobe Credit Jun","type":"Shop","frequency":"Monthly","value":20.83,"period":"M6"},{"name":"Adobe Credit Jul","type":"Shop","frequency":"Monthly","value":20.83,"period":"M7"},{"name":"Adobe Credit Aug","type":"Shop","frequency":"Monthly","value":20.83,"period":"M8"},{"name":"Adobe Credit Sep","type":"Shop","frequency":"Monthly","value":20.83,"period":"M9"},{"name":"Adobe Credit Oct","type":"Shop","frequency":"Monthly","value":20.83,"period":"M10"},{"name":"Adobe Credit Nov","type":"Shop","frequency":"Monthly","value":20.83,"period":"M11"},{"name":"Adobe Credit Dec","type":"Shop","frequency":"Monthly","value":20.83,"period":"M12"},{"name":"Indeed Credit Jan","type":"Shop","frequency":"Monthly","value":30,"period":"M1"},{"name":"Indeed Credit Feb","type":"Shop","frequency":"Monthly","value":30,"period":"M2"},{"name":"Indeed Credit Mar","type":"Shop","frequency":"Monthly","value":30,"period":"M3"},{"name":"Indeed Credit Apr","type":"Shop","frequency":"Monthly","value":30,"period":"M4"},{"name":"Indeed Credit May","type":"Shop","frequency":"Monthly","value":30,"period":"M5"},{"name":"Indeed Credit Jun","type":"Shop","frequency":"Monthly","value":30,"period":"M6"},{"name":"Indeed Credit Jul","type":"Shop","frequency":"Monthly","value":30,"period":"M7"},{"name":"Indeed Credit Aug","type":"Shop","frequency":"Monthly","value":30,"period":"M8"},{"name":"Indeed Credit Sep","type":"Shop","frequency":"Monthly","value":30,"period":"M9"},{"name":"Indeed Credit Oct","type":"Shop","frequency":"Monthly","value":30,"period":"M10"},{"name":"Indeed Credit Nov","type":"Shop","frequency":"Monthly","value":30,"period":"M11"},{"name":"Indeed Credit Dec","type":"Shop","frequency":"Monthly","value":30,"period":"M12"},{"name":"Wireless Credit Jan","type":"Shop","frequency":"Monthly","value":10,"period":"M1"},{"name":"Wireless Credit Feb","type":"Shop","frequency":"Monthly","value":10,"period":"M2"},{"name":"Wireless Credit Mar","type":"Shop","frequency":"Monthly","value":10,"period":"M3"},{"name":"Wireless Credit Apr","type":"Shop","frequency":"Monthly","value":10,"period":"M4"},{"name":"Wireless Credit May","type":"Shop","frequency":"Monthly","value":10,"period":"M5"},{"name":"Wireless Credit Jun","type":"Shop","frequency":"Monthly","value":10,"period":"M6"},{"name":"Wireless Credit Jul","type":"Shop","frequency":"Monthly","value":10,"period":"M7"},{"name":"Wireless Credit Aug","type":"Shop","frequency":"Monthly","value":10,"period":"M8"},{"name":"Wireless Credit Sep","type":"Shop","frequency":"Monthly","value":10,"period":"M9"},{"name":"Wireless Credit Oct","type":"Shop","frequency":"Monthly","value":10,"period":"M10"},{"name":"Wireless Credit Nov","type":"Shop","frequency":"Monthly","value":10,"period":"M11"},{"name":"Wireless Credit Dec","type":"Shop","frequency":"Monthly","value":10,"period":"M12"},{"name":"Hotel Credit (FHR/THC) H1","type":"Travel","frequency":"Semi-Annual","value":300,"period":"H1"},{"name":"Hotel Credit (FHR/THC) H2","type":"Travel","frequency":"Semi-Annual","value":300,"period":"H2"},{"name":"Hilton For Business H1","type":"Travel","frequency":"Semi-Annual","value":100,"period":"H1"},{"name":"Hilton For Business H2","type":"Travel","frequency":"Semi-Annual","value":100,"period":"H2"},{"name":"Airline Fee Credit","type":"Travel","frequency":"Annual","value":200},{"name":"CLEAR Credit","type":"Travel","frequency":"Annual","value":209}],"spendBenefits":[],"multipliers":{"AmexTravel Flights":5,"AmexTravel Hotels":5,"Construction/Hardware":2,"Electronics":2,"Software/Cloud":2,"Shipping":2,"Purchases $5k+":2,"Everything Else":1}},"Amex Gold":{"issuer":"American Express","annualFee":325,"periodicBenefits":[{"name":"Uber Cash Jan","type":"Dining","frequency":"Monthly","value":10,"period":"M1"},{"name":"Uber Cash Feb","type":"Dining","frequency":"Monthly","value":10,"period":"M2"},{"name":"Uber Cash Mar","type":"Dining","frequency":"Monthly","value":10,"period":"M3"},{"name":"Uber Cash Apr","type":"Dining","frequency":"Monthly","value":10,"period":"M4"},{"name":"Uber Cash May","type":"Dining","frequency":"Monthly","value":10,"period":"M5"},{"name":"Uber Cash Jun","type":"Dining","frequency":"Monthly","value":10,"period":"M6"},{"name":"Uber Cash Jul","type":"Dining","frequency":"Monthly","value":10,"period":"M7"},{"name":"Uber Cash Aug","type":"Dining","frequency":"Monthly","value":10,"period":"M8"},{"name":"Uber Cash Sep","type":"Dining","frequency":"Monthly","value":10,"period":"M9"},{"name":"Uber Cash Oct","type":"Dining","frequency":"Monthly","value":10,"period":"M10"},{"name":"Uber Cash Nov","type":"Dining","frequency":"Monthly","value":10,"period":"M11"},{"name":"Uber Cash Dec","type":"Dining","frequency":"Monthly","value":10,"period":"M12"},{"name":"Grubhub/Dining Credit Jan","type":"Dining","frequency":"Monthly","value":10,"period":"M1"},{"name":"Grubhub/Dining Credit Feb","type":"Dining","frequency":"Monthly","value":10,"period":"M2"},{"name":"Grubhub/Dining Credit Mar","type":"Dining","frequency":"Monthly","value":10,"period":"M3"},{"name":"Grubhub/Dining Credit Apr","type":"Dining","frequency":"Monthly","value":10,"period":"M4"},{"name":"Grubhub/Dining Credit May","type":"Dining","frequency":"Monthly","value":10,"period":"M5"},{"name":"Grubhub/Dining Credit Jun","type":"Dining","frequency":"Monthly","value":10,"period":"M6"},{"name":"Grubhub/Dining Credit Jul","type":"Dining","frequency":"Monthly","value":10,"period":"M7"},{"name":"Grubhub/Dining Credit Aug","type":"Dining","frequency":"Monthly","value":10,"period":"M8"},{"name":"Grubhub/Dining Credit Sep","type":"Dining","frequency":"Monthly","value":10,"period":"M9"},{"name":"Grubhub/Dining Credit Oct","type":"Dining","frequency":"Monthly","value":10,"period":"M10"},{"name":"Grubhub/Dining Credit Nov","type":"Dining","frequency":"Monthly","value":10,"period":"M11"},{"name":"Grubhub/Dining Credit Dec","type":"Dining","frequency":"Monthly","value":10,"period":"M12"},{"name":"Dunkin' Credit Jan","type":"Dining","frequency":"Monthly","value":7,"period":"M1"},{"name":"Dunkin' Credit Feb","type":"Dining","frequency":"Monthly","value":7,"period":"M2"},{"name":"Dunkin' Credit Mar","type":"Dining","frequency":"Monthly","value":7,"period":"M3"},{"name":"Dunkin' Credit Apr","type":"Dining","frequency":"Monthly","value":7,"period":"M4"},{"name":"Dunkin' Credit May","type":"Dining","frequency":"Monthly","value":7,"period":"M5"},{"name":"Dunkin' Credit Jun","type":"Dining","frequency":"Monthly","value":7,"period":"M6"},{"name":"Dunkin' Credit Jul","type":"Dining","frequency":"Monthly","value":7,"period":"M7"},{"name":"Dunkin' Credit Aug","type":"Dining","frequency":"Monthly","value":7,"period":"M8"},{"name":"Dunkin' Credit Sep","type":"Dining","frequency":"Monthly","value":7,"period":"M9"},{"name":"Dunkin' Credit Oct","type":"Dining","frequency":"Monthly","value":7,"period":"M10"},{"name":"Dunkin' Credit Nov","type":"Dining","frequency":"Monthly","value":7,"period":"M11"},{"name":"Dunkin' Credit Dec","type":"Dining","frequency":"Monthly","value":7,"period":"M12"},{"name":"Resy Credit H1","type":"Dining","frequency":"Semi-Annual","value":50,"period":"H1"},{"name":"Resy Credit H2","type":"Dining","frequency":"Semi-Annual","value":50,"period":"H2"}],"spendBenefits":[],"multipliers":{"Dining":4,"Supermarkets":4,"Everything Else":1}},"Business Gold":{"issuer":"American Express","annualFee":375,"periodicBenefits":[{"name":"FedEx/Grubhub/Office Supply Jan","type":"Shop","frequency":"Monthly","value":20,"period":"M1"},{"name":"FedEx/Grubhub/Office Supply Feb","type":"Shop","frequency":"Monthly","value":20,"period":"M2"},{"name":"FedEx/Grubhub/Office Supply Mar","type":"Shop","frequency":"Monthly","value":20,"period":"M3"},{"name":"FedEx/Grubhub/Office Supply Apr","type":"Shop","frequency":"Monthly","value":20,"period":"M4"},{"name":"FedEx/Grubhub/Office Supply May","type":"Shop","frequency":"Monthly","value":20,"period":"M5"},{"name":"FedEx/Grubhub/Office Supply Jun","type":"Shop","frequency":"Monthly","value":20,"period":"M6"},{"name":"FedEx/Grubhub/Office Supply Jul","type":"Shop","frequency":"Monthly","value":20,"period":"M7"},{"name":"FedEx/Grubhub/Office Supply Aug","type":"Shop","frequency":"Monthly","value":20,"period":"M8"},{"name":"FedEx/Grubhub/Office Supply Sep","type":"Shop","frequency":"Monthly","value":20,"period":"M9"},{"name":"FedEx/Grubhub/Office Supply Oct","type":"Shop","frequency":"Monthly","value":20,"period":"M10"},{"name":"FedEx/Grubhub/Office Supply Nov","type":"Shop","frequency":"Monthly","value":20,"period":"M11"},{"name":"FedEx/Grubhub/Office Supply Dec","type":"Shop","frequency":"Monthly","value":20,"period":"M12"},{"name":"Walmart+ Membership Jan","type":"Shop","frequency":"Monthly","value":12.95,"period":"M1"},{"name":"Walmart+ Membership Feb","type":"Shop","frequency":"Monthly","value":12.95,"period":"M2"},{"name":"Walmart+ Membership Mar","type":"Shop","frequency":"Monthly","value":12.95,"period":"M3"},{"name":"Walmart+ Membership Apr","type":"Shop","frequency":"Monthly","value":12.95,"period":"M4"},{"name":"Walmart+ Membership May","type":"Shop","frequency":"Monthly","value":12.95,"period":"M5"},{"name":"Walmart+ Membership Jun","type":"Shop","frequency":"Monthly","value":12.95,"period":"M6"},{"name":"Walmart+ Membership Jul","type":"Shop","frequency":"Monthly","value":12.95,"period":"M7"},{"name":"Walmart+ Membership Aug","type":"Shop","frequency":"Monthly","value":12.95,"period":"M8"},{"name":"Walmart+ Membership Sep","type":"Shop","frequency":"Monthly","value":12.95,"period":"M9"},{"name":"Walmart+ Membership Oct","type":"Shop","frequency":"Monthly","value":12.95,"period":"M10"},{"name":"Walmart+ Membership Nov","type":"Shop","frequency":"Monthly","value":12.95,"period":"M11"},{"name":"Walmart+ Membership Dec","type":"Shop","frequency":"Monthly","value":12.95,"period":"M12"}],"spendBenefits":[],"multipliers":{"Top 2 Categories Auto":4,"AmexTravel":3,"Everything Else":1}},"Chase Sapphire Reserve":{"issuer":"Chase","annualFee":550,"periodicBenefits":[{"name":"DoorDash Restaurant Jan","type":"Dining","frequency":"Monthly","value":5,"period":"M1"},{"name":"DoorDash Restaurant Feb","type":"Dining","frequency":"Monthly","value":5,"period":"M2"},{"name":"DoorDash Restaurant Mar","type":"Dining","frequency":"Monthly","value":5,"period":"M3"},{"name":"DoorDash Restaurant Apr","type":"Dining","frequency":"Monthly","value":5,"period":"M4"},{"name":"DoorDash Restaurant May","type":"Dining","frequency":"Monthly","value":5,"period":"M5"},{"name":"DoorDash Restaurant Jun","type":"Dining","frequency":"Monthly","value":5,"period":"M6"},{"name":"DoorDash Restaurant Jul","type":"Dining","frequency":"Monthly","value":5,"period":"M7"},{"name":"DoorDash Restaurant Aug","type":"Dining","frequency":"Monthly","value":5,"period":"M8"},{"name":"DoorDash Restaurant Sep","type":"Dining","frequency":"Monthly","value":5,"period":"M9"},{"name":"DoorDash Restaurant Oct","type":"Dining","frequency":"Monthly","value":5,"period":"M10"},{"name":"DoorDash Restaurant Nov","type":"Dining","frequency":"Monthly","value":5,"period":"M11"},{"name":"DoorDash Restaurant Dec","type":"Dining","frequency":"Monthly","value":5,"period":"M12"},{"name":"DoorDash Non-Restaurant 1 Jan","type":"Shop","frequency":"Monthly","value":10,"period":"M1"},{"name":"DoorDash Non-Restaurant 1 Feb","type":"Shop","frequency":"Monthly","value":10,"period":"M2"},{"name":"DoorDash Non-Restaurant 1 Mar","type":"Shop","frequency":"Monthly","value":10,"period":"M3"},{"name":"DoorDash Non-Restaurant 1 Apr","type":"Shop","frequency":"Monthly","value":10,"period":"M4"},{"name":"DoorDash Non-Restaurant 1 May","type":"Shop","frequency":"Monthly","value":10,"period":"M5"},{"name":"DoorDash Non-Restaurant 1 Jun","type":"Shop","frequency":"Monthly","value":10,"period":"M6"},{"name":"DoorDash Non-Restaurant 1 Jul","type":"Shop","frequency":"Monthly","value":10,"period":"M7"},{"name":"DoorDash Non-Restaurant 1 Aug","type":"Shop","frequency":"Monthly","value":10,"period":"M8"},{"name":"DoorDash Non-Restaurant 1 Sep","type":"Shop","frequency":"Monthly","value":10,"period":"M9"},{"name":"DoorDash Non-Restaurant 1 Oct","type":"Shop","frequency":"Monthly","value":10,"period":"M10"},{"name":"DoorDash Non-Restaurant 1 Nov","type":"Shop","frequency":"Monthly","value":10,"period":"M11"},{"name":"DoorDash Non-Restaurant 1 Dec","type":"Shop","frequency":"Monthly","value":10,"period":"M12"},{"name":"DoorDash Non-Restaurant 2 Jan","type":"Shop","frequency":"Monthly","value":10,"period":"M1"},{"name":"DoorDash Non-Restaurant 2 Feb","type":"Shop","frequency":"Monthly","value":10,"period":"M2"},{"name":"DoorDash Non-Restaurant 2 Mar","type":"Shop","frequency":"Monthly","value":10,"period":"M3"},{"name":"DoorDash Non-Restaurant 2 Apr","type":"Shop","frequency":"Monthly","value":10,"period":"M4"},{"name":"DoorDash Non-Restaurant 2 May","type":"Shop","frequency":"Monthly","value":10,"period":"M5"},{"name":"DoorDash Non-Restaurant 2 Jun","type":"Shop","frequency":"Monthly","value":10,"period":"M6"},{"name":"DoorDash Non-Restaurant 2 Jul","type":"Shop","frequency":"Monthly","value":10,"period":"M7"},{"name":"DoorDash Non-Restaurant 2 Aug","type":"Shop","frequency":"Monthly","value":10,"period":"M8"},{"name":"DoorDash Non-Restaurant 2 Sep","type":"Shop","frequency":"Monthly","value":10,"period":"M9"},{"name":"DoorDash Non-Restaurant 2 Oct","type":"Shop","frequency":"Monthly","value":10,"period":"M10"},{"name":"DoorDash Non-Restaurant 2 Nov","type":"Shop","frequency":"Monthly","value":10,"period":"M11"},{"name":"DoorDash Non-Restaurant 2 Dec","type":"Shop","frequency":"Monthly","value":10,"period":"M12"},{"name":"Lyft Credit Jan","type":"Travel","frequency":"Monthly","value":10,"period":"M1"},{"name":"Lyft Credit Feb","type":"Travel","frequency":"Monthly","value":10,"period":"M2"},{"name":"Lyft Credit Mar","type":"Travel","frequency":"Monthly","value":10,"period":"M3"},{"name":"Lyft Credit Apr","type":"Travel","frequency":"Monthly","value":10,"period":"M4"},{"name":"Lyft Credit May","type":"Travel","frequency":"Monthly","value":10,"period":"M5"},{"name":"Lyft Credit Jun","type":"Travel","frequency":"Monthly","value":10,"period":"M6"},{"name":"Lyft Credit Jul","type":"Travel","frequency":"Monthly","value":10,"period":"M7"},{"name":"Lyft Credit Aug","type":"Travel","frequency":"Monthly","value":10,"period":"M8"},{"name":"Lyft Credit Sep","type":"Travel","frequency":"Monthly","value":10,"period":"M9"},{"name":"Lyft Credit Oct","type":"Travel","frequency":"Monthly","value":10,"period":"M10"},{"name":"Lyft Credit Nov","type":"Travel","frequency":"Monthly","value":10,"period":"M11"},{"name":"Lyft Credit Dec","type":"Travel","frequency":"Monthly","value":10,"period":"M12"},{"name":"Peloton Membership Jan","type":"Shop","frequency":"Monthly","value":10,"period":"M1"},{"name":"Peloton Membership Feb","type":"Shop","frequency":"Monthly","value":10,"period":"M2"},{"name":"Peloton Membership Mar","type":"Shop","frequency":"Monthly","value":10,"period":"M3"},{"name":"Peloton Membership Apr","type":"Shop","frequency":"Monthly","value":10,"period":"M4"},{"name":"Peloton Membership May","type":"Shop","frequency":"Monthly","value":10,"period":"M5"},{"name":"Peloton Membership Jun","type":"Shop","frequency":"Monthly","value":10,"period":"M6"},{"name":"Peloton Membership Jul","type":"Shop","frequency":"Monthly","value":10,"period":"M7"},{"name":"Peloton Membership Aug","type":"Shop","frequency":"Monthly","value":10,"period":"M8"},{"name":"Peloton Membership Sep","type":"Shop","frequency":"Monthly","value":10,"period":"M9"},{"name":"Peloton Membership Oct","type":"Shop","frequency":"Monthly","value":10,"period":"M10"},{"name":"Peloton Membership Nov","type":"Shop","frequency":"Monthly","value":10,"period":"M11"},{"name":"Peloton Membership Dec","type":"Shop","frequency":"Monthly","value":10,"period":"M12"},{"name":"The Edit Hotel Credit H1","type":"Travel","frequency":"Semi-Annual","value":250,"period":"H1"},{"name":"The Edit Hotel Credit H2","type":"Travel","frequency":"Semi-Annual","value":250,"period":"H2"},{"name":"Sapphire Tables Credit H1","type":"Dining","frequency":"Semi-Annual","value":150,"period":"H1"},{"name":"Sapphire Tables Credit H2","type":"Dining","frequency":"Semi-Annual","value":150,"period":"H2"},{"name":"StubHub/viagogo Credit H1","type":"Dining","frequency":"Semi-Annual","value":150,"period":"H1"},{"name":"StubHub/viagogo Credit H2","type":"Dining","frequency":"Semi-Annual","value":150,"period":"H2"},{"name":"Chase Travel Credit","type":"Travel","frequency":"Annual","value":300},{"name":"Apple TV+ & Music","type":"Shop","frequency":"Annual","value":250}],"spendBenefits":[],"multipliers":{"Chase Travel":8,"Flights (Direct)":4,"Hotels (Direct)":4,"Dining":3,"Everything Else":1}},"Hilton Honors Aspire":{"issuer":"American Express","annualFee":550,"periodicBenefits":[{"name":"Dining Credit Jan","type":"Dining","frequency":"Monthly","value":25,"period":"M1"},{"name":"Dining Credit Feb","type":"Dining","frequency":"Monthly","value":25,"period":"M2"},{"name":"Dining Credit Mar","type":"Dining","frequency":"Monthly","value":25,"period":"M3"},{"name":"Dining Credit Apr","type":"Dining","frequency":"Monthly","value":25,"period":"M4"},{"name":"Dining Credit May","type":"Dining","frequency":"Monthly","value":25,"period":"M5"},{"name":"Dining Credit Jun","type":"Dining","frequency":"Monthly","value":25,"period":"M6"},{"name":"Dining Credit Jul","type":"Dining","frequency":"Monthly","value":25,"period":"M7"},{"name":"Dining Credit Aug","type":"Dining","frequency":"Monthly","value":25,"period":"M8"},{"name":"Dining Credit Sep","type":"Dining","frequency":"Monthly","value":25,"period":"M9"},{"name":"Dining Credit Oct","type":"Dining","frequency":"Monthly","value":25,"period":"M10"},{"name":"Dining Credit Nov","type":"Dining","frequency":"Monthly","value":25,"period":"M11"},{"name":"Dining Credit Dec","type":"Dining","frequency":"Monthly","value":25,"period":"M12"},{"name":"Airline Credit Q1","type":"Travel","frequency":"Quarterly","value":50,"period":"Q1"},{"name":"Airline Credit Q2","type":"Travel","frequency":"Quarterly","value":50,"period":"Q2"},{"name":"Airline Credit Q3","type":"Travel","frequency":"Quarterly","value":50,"period":"Q3"},{"name":"Airline Credit Q4","type":"Travel","frequency":"Quarterly","value":50,"period":"Q4"},{"name":"Hilton Resort Credit H1","type":"Travel","frequency":"Semi-Annual","value":200,"period":"H1"},{"name":"Hilton Resort Credit H2","type":"Travel","frequency":"Semi-Annual","value":200,"period":"H2"}],"spendBenefits":[{"name":"Second Free Night","spendRequired":30000,"yearType":"Calendar Year"},{"name":"Third Free Night","spendRequired":60000,"yearType":"Calendar Year"}],"multipliers":{"Hilton":14,"Dining (US Restaurants)":7,"Dining (US Takeout/Delivery)":7,"Flights":7,"Car Rentals":7,"Everything Else":3}},"Hilton Honors Surpass":{"issuer":"American Express","annualFee":150,"periodicBenefits":[{"name":"Hilton Credit Q1","type":"Travel","frequency":"Quarterly","value":50,"period":"Q1"},{"name":"Hilton Credit Q2","type":"Travel","frequency":"Quarterly","value":50,"period":"Q2"},{"name":"Hilton Credit Q3","type":"Travel","frequency":"Quarterly","value":50,"period":"Q3"},{"name":"Hilton Credit Q4","type":"Travel","frequency":"Quarterly","value":50,"period":"Q4"}],"spendBenefits":[{"name":"Free Night Award","spendRequired":15000,"yearType":"Calendar Year"},{"name":"Diamond Status","spendRequired":40000,"yearType":"Calendar Year"}],"multipliers":{"Hilton":12,"Supermarkets (US)":6,"Dining (US Restaurants)":6,"Gas Stations (US)":6,"Everything Else":3}},"Marriott Bonvoy Brilliant":{"issuer":"American Express","annualFee":650,"periodicBenefits":[{"name":"Dining Credit Jan","type":"Dining","frequency":"Monthly","value":25,"period":"M1"},{"name":"Dining Credit Feb","type":"Dining","frequency":"Monthly","value":25,"period":"M2"},{"name":"Dining Credit Mar","type":"Dining","frequency":"Monthly","value":25,"period":"M3"},{"name":"Dining Credit Apr","type":"Dining","frequency":"Monthly","value":25,"period":"M4"},{"name":"Dining Credit May","type":"Dining","frequency":"Monthly","value":25,"period":"M5"},{"name":"Dining Credit Jun","type":"Dining","frequency":"Monthly","value":25,"period":"M6"},{"name":"Dining Credit Jul","type":"Dining","frequency":"Monthly","value":25,"period":"M7"},{"name":"Dining Credit Aug","type":"Dining","frequency":"Monthly","value":25,"period":"M8"},{"name":"Dining Credit Sep","type":"Dining","frequency":"Monthly","value":25,"period":"M9"},{"name":"Dining Credit Oct","type":"Dining","frequency":"Monthly","value":25,"period":"M10"},{"name":"Dining Credit Nov","type":"Dining","frequency":"Monthly","value":25,"period":"M11"},{"name":"Dining Credit Dec","type":"Dining","frequency":"Monthly","value":25,"period":"M12"},{"name":"Free Night Award","type":"Travel","frequency":"Annual","value":"Up to 85k pts"}],"spendBenefits":[{"name":"Earned Choice Award","spendRequired":60000,"yearType":"Calendar Year"}],"multipliers":{"Marriott":10,"Dining (US)":5,"Everything Else":3}},"Marriott Bonvoy Bold":{"issuer":"Chase","annualFee":0,"periodicBenefits":[],"spendBenefits":[{"name":"Free Night Award","spendRequired":15000,"yearType":"Calendar Year"}],"multipliers":{"Marriott":14,"Supermarkets":2,"Telcom/Cable/Satellite":2,"Rideshare":2,"Food Delivery":2,"Everything Else":1}},"World of Hyatt":{"issuer":"Chase","annualFee":99,"periodicBenefits":[{"name":"Free Night Award","type":"Travel","frequency":"Annual","value":"Cat 1-4"}],"spendBenefits":[{"name":"Additional Free Night","spendRequired":15000,"yearType":"Calendar Year"}],"multipliers":{"Hyatt Purchases":9,"Dining":4,"Airline/Car Rental/Cruise":2,"Fitness/Gym":2,"Streaming":2,"Everything Else":1}},"Venture X":{"issuer":"Capital One","annualFee":395,"periodicBenefits":[{"name":"Capital One Travel Credit","type":"Travel","frequency":"Annual","value":300}],"spendBenefits":[],"multipliers":{"Capital One Travel Hotels/Rental Cars":10,"Everything Else":2}},"Strata Premier":{"issuer":"Citi","annualFee":95,"periodicBenefits":[{"name":"Hotel Credit","type":"Travel","frequency":"Annual","value":100}],"spendBenefits":[],"multipliers":{"Everything Else":1}},"Jetblue Plus":{"issuer":"Barclays","annualFee":99,"periodicBenefits":[{"name":"JetBlue Vacations Credit","type":"Travel","frequency":"Annual","value":100}],"spendBenefits":[{"name":"Mosaic Status","spendRequired":50000,"yearType":"Calendar Year"}],"multipliers":{"JetBlue Purchases":6,"Dining":2,"Grocery":2,"Everything Else":1}},"Ritz Carlton Rewards Visa":{"issuer":"Chase","annualFee":450,"periodicBenefits":[{"name":"Airline Fee Credit","type":"Travel","frequency":"Annual","value":300},{"name":"Free Night Award","type":"Travel","frequency":"Annual","value":"Up to 100k pts"},{"name":"Club Level Upgrade Certificates","type":"Travel","frequency":"Annual","value":"3 Certificates"}],"spendBenefits":[],"multipliers":{"Marriott":10,"Everything Else":3}},"Atmos Rewards Summit":{"issuer":"Bank of America","annualFee":395,"periodicBenefits":[{"name":"Alaska Lounge Pass 1 Q1","type":"Travel","frequency":"Quarterly","value":35,"period":"Q1"},{"name":"Alaska Lounge Pass 1 Q2","type":"Travel","frequency":"Quarterly","value":35,"period":"Q2"},{"name":"Alaska Lounge Pass 1 Q3","type":"Travel","frequency":"Quarterly","value":35,"period":"Q3"},{"name":"Alaska Lounge Pass 1 Q4","type":"Travel","frequency":"Quarterly","value":35,"period":"Q4"},{"name":"Alaska Lounge Pass 2 Q1","type":"Travel","frequency":"Quarterly","value":35,"period":"Q1"},{"name":"Alaska Lounge Pass 2 Q2","type":"Travel","frequency":"Quarterly","value":35,"period":"Q2"},{"name":"Alaska Lounge Pass 2 Q3","type":"Travel","frequency":"Quarterly","value":35,"period":"Q3"},{"name":"Alaska Lounge Pass 2 Q4","type":"Travel","frequency":"Quarterly","value":35,"period":"Q4"},{"name":"Wi-Fi Pass 1 Q1","type":"Travel","frequency":"Quarterly","value":8,"period":"Q1"},{"name":"Wi-Fi Pass 1 Q2","type":"Travel","frequency":"Quarterly","value":8,"period":"Q2"},{"name":"Wi-Fi Pass 1 Q3","type":"Travel","frequency":"Quarterly","value":8,"period":"Q3"},{"name":"Wi-Fi Pass 1 Q4","type":"Travel","frequency":"Quarterly","value":8,"period":"Q4"},{"name":"Wi-Fi Pass 2 Q1","type":"Travel","frequency":"Quarterly","value":8,"period":"Q1"},{"name":"Wi-Fi Pass 2 Q2","type":"Travel","frequency":"Quarterly","value":8,"period":"Q2"},{"name":"Wi-Fi Pass 2 Q3","type":"Travel","frequency":"Quarterly","value":8,"period":"Q3"},{"name":"Wi-Fi Pass 2 Q4","type":"Travel","frequency":"Quarterly","value":8,"period":"Q4"},{"name":"Companion Certificate","type":"Travel","frequency":"Annual","value":"25,000 pts"}],"spendBenefits":[{"name":"Global 100K Companion Award","spendRequired":60000,"yearType":"Membership Year"}],"multipliers":{"Everything Else":1}},"Chase Freedom":{"issuer":"Chase","annualFee":0,"periodicBenefits":[],"spendBenefits":[],"multipliers":{"Quarterly 5% Categories":5,"Drugstores":3,"Dining":3,"Everything Else":1}},"Chase Freedom Unlimited":{"issuer":"Chase","annualFee":0,"periodicBenefits":[],"spendBenefits":[],"multipliers":{"Chase Travel":5,"Dining":3,"Drugstores":3,"Lyft":2,"Everything Else":1.5}},"Ink Business Cash":{"issuer":"Chase","annualFee":0,"periodicBenefits":[],"spendBenefits":[],"multipliers":{"Office Supply":5,"Internet/Cable/Phone":5,"Gas Stations":5,"Dining":2,"Everything Else":1}},"Ink Business Preferred":{"issuer":"Chase","annualFee":95,"periodicBenefits":[],"spendBenefits":[],"multipliers":{"Travel":3,"Shipping":3,"Internet/Cable/Phone":3,"Advertising":3,"Lyft":5,"Everything Else":1}},"Ink Business Unlimited":{"issuer":"Chase","annualFee":0,"periodicBenefits":[],"spendBenefits":[],"multipliers":{"Everything":1.5}},"Blue Business Plus":{"issuer":"American Express","annualFee":0,"periodicBenefits":[],"spendBenefits":[],"multipliers":{"Everything (up to $50k)":2,"Over $50k":1}},"Delta Blue":{"issuer":"American Express","annualFee":0,"periodicBenefits":[],"spendBenefits":[],"multipliers":{"Delta Purchases":2,"Dining (US Restaurants)":2,"Everything Else":1}},"Citi AAdvantage Business":{"issuer":"Citi","annualFee":99,"periodicBenefits":[],"spendBenefits":[{"name":"Companion Certificate","spendRequired":30000,"yearType":"Membership Year"}],"multipliers":{"AA Purchases":2,"Telcom/Cable/Satellite":2,"Gas Stations":2,"Car Rentals":2,"Everything Else":1}},"AAdvantage Aviator Red":{"issuer":"Barclays","annualFee":99,"periodicBenefits":[],"spendBenefits":[{"name":"Companion Certificate","spendRequired":20000,"yearType":"Membership Year"}],"multipliers":{"AA Purchases":2,"Everything Else":1}}};
+        
+        const SPENDING_CATEGORIES = [
+            "Dining", "Supermarkets", "Gas Stations", "Travel", "Hotels",
+            "Flights", "Office Supply", "Internet/Cable/Phone", "Shipping",
+            "Drugstores", "Rideshare", "Streaming", "Everything Else"
+        ];
+
+        const getCurrentMonth = () => new Date().getMonth() + 1;
+        const getCurrentQuarter = () => Math.ceil(getCurrentMonth() / 3);
+        const getCurrentHalf = () => getCurrentMonth() <= 6 ? 1 : 2;
+        const getCurrentYear = () => new Date().getFullYear();
+
+        const getPeriodKey = (frequency, period) => {
+            const year = getCurrentYear();
+            if (frequency === 'Monthly' && period) return `${year}-${period}`;
+            if (frequency === 'Quarterly' && period) return `${year}-${period}`;
+            if (frequency === 'Semi-Annual' && period) return `${year}-${period}`;
+            if (frequency === 'Annual') return `${year}`;
+            return `${year}-M${getCurrentMonth()}`;
+        };
+
+        const isCurrentPeriod = (benefit) => {
+            if (benefit.frequency === 'Monthly') {
+                if (benefit.period && benefit.period.startsWith('M')) {
+                    return parseInt(benefit.period.substring(1)) === getCurrentMonth();
+                }
+                return true;
+            }
+            if (benefit.frequency === 'Quarterly') return benefit.period === `Q${getCurrentQuarter()}`;
+            if (benefit.frequency === 'Semi-Annual') return benefit.period === `H${getCurrentHalf()}`;
+            if (benefit.frequency === 'Annual') return true;
+            return false;
+        };
+
+        function ProgressCircle({ percentage }) {
+            const size = 56;
+            const strokeWidth = 4;
+            const radius = (size - strokeWidth) / 2;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (percentage / 100) * circumference;
+
+            return (
+                <div className="progress-circle">
+                    <svg className="progress-svg" viewBox={`0 0 ${size} ${size}`}>
+                        <circle className="progress-bg" cx={size/2} cy={size/2} r={radius} />
+                        <circle 
+                            className="progress-bar" 
+                            cx={size/2} cy={size/2} r={radius}
+                            strokeDasharray={circumference}
+                            strokeDashoffset={offset}
+                        />
+                    </svg>
+                    <div className="progress-text">{Math.round(percentage)}%</div>
+                </div>
+            );
+        }
+
+        function App() {
+            const [activeTab, setActiveTab] = useState('dashboard');
+            const [profiles, setProfiles] = useState([]);
+            const [cards, setCards] = useState([]);
+            const [cardDatabase, setCardDatabase] = useState(INITIAL_CARD_DATABASE);
+            const [expandedCards, setExpandedCards] = useState({});
+            const [usedBenefits, setUsedBenefits] = useState({});
+            const [annualSpending, setAnnualSpending] = useState({});
+            
+            const [showAddCardModal, setShowAddCardModal] = useState(false);
+            const [showProfileModal, setShowProfileModal] = useState(false);
+            const [showDatabaseModal, setShowDatabaseModal] = useState(false);
+            const [showEditCardModal, setShowEditCardModal] = useState(false);
+            const [showEditBenefitsModal, setShowEditBenefitsModal] = useState(false);
+            const [showImportModal, setShowImportModal] = useState(false);
+            
+            const [selectedProfile, setSelectedProfile] = useState('');
+            const [newProfileName, setNewProfileName] = useState('');
+            const [editingCardName, setEditingCardName] = useState('');
+            const [newCardForm, setNewCardForm] = useState({ name: '', issuer: '', annualFee: 0 });
+            const [newBenefitForm, setNewBenefitForm] = useState({
+                name: '', type: 'Dining', frequency: 'Monthly', value: 0, period: ''
+            });
+
+            useEffect(() => {
+                loadData();
+            }, []);
+
+            const loadData = () => {
+                try {
+                    const profilesData = localStorage.getItem('profiles');
+                    const cardsData = localStorage.getItem('cards');
+                    const databaseData = localStorage.getItem('card-database');
+                    const benefitsData = localStorage.getItem('used-benefits');
+                    const spendingData = localStorage.getItem('annual-spending');
+                    
+                    if (profilesData) setProfiles(JSON.parse(profilesData));
+                    if (cardsData) setCards(JSON.parse(cardsData));
+                    if (databaseData) setCardDatabase(JSON.parse(databaseData));
+                    if (benefitsData) setUsedBenefits(JSON.parse(benefitsData));
+                    if (spendingData) setAnnualSpending(JSON.parse(spendingData));
+                } catch (error) {
+                    console.log('No saved data');
+                }
+            };
+
+            const saveData = () => {
+                try {
+                    localStorage.setItem('profiles', JSON.stringify(profiles));
+                    localStorage.setItem('cards', JSON.stringify(cards));
+                    localStorage.setItem('card-database', JSON.stringify(cardDatabase));
+                    localStorage.setItem('used-benefits', JSON.stringify(usedBenefits));
+                    localStorage.setItem('annual-spending', JSON.stringify(annualSpending));
+                } catch (error) {
+                    console.error('Save error:', error);
+                }
+            };
+
+            useEffect(() => {
+                if (profiles.length > 0 || cards.length > 0 || Object.keys(cardDatabase).length > 0) {
+                    saveData();
+                }
+            }, [profiles, cards, cardDatabase, usedBenefits, annualSpending]);
+
+            const addProfile = () => {
+                if (newProfileName.trim()) {
+                    setProfiles([...profiles, { id: `prof-${Date.now()}`, name: newProfileName.trim() }]);
+                    setNewProfileName('');
+                }
+            };
+
+            const deleteProfile = (profileId) => {
+                setProfiles(profiles.filter(p => p.id !== profileId));
+                setCards(cards.filter(c => c.profileId !== profileId));
+            };
+
+            const addCard = (cardName, profileId) => {
+                const cardData = cardDatabase[cardName];
+                if (cardData && profileId) {
+                    setCards([...cards, {
+                        id: `card-${Date.now()}`,
+                        profileId,
+                        cardName,
+                        ...cardData
+                    }]);
+                    setShowAddCardModal(false);
+                    setSelectedProfile('');
+                }
+            };
+
+            const removeCard = (cardId) => {
+                setCards(cards.filter(c => c.id !== cardId));
+            };
+
+            const addCardToDatabase = () => {
+                if (newCardForm.name && newCardForm.issuer) {
+                    setCardDatabase({
+                        ...cardDatabase,
+                        [newCardForm.name]: {
+                            issuer: newCardForm.issuer,
+                            annualFee: parseFloat(newCardForm.annualFee) || 0,
+                            periodicBenefits: [],
+                            multipliers: { "Everything Else": 1 }
+                        }
+                    });
+                    setNewCardForm({ name: '', issuer: '', annualFee: 0 });
+                    setShowDatabaseModal(false);
+                }
+            };
+
+            const addBenefitToCard = () => {
+                if (editingCardName && newBenefitForm.name) {
+                    const card = cardDatabase[editingCardName];
+                    const updatedBenefits = [
+                        ...(card.periodicBenefits || []),
+                        {
+                            name: newBenefitForm.name,
+                            type: newBenefitForm.type,
+                            frequency: newBenefitForm.frequency,
+                            value: parseFloat(newBenefitForm.value) || 0,
+                            period: newBenefitForm.period || undefined
+                        }
+                    ];
+                    
+                    setCardDatabase({
+                        ...cardDatabase,
+                        [editingCardName]: {
+                            ...card,
+                            periodicBenefits: updatedBenefits
+                        }
+                    });
+                    
+                    setNewBenefitForm({ name: '', type: 'Dining', frequency: 'Monthly', value: 0, period: '' });
+                }
+            };
+
+            const removeBenefitFromCard = (cardName, benefitIndex) => {
+                const card = cardDatabase[cardName];
+                const updatedBenefits = card.periodicBenefits.filter((_, idx) => idx !== benefitIndex);
+                setCardDatabase({
+                    ...cardDatabase,
+                    [cardName]: {
+                        ...card,
+                        periodicBenefits: updatedBenefits
+                    }
+                });
+            };
+
+            const importData = (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const imported = JSON.parse(e.target.result);
+                            if (imported.profiles) setProfiles(imported.profiles);
+                            if (imported.cards) setCards(imported.cards);
+                            if (imported.cardDatabase) setCardDatabase(imported.cardDatabase);
+                            if (imported.usedBenefits) setUsedBenefits(imported.usedBenefits);
+                            if (imported.annualSpending) setAnnualSpending(imported.annualSpending);
+                            setShowImportModal(false);
+                            alert('Data imported successfully!');
+                        } catch (error) {
+                            alert('Error importing data. Please check the file format.');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+
+            const toggleCard = (cardId) => {
+                setExpandedCards(prev => ({ ...prev, [cardId]: !prev[cardId] }));
+            };
+
+            const toggleBenefit = (cardId, benefitIndex, benefit) => {
+                if (!isCurrentPeriod(benefit)) return;
+                const periodKey = getPeriodKey(benefit.frequency, benefit.period);
+                const key = `${cardId}-${benefitIndex}-${periodKey}`;
+                setUsedBenefits(prev => ({ ...prev, [key]: !prev[key] }));
+            };
+
+            const isBenefitUsed = (cardId, benefitIndex, benefit) => {
+                const periodKey = getPeriodKey(benefit.frequency, benefit.period);
+                const key = `${cardId}-${benefitIndex}-${periodKey}`;
+                return usedBenefits[key] || false;
+            };
+
+            const calculateCardStats = (card) => {
+                let totalValue = 0, usedValue = 0;
+                card.periodicBenefits.forEach((benefit, idx) => {
+                    if (isCurrentPeriod(benefit)) {
+                        const val = typeof benefit.value === 'number' ? benefit.value : 0;
+                        totalValue += val;
+                        if (isBenefitUsed(card.id, idx, benefit)) usedValue += val;
+                    }
+                });
+                const recovery = card.annualFee > 0 ? (usedValue / card.annualFee) * 100 : 0;
+                return { totalValue, usedValue, recovery: Math.min(recovery, 100) };
+            };
+
+            const getTotalStats = () => {
+                let totalFees = 0, totalRecovered = 0;
+                cards.forEach(card => {
+                    const stats = calculateCardStats(card);
+                    totalFees += card.annualFee;
+                    totalRecovered += stats.usedValue;
+                });
+                return {
+                    totalFees,
+                    totalRecovered,
+                    overallRecovery: totalFees > 0 ? (totalRecovered / totalFees) * 100 : 0
+                };
+            };
+
+            const getBestCardForCategory = (category) => {
+                let bestCard = null, bestMultiplier = 0;
+                cards.forEach(card => {
+                    if (!card.multipliers) return;
+                    Object.entries(card.multipliers).forEach(([cat, mult]) => {
+                        const catLower = cat.toLowerCase();
+                        const categoryLower = category.toLowerCase();
+                        if (catLower.includes(categoryLower) || categoryLower.includes(catLower.split(' ')[0])) {
+                            if (mult > bestMultiplier) {
+                                bestMultiplier = mult;
+                                bestCard = card.cardName;
+                            }
+                        }
+                    });
+                });
+                return { card: bestCard || 'None', multiplier: bestMultiplier };
+            };
+
+            const calculateOptimalWallet = (walletSize) => {
+                const categoryScores = {};
+                cards.forEach(card => {
+                    if (!card.multipliers) return;
+                    let cardScore = 0;
+                    Object.values(card.multipliers).forEach(multiplier => {
+                        cardScore += multiplier;
+                    });
+                    categoryScores[card.cardName] = cardScore;
+                });
+                return Object.entries(categoryScores)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, walletSize)
+                    .map(([name]) => name);
+            };
+
+            const getProfileName = (profileId) => {
+                const profile = profiles.find(p => p.id === profileId);
+                return profile ? profile.name : 'Unknown';
+            };
+
+            const totalStats = getTotalStats();
+
+            const renderDashboard = () => (
+                <>
+                    <div className="stats">
+                        <div className="stat-box">
+                            <div className="stat-label">Total Fees</div>
+                            <div className="stat-value">${totalStats.totalFees}</div>
+                            <div className="stat-sub">{cards.length} cards</div>
+                        </div>
+                        <div className="stat-box">
+                            <div className="stat-label">Recovered</div>
+                            <div className="stat-value">${Math.round(totalStats.totalRecovered)}</div>
+                            <div className="stat-sub">from benefits</div>
+                        </div>
+                        <div className="stat-box">
+                            <div className="stat-label">Recovery Rate</div>
+                            <div className="stat-value">{Math.round(totalStats.overallRecovery)}%</div>
+                            <div className="stat-sub">
+                                {totalStats.overallRecovery >= 100 ? 'Fully covered' : 
+                                 `$${Math.round(totalStats.totalFees - totalStats.totalRecovered)} left`}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="actions-bar">
+                        <button className="btn" onClick={() => setShowAddCardModal(true)}>+ Add Card</button>
+                        <button className="btn" onClick={() => setShowProfileModal(true)}>Manage Profiles</button>
+                        <button className="btn" onClick={() => setShowDatabaseModal(true)}>Add Card to Database</button>
+                        <button className="btn" onClick={() => {
+                            const data = {
+                                profiles,
+                                cards,
+                                cardDatabase,
+                                usedBenefits,
+                                annualSpending,
+                                exportDate: new Date().toISOString()
+                            };
+                            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `credit-card-tracker-backup-${new Date().toISOString().split('T')[0]}.json`;
+                            a.click();
+                        }}>Export Data</button>
+                        <button className="btn" onClick={() => setShowImportModal(true)}>Import Data</button>
+                    </div>
+
+                    {cards.length === 0 ? (
+                        <div className="empty">
+                            <div className="empty-icon">💳</div>
+                            <div>Create a profile and add cards to start tracking!</div>
+                            <div style={{marginTop: '1.5rem'}}>
+                                <button className="btn" onClick={() => setShowProfileModal(true)}>Create Profile</button>
+                            </div>
+                        </div>
+                    ) : (
+                        cards.map(card => {
+                            const stats = calculateCardStats(card);
+                            const isExpanded = expandedCards[card.id];
+                            const currentBenefits = card.periodicBenefits.filter(b => isCurrentPeriod(b));
+                            const availableCount = currentBenefits.filter((b, idx) => 
+                                !isBenefitUsed(card.id, card.periodicBenefits.indexOf(b), b)
+                            ).length;
+
+                            return (
+                                <div key={card.id} className="card-section">
+                                    <div className="card-header" onClick={() => toggleCard(card.id)}>
+                                        <div className="card-header-left">
+                                            <ProgressCircle percentage={stats.recovery} />
+                                            <div>
+                                                <div className="card-name">
+                                                    {card.cardName}
+                                                    <span className="profile-badge">{getProfileName(card.profileId)}</span>
+                                                </div>
+                                                <div className="card-issuer">{card.issuer}</div>
+                                            </div>
+                                        </div>
+                                        <div className="card-stats">
+                                            <div className="card-stat">
+                                                <div className="card-stat-label">Fee</div>
+                                                <div className="card-stat-value">${card.annualFee}</div>
+                                            </div>
+                                            <div className="card-stat">
+                                                <div className="card-stat-label">Available</div>
+                                                <div className="card-stat-value">{availableCount}</div>
+                                            </div>
+                                            <div className="card-stat">
+                                                <div className="card-stat-label">Used</div>
+                                                <div className="card-stat-value">${Math.round(stats.usedValue)}</div>
+                                            </div>
+                                            <button 
+                                                className="btn btn-sm"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (confirm(`Remove ${card.cardName} from ${getProfileName(card.profileId)}?`)) {
+                                                        removeCard(card.id);
+                                                    }
+                                                }}
+                                                style={{marginLeft: '1rem'}}
+                                            >
+                                                Remove
+                                            </button>
+                                            <div className={`toggle ${isExpanded ? 'open' : ''}`}>▼</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className={`benefits-container ${isExpanded ? 'open' : ''}`}>
+                                        <div className="benefits-grid">
+                                            {currentBenefits.map((benefit, idx) => {
+                                                const originalIndex = card.periodicBenefits.indexOf(benefit);
+                                                const isUsed = isBenefitUsed(card.id, originalIndex, benefit);
+                                                
+                                                return (
+                                                    <div 
+                                                        key={originalIndex} 
+                                                        className={`benefit ${isUsed ? 'used' : ''}`}
+                                                        onClick={() => toggleBenefit(card.id, originalIndex, benefit)}
+                                                    >
+                                                        <div className="badge">{benefit.frequency}</div>
+                                                        <div className="benefit-name">{benefit.name}</div>
+                                                        <div className="benefit-type">{benefit.type}</div>
+                                                        <div className="benefit-value">
+                                                            ${typeof benefit.value === 'number' ? benefit.value : benefit.value}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })
+                    )}
+                </>
+            );
+
+            const renderDatabase = () => (
+                <>
+                    <h2 style={{marginBottom: '2rem'}}>Card Database Management</h2>
+                    <div className="actions-bar">
+                        <button className="btn" onClick={() => setShowDatabaseModal(true)}>+ Add New Card</button>
+                    </div>
+                    <div style={{display: 'grid', gap: '1rem'}}>
+                        {Object.entries(cardDatabase).map(([name, data]) => (
+                            <div key={name} className="card-option">
+                                <div style={{fontWeight: 700, marginBottom: '0.5rem'}}>{name}</div>
+                                <div style={{fontSize: '0.875rem', color: 'rgba(255,255,255,0.7)', marginBottom: '0.5rem'}}>
+                                    {data.issuer} • ${data.annualFee} AF • {data.periodicBenefits.length} benefits
+                                </div>
+                                <button 
+                                    className="btn btn-sm"
+                                    onClick={() => {
+                                        setEditingCardName(name);
+                                        setShowEditBenefitsModal(true);
+                                    }}
+                                >
+                                    Edit Benefits
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </>
+            );
+
+            const renderOptimizer = () => {
+                if (cards.length === 0) {
+                    return (
+                        <div className="empty">
+                            <div className="empty-icon">📊</div>
+                            <div>Add cards to see spend optimization</div>
+                        </div>
+                    );
+                }
+
+                const wallet3 = calculateOptimalWallet(3);
+                const wallet5 = calculateOptimalWallet(5);
+                const wallet7 = calculateOptimalWallet(7);
+
+                return (
+                    <>
+                        <h2 style={{marginBottom: '2rem'}}>Wallet Optimization</h2>
+                        <div className="spending-grid">
+                            {SPENDING_CATEGORIES.map(category => {
+                                const { card, multiplier } = getBestCardForCategory(category);
+                                const spending = annualSpending[category] || 0;
+                                const points = spending * multiplier;
+                                
+                                return (
+                                    <div key={category} className="spending-input-group">
+                                        <div className="spending-label">{category}</div>
+                                        <input 
+                                            type="number"
+                                            className="spending-input"
+                                            placeholder="$0"
+                                            value={annualSpending[category] || ''}
+                                            onChange={(e) => setAnnualSpending({
+                                                ...annualSpending,
+                                                [category]: parseFloat(e.target.value) || 0
+                                            })}
+                                        />
+                                        {spending > 0 && (
+                                            <div style={{fontSize: '0.75rem', marginTop: '0.5rem', color: 'rgba(255,255,255,0.7)'}}>
+                                                Best: {card} ({multiplier}x) = {Math.round(points)} pts
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        <div style={{marginTop: '3rem'}}>
+                            <h3 style={{marginBottom: '1rem'}}>Optimal Wallets</h3>
+                            <div style={{display: 'grid', gap: '1rem'}}>
+                                <div className="card-option">
+                                    <div style={{fontWeight: 700, marginBottom: '0.5rem'}}>3-Card Daily Carry</div>
+                                    <div style={{display: 'flex', gap: '0.5rem', flexWrap: 'wrap'}}>
+                                        {wallet3.map(card => (
+                                            <span key={card} className="badge">{card}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="card-option">
+                                    <div style={{fontWeight: 700, marginBottom: '0.5rem'}}>5-Card Travel Setup</div>
+                                    <div style={{display: 'flex', gap: '0.5rem', flexWrap: 'wrap'}}>
+                                        {wallet5.map(card => (
+                                            <span key={card} className="badge">{card}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="card-option">
+                                    <div style={{fontWeight: 700, marginBottom: '0.5rem'}}>7-Card Maximum</div>
+                                    <div style={{display: 'flex', gap: '0.5rem', flexWrap: 'wrap'}}>
+                                        {wallet7.map(card => (
+                                            <span key={card} className="badge">{card}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                );
+            };
+
+            return (
+                <div className="container">
+                    <header className="header">
+                        <h1>Credit Card Rewards Tracker</h1>
+                        <div className="tabs">
+                            <div className={`tab ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
+                                Dashboard
+                            </div>
+                            <div className={`tab ${activeTab === 'optimize' ? 'active' : ''}`} onClick={() => setActiveTab('optimize')}>
+                                Optimize
+                            </div>
+                            <div className={`tab ${activeTab === 'database' ? 'active' : ''}`} onClick={() => setActiveTab('database')}>
+                                Database
+                            </div>
+                        </div>
+                    </header>
+
+                    {activeTab === 'dashboard' && renderDashboard()}
+                    {activeTab === 'optimize' && renderOptimizer()}
+                    {activeTab === 'database' && renderDatabase()}
+
+                    {showAddCardModal && (
+                        <div className="modal-overlay" onClick={() => setShowAddCardModal(false)}>
+                            <div className="modal" onClick={e => e.stopPropagation()}>
+                                <h2>Add Card to Wallet</h2>
+                                <div className="form-group">
+                                    <label className="form-label">Profile</label>
+                                    <select className="form-select" value={selectedProfile} onChange={(e) => setSelectedProfile(e.target.value)}>
+                                        <option value="">Choose profile...</option>
+                                        {profiles.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                    </select>
+                                </div>
+                                {selectedProfile && (
+                                    <div className="form-group">
+                                        {Object.entries(cardDatabase).map(([name, data]) => (
+                                            <div key={name} className="card-option" onClick={() => addCard(name, selectedProfile)}>
+                                                <div style={{fontWeight: 700}}>{name}</div>
+                                                <div style={{fontSize: '0.875rem', color: 'rgba(255,255,255,0.7)'}}>
+                                                    {data.issuer} • ${data.annualFee} AF
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                <button className="btn" onClick={() => setShowAddCardModal(false)}>Close</button>
+                            </div>
+                        </div>
+                    )}
+
+                    {showProfileModal && (
+                        <div className="modal-overlay" onClick={() => setShowProfileModal(false)}>
+                            <div className="modal" onClick={e => e.stopPropagation()}>
+                                <h2>Manage Profiles</h2>
+                                <div className="profile-list">
+                                    {profiles.map(profile => (
+                                        <div key={profile.id} className="profile-item">
+                                            <div>{profile.name}</div>
+                                            <button className="btn btn-sm" onClick={() => deleteProfile(profile.id)}>Delete</button>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">New Profile</label>
+                                    <input 
+                                        className="form-input"
+                                        placeholder="Name"
+                                        value={newProfileName}
+                                        onChange={(e) => setNewProfileName(e.target.value)}
+                                    />
+                                </div>
+                                <div style={{display: 'flex', gap: '1rem'}}>
+                                    <button className="btn" onClick={addProfile}>Add</button>
+                                    <button className="btn" onClick={() => setShowProfileModal(false)}>Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {showDatabaseModal && (
+                        <div className="modal-overlay" onClick={() => setShowDatabaseModal(false)}>
+                            <div className="modal" onClick={e => e.stopPropagation()}>
+                                <h2>Add Card to Database</h2>
+                                <div className="form-group">
+                                    <label className="form-label">Card Name</label>
+                                    <input 
+                                        className="form-input"
+                                        value={newCardForm.name}
+                                        onChange={(e) => setNewCardForm({...newCardForm, name: e.target.value})}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Issuer</label>
+                                    <input 
+                                        className="form-input"
+                                        value={newCardForm.issuer}
+                                        onChange={(e) => setNewCardForm({...newCardForm, issuer: e.target.value})}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Annual Fee</label>
+                                    <input 
+                                        type="number"
+                                        className="form-input"
+                                        value={newCardForm.annualFee}
+                                        onChange={(e) => setNewCardForm({...newCardForm, annualFee: e.target.value})}
+                                    />
+                                </div>
+                                <div style={{display: 'flex', gap: '1rem'}}>
+                                    <button className="btn" onClick={addCardToDatabase}>Add</button>
+                                    <button className="btn" onClick={() => setShowDatabaseModal(false)}>Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {showEditBenefitsModal && (
+                        <div className="modal-overlay" onClick={() => setShowEditBenefitsModal(false)}>
+                            <div className="modal" onClick={e => e.stopPropagation()}>
+                                <h2>Edit Benefits: {editingCardName}</h2>
+                                <div className="benefit-list">
+                                    {cardDatabase[editingCardName]?.periodicBenefits.map((benefit, idx) => (
+                                        <div key={idx} className="benefit-list-item">
+                                            <div>
+                                                <div style={{fontWeight: 600}}>{benefit.name}</div>
+                                                <div style={{fontSize: '0.75rem', color: 'rgba(255,255,255,0.7)'}}>
+                                                    {benefit.frequency} • ${benefit.value}
+                                                </div>
+                                            </div>
+                                            <button 
+                                                className="btn btn-sm" 
+                                                onClick={() => removeBenefitFromCard(editingCardName, idx)}
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Add Benefit</label>
+                                    <input 
+                                        className="form-input"
+                                        placeholder="Name"
+                                        value={newBenefitForm.name}
+                                        onChange={(e) => setNewBenefitForm({...newBenefitForm, name: e.target.value})}
+                                        style={{marginBottom: '0.5rem'}}
+                                    />
+                                    <select 
+                                        className="form-select"
+                                        value={newBenefitForm.type}
+                                        onChange={(e) => setNewBenefitForm({...newBenefitForm, type: e.target.value})}
+                                        style={{marginBottom: '0.5rem'}}
+                                    >
+                                        <option>Dining</option>
+                                        <option>Travel</option>
+                                        <option>Shop</option>
+                                    </select>
+                                    <select 
+                                        className="form-select"
+                                        value={newBenefitForm.frequency}
+                                        onChange={(e) => setNewBenefitForm({...newBenefitForm, frequency: e.target.value})}
+                                        style={{marginBottom: '0.5rem'}}
+                                    >
+                                        <option>Monthly</option>
+                                        <option>Quarterly</option>
+                                        <option>Semi-Annual</option>
+                                        <option>Annual</option>
+                                    </select>
+                                    <input 
+                                        type="number"
+                                        className="form-input"
+                                        placeholder="Value"
+                                        value={newBenefitForm.value}
+                                        onChange={(e) => setNewBenefitForm({...newBenefitForm, value: e.target.value})}
+                                        style={{marginBottom: '0.5rem'}}
+                                    />
+                                    <input 
+                                        className="form-input"
+                                        placeholder="Period (e.g., M2, Q1, H1)"
+                                        value={newBenefitForm.period}
+                                        onChange={(e) => setNewBenefitForm({...newBenefitForm, period: e.target.value})}
+                                    />
+                                </div>
+                                <div style={{display: 'flex', gap: '1rem'}}>
+                                    <button className="btn" onClick={addBenefitToCard}>Add Benefit</button>
+                                    <button className="btn" onClick={() => setShowEditBenefitsModal(false)}>Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {showImportModal && (
+                        <div className="modal-overlay" onClick={() => setShowImportModal(false)}>
+                            <div className="modal" onClick={e => e.stopPropagation()}>
+                                <h2>Import Data</h2>
+                                <div className="form-group">
+                                    <label className="form-label">Select backup file (JSON)</label>
+                                    <input 
+                                        type="file"
+                                        accept=".json"
+                                        className="form-input"
+                                        onChange={importData}
+                                    />
+                                </div>
+                                <div style={{padding: '1rem', background: 'rgba(255,193,7,0.1)', borderRadius: '8px', marginTop: '1rem'}}>
+                                    <strong>⚠️ Warning:</strong> Importing will replace all current data. Make sure to export your current data first!
+                                </div>
+                                <button className="btn" onClick={() => setShowImportModal(false)} style={{marginTop: '1rem'}}>Cancel</button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
