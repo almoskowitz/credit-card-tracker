@@ -2,6 +2,26 @@
 
 All notable changes to the Credit Card Rewards Tracker will be documented in this file.
 
+## [2.2.0] - 2026-02-10
+
+### Added
+- **Available Benefits HUD** - Centralized benefit tracking dashboard
+  - Shows all current benefits from all cards in one place
+  - Tile format matching individual card style
+  - Displays card name on each benefit tile
+  - Click to mark used/unused
+  - **Syncs automatically** with individual card sections
+  - Only shows benefits for current period
+  - Appears between stats and action buttons
+  - Glassmorphic design matching overall theme
+
+### Technical Details
+- Clicking benefit in HUD updates the same benefit in card section
+- Clicking benefit in card section updates the same benefit in HUD
+- Uses same `toggleBenefit` function for perfect sync
+- Filters to current period only (no inactive benefits)
+- Benefits keyed by unique card ID + benefit index
+
 ## [2.1.0] - 2026-02-10
 
 ### Added

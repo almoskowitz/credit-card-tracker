@@ -4,11 +4,12 @@
 1. [Getting Started](#getting-started)
 2. [Managing Profiles](#managing-profiles)
 3. [Adding Cards](#adding-cards)
-4. [Tracking Benefits](#tracking-benefits)
-5. [Removing Cards](#removing-cards)
-6. [Managing the Database](#managing-the-database)
-7. [Optimizing Your Wallet](#optimizing-your-wallet)
-8. [Backup & Restore](#backup--restore)
+4. [Available Benefits HUD](#available-benefits-hud)
+5. [Tracking Benefits](#tracking-benefits)
+6. [Removing Cards](#removing-cards)
+7. [Managing the Database](#managing-the-database)
+8. [Optimizing Your Wallet](#optimizing-your-wallet)
+9. [Backup & Restore](#backup--restore)
 
 ---
 
@@ -61,6 +62,63 @@ Profiles allow multiple people to track their own cards independently.
 - Recovery donut chart
 - Available benefits count
 - Used benefits value
+
+---
+
+## Available Benefits HUD
+
+**NEW FEATURE!** The HUD (Heads-Up Display) shows all your current benefits in one place.
+
+### What is the HUD?
+The HUD is a centralized dashboard that displays **all available benefits** from **all your cards** in a single view. It appears right below your stats and above the action buttons.
+
+### How It Works
+- **All Current Benefits** - Shows benefits from all your cards that are available this period
+- **Tile Format** - Same beautiful tile design as individual card sections
+- **Card Name** - Each tile shows which card the benefit belongs to
+- **Click to Toggle** - Click any tile to mark it used/unused
+- **Perfect Sync** - Changes in HUD automatically update individual cards (and vice versa)
+
+### Using the HUD
+1. Look at the "Available Benefits HUD" section
+2. You'll see tiles for every current benefit across all cards
+3. Each tile shows:
+   - Benefit name
+   - Card name (in small text)
+   - Frequency badge
+   - Type
+   - Value
+4. **Click any tile** to mark it as used
+5. Tile turns green with checkmark ✓
+6. **All stats update immediately**
+7. The same benefit in the individual card section also turns green!
+
+### HUD vs Individual Cards
+**Both views are fully synchronized:**
+- Mark used in HUD → Updates in card section
+- Mark used in card section → Updates in HUD
+- Recovery percentages update in both places
+- Available/Used counts stay in sync
+
+### Benefits of the HUD
+- **Quick Overview** - See all benefits at a glance
+- **Faster Tracking** - No need to expand individual cards
+- **Easy Comparison** - Compare benefits across cards
+- **One-Stop Shop** - Track everything from one place
+- **Still Organized** - Scroll down for detailed card view
+
+### When to Use HUD vs Card Sections
+**Use the HUD when:**
+- You want to see all available benefits at once
+- Tracking multiple benefits quickly
+- Comparing benefits across cards
+- Daily benefit check-in
+
+**Use individual card sections when:**
+- Focusing on one specific card
+- Want to see only that card's benefits
+- Checking card-specific recovery rate
+- Managing one card at a time
 
 ---
 
