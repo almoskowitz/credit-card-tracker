@@ -12,9 +12,9 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #581c87 100%);
+            background: linear-gradient(160deg, #0f172a 0%, #1a2540 55%, #0f172a 100%);
             min-height: 100vh;
-            color: #ffffff;
+            color: #e2e8f0;
             line-height: 1.5;
             position: relative;
         }
@@ -23,10 +23,9 @@
             content: '';
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(79, 70, 229, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.25) 0%, transparent 50%),
-                radial-gradient(circle at 40% 20%, rgba(124, 58, 237, 0.2) 0%, transparent 50%);
+            background:
+                radial-gradient(circle at 20% 40%, rgba(99, 102, 241, 0.09) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(56, 189, 248, 0.06) 0%, transparent 45%);
             pointer-events: none;
         }
 
@@ -39,30 +38,35 @@
         }
 
         .header {
-            margin-bottom: 2rem;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.15);
+            margin-bottom: 1rem;
+            padding: 0.75rem 1.25rem;
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
         }
 
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
             background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .tabs {
             display: flex;
             gap: 0.5rem;
-            margin-top: 1.5rem;
             flex-wrap: wrap;
+            flex: 1;
         }
 
         .tab {
@@ -89,25 +93,29 @@
         }
 
         .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+            display: flex;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            overflow: hidden;
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.4);
         }
 
         .stat-box {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 1.5rem;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
-            transition: all 0.3s;
+            flex: 1;
+            padding: 0.875rem 1.25rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.07);
+            transition: background 0.2s;
+        }
+
+        .stat-box:last-child {
+            border-right: none;
         }
 
         .stat-box:hover {
-            transform: translateY(-2px);
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .stat-label {
@@ -120,7 +128,7 @@
         }
 
         .stat-value {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 700;
             font-variant-numeric: tabular-nums;
             filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
@@ -133,26 +141,26 @@
         }
 
         .card-section {
-            margin-bottom: 2rem;
+            margin-bottom: 0.625rem;
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem;
-            background: rgba(255, 255, 255, 0.15);
+            padding: 0.875rem 1.25rem;
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
             cursor: pointer;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
-            transition: all 0.3s;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+            transition: all 0.2s;
         }
 
         .card-header:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-1px);
         }
 
         .card-header-left {
@@ -163,7 +171,7 @@
         }
 
         .card-name {
-            font-size: 1.25rem;
+            font-size: 1rem;
             font-weight: 700;
             filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
         }
@@ -185,7 +193,7 @@
 
         .card-stats {
             display: flex;
-            gap: 2rem;
+            gap: 1.25rem;
             align-items: center;
         }
 
@@ -208,8 +216,8 @@
         }
 
         .progress-circle {
-            width: 56px;
-            height: 56px;
+            width: 44px;
+            height: 44px;
             position: relative;
             background: rgba(255, 255, 255, 0.15);
             border-radius: 50%;
@@ -269,33 +277,51 @@
 
         .benefits-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-            padding: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.625rem;
+            margin-top: 0.875rem;
+            padding: 0.75rem;
         }
 
         .benefit {
-            background: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            padding: 1.25rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            padding: 0.75rem;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             position: relative;
-            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.3);
         }
 
         .benefit:hover {
-            background: rgba(255, 255, 255, 0.18);
-            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.09);
+            transform: translateY(-1px);
         }
 
         .benefit.used {
-            background: rgba(16, 185, 129, 0.25);
-            border-color: rgba(16, 185, 129, 0.5);
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.35);
         }
+
+        /* Benefit type tints */
+        .benefit.type-dining { background: rgba(251, 146, 60, 0.1); border-color: rgba(251, 146, 60, 0.25); }
+        .benefit.type-travel { background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.25); }
+        .benefit.type-shop   { background: rgba(167, 139, 250, 0.1); border-color: rgba(167, 139, 250, 0.25); }
+        .benefit.type-dining:hover { background: rgba(251, 146, 60, 0.16); }
+        .benefit.type-travel:hover { background: rgba(56, 189, 248, 0.16); }
+        .benefit.type-shop:hover   { background: rgba(167, 139, 250, 0.16); }
+        /* used state always wins */
+        .benefit.used { background: rgba(16, 185, 129, 0.15) !important; border-color: rgba(16, 185, 129, 0.35) !important; }
+
+        /* Issuer accent — left border via box-shadow so border-radius is preserved */
+        .card-header.issuer-amex         { box-shadow: inset 3px 0 0 #c9a357, 0 2px 12px 0 rgba(0,0,0,0.4); }
+        .card-header.issuer-chase        { box-shadow: inset 3px 0 0 #1a8fe3, 0 2px 12px 0 rgba(0,0,0,0.4); }
+        .card-header.issuer-capital-one  { box-shadow: inset 3px 0 0 #e04535, 0 2px 12px 0 rgba(0,0,0,0.4); }
+        .card-header.issuer-citi         { box-shadow: inset 3px 0 0 #0073cf, 0 2px 12px 0 rgba(0,0,0,0.4); }
+        .card-header.issuer-barclays     { box-shadow: inset 3px 0 0 #00aeef, 0 2px 12px 0 rgba(0,0,0,0.4); }
+        .card-header.issuer-boa          { box-shadow: inset 3px 0 0 #cc1f36, 0 2px 12px 0 rgba(0,0,0,0.4); }
 
         .benefit.used::after {
             content: '✓';
@@ -307,9 +333,9 @@
         }
 
         .benefit-name {
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
             filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
         }
 
@@ -320,23 +346,23 @@
         }
 
         .benefit-value {
-            font-size: 1.125rem;
+            font-size: 1rem;
             font-weight: 700;
             font-variant-numeric: tabular-nums;
-            margin-top: 0.5rem;
+            margin-top: 0.25rem;
             filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
         }
 
         .badge {
             display: inline-block;
-            padding: 0.25rem 0.75rem;
-            font-size: 0.625rem;
+            padding: 0.15rem 0.5rem;
+            font-size: 0.6rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             background: rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            margin-bottom: 0.5rem;
+            border-radius: 10px;
+            margin-bottom: 0.3rem;
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
@@ -368,10 +394,11 @@
         }
 
         .actions-bar {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             display: flex;
-            gap: 1rem;
+            gap: 0.5rem;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .modal-overlay {
@@ -534,13 +561,84 @@
             opacity: 0.5;
         }
 
+        .hud-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .hud-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            user-select: none;
+        }
+
+        .hud-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .toggle-chip {
+            padding: 0.3rem 0.75rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .toggle-chip:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+        }
+
+        .toggle-chip.active {
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.4);
+            color: #ffffff;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.2rem 0.4rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-family: inherit;
+            line-height: 1;
+        }
+
+        .card-header:hover .btn-icon {
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        .btn-icon:hover {
+            color: #ff6b6b !important;
+            background: rgba(255, 80, 80, 0.15);
+        }
+
         @media (max-width: 768px) {
-            .container { padding: 1rem; }
-            .stats { grid-template-columns: 1fr; }
+            .container { padding: 0.75rem; }
+            .stats { flex-direction: column; }
+            .stat-box { border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
+            .stat-box:last-child { border-bottom: none; }
             .card-header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 1rem;
+                gap: 0.75rem;
             }
             .card-stats {
                 width: 100%;
@@ -596,7 +694,7 @@
         };
 
         function ProgressCircle({ percentage }) {
-            const size = 56;
+            const size = 44;
             const strokeWidth = 4;
             const radius = (size - strokeWidth) / 2;
             const circumference = 2 * Math.PI * radius;
@@ -627,6 +725,12 @@
             const [usedBenefits, setUsedBenefits] = useState({});
             const [annualSpending, setAnnualSpending] = useState({});
             
+            const [showUnusedOnly, setShowUnusedOnly] = useState(false);
+            const [hudExpanded, setHudExpanded] = useState(false);
+            const [hudSections, setHudSections] = useState({ Monthly: true, Quarterly: false, 'Semi-Annual': false, Annual: false });
+            const [editingBenefitIdx, setEditingBenefitIdx] = useState(null);
+            const [editingBenefitData, setEditingBenefitData] = useState(null);
+
             const [showAddCardModal, setShowAddCardModal] = useState(false);
             const [showProfileModal, setShowProfileModal] = useState(false);
             const [showDatabaseModal, setShowDatabaseModal] = useState(false);
@@ -695,14 +799,8 @@
             };
 
             const addCard = (cardName, profileId) => {
-                const cardData = cardDatabase[cardName];
-                if (cardData && profileId) {
-                    setCards([...cards, {
-                        id: `card-${Date.now()}`,
-                        profileId,
-                        cardName,
-                        ...cardData
-                    }]);
+                if (cardDatabase[cardName] && profileId) {
+                    setCards([...cards, { id: `card-${Date.now()}`, profileId, cardName }]);
                     setShowAddCardModal(false);
                     setSelectedProfile('');
                 }
@@ -731,39 +829,30 @@
             const addBenefitToCard = () => {
                 if (editingCardName && newBenefitForm.name) {
                     const card = cardDatabase[editingCardName];
-                    const updatedBenefits = [
-                        ...(card.periodicBenefits || []),
-                        {
-                            name: newBenefitForm.name,
-                            type: newBenefitForm.type,
-                            frequency: newBenefitForm.frequency,
-                            value: parseFloat(newBenefitForm.value) || 0,
-                            period: newBenefitForm.period || undefined
-                        }
-                    ];
-                    
-                    setCardDatabase({
-                        ...cardDatabase,
-                        [editingCardName]: {
-                            ...card,
-                            periodicBenefits: updatedBenefits
-                        }
-                    });
-                    
-                    setNewBenefitForm({ name: '', type: 'Dining', frequency: 'Monthly', value: 0, period: '' });
+                    const rawVal = newBenefitForm.value;
+                    const numVal = parseFloat(rawVal);
+                    const benefit = {
+                        name: newBenefitForm.name,
+                        type: newBenefitForm.type,
+                        frequency: newBenefitForm.frequency,
+                        value: isNaN(numVal) ? (rawVal || 0) : numVal,
+                        period: newBenefitForm.period || undefined,
+                    };
+                    if (newBenefitForm.monetaryValue) benefit.monetaryValue = parseFloat(newBenefitForm.monetaryValue);
+                    setCardDatabase({ ...cardDatabase, [editingCardName]: { ...card, periodicBenefits: [...(card.periodicBenefits || []), benefit] } });
+                    setNewBenefitForm({ name: '', type: 'Dining', frequency: 'Monthly', value: '', period: '' });
                 }
+            };
+
+            const updateBenefitInCard = (cardName, idx, updated) => {
+                const card = cardDatabase[cardName];
+                const updatedBenefits = card.periodicBenefits.map((b, i) => i === idx ? updated : b);
+                setCardDatabase({ ...cardDatabase, [cardName]: { ...card, periodicBenefits: updatedBenefits } });
             };
 
             const removeBenefitFromCard = (cardName, benefitIndex) => {
                 const card = cardDatabase[cardName];
-                const updatedBenefits = card.periodicBenefits.filter((_, idx) => idx !== benefitIndex);
-                setCardDatabase({
-                    ...cardDatabase,
-                    [cardName]: {
-                        ...card,
-                        periodicBenefits: updatedBenefits
-                    }
-                });
+                setCardDatabase({ ...cardDatabase, [cardName]: { ...card, periodicBenefits: card.periodicBenefits.filter((_, i) => i !== benefitIndex) } });
             };
 
             const importData = (event) => {
@@ -805,45 +894,54 @@
                 return usedBenefits[key] || false;
             };
 
+            // Merges wallet card (id/profileId/cardName) with live database data so edits propagate instantly
+            const resolveCard = (wc) => {
+                const db = cardDatabase[wc.cardName];
+                if (db) return { ...db, id: wc.id, profileId: wc.profileId, cardName: wc.cardName };
+                // Fallback for old embedded-data wallet cards or missing db entries
+                return { periodicBenefits: [], multipliers: {}, annualFee: 0, issuer: 'Unknown', ...wc };
+            };
+
+            const benefitStatValue = (benefit) =>
+                benefit.monetaryValue !== undefined ? benefit.monetaryValue :
+                (typeof benefit.value === 'number' ? benefit.value : 0);
+
             const calculateCardStats = (card) => {
-                let totalValue = 0, usedValue = 0;
+                let totalAnnualValue = 0, usedAnnualValue = 0;
+                let currentPeriodTotal = 0, currentPeriodUsed = 0;
                 card.periodicBenefits.forEach((benefit, idx) => {
+                    const val = benefitStatValue(benefit);
+                    const isUsed = isBenefitUsed(card.id, idx, benefit);
+                    totalAnnualValue += val;
+                    if (isUsed) usedAnnualValue += val;
                     if (isCurrentPeriod(benefit)) {
-                        const val = typeof benefit.value === 'number' ? benefit.value : 0;
-                        totalValue += val;
-                        if (isBenefitUsed(card.id, idx, benefit)) usedValue += val;
+                        currentPeriodTotal += val;
+                        if (isUsed) currentPeriodUsed += val;
                     }
                 });
-                const recovery = card.annualFee > 0 ? (usedValue / card.annualFee) * 100 : 0;
-                return { totalValue, usedValue, recovery: Math.min(recovery, 100) };
+                const recovery = card.annualFee > 0 ? (usedAnnualValue / card.annualFee) * 100 : 0;
+                return { totalAnnualValue, usedAnnualValue, recovery: Math.min(recovery, 100), currentPeriodTotal, currentPeriodUsed };
             };
 
             const getTotalStats = () => {
                 let totalFees = 0, totalRecovered = 0;
-                cards.forEach(card => {
+                cards.map(resolveCard).forEach(card => {
                     const stats = calculateCardStats(card);
                     totalFees += card.annualFee;
-                    totalRecovered += stats.usedValue;
+                    totalRecovered += stats.usedAnnualValue;
                 });
-                return {
-                    totalFees,
-                    totalRecovered,
-                    overallRecovery: totalFees > 0 ? (totalRecovered / totalFees) * 100 : 0
-                };
+                return { totalFees, totalRecovered, overallRecovery: totalFees > 0 ? (totalRecovered / totalFees) * 100 : 0, netCost: Math.max(0, totalFees - totalRecovered) };
             };
 
             const getBestCardForCategory = (category) => {
                 let bestCard = null, bestMultiplier = 0;
-                cards.forEach(card => {
+                cards.map(resolveCard).forEach(card => {
                     if (!card.multipliers) return;
                     Object.entries(card.multipliers).forEach(([cat, mult]) => {
                         const catLower = cat.toLowerCase();
                         const categoryLower = category.toLowerCase();
                         if (catLower.includes(categoryLower) || categoryLower.includes(catLower.split(' ')[0])) {
-                            if (mult > bestMultiplier) {
-                                bestMultiplier = mult;
-                                bestCard = card.cardName;
-                            }
+                            if (mult > bestMultiplier) { bestMultiplier = mult; bestCard = card.cardName; }
                         }
                     });
                 });
@@ -851,19 +949,30 @@
             };
 
             const calculateOptimalWallet = (walletSize) => {
-                const categoryScores = {};
-                cards.forEach(card => {
+                const totalSpending = Object.values(annualSpending).reduce((a, b) => a + b, 0);
+                const cardScores = {};
+                cards.map(resolveCard).forEach(card => {
                     if (!card.multipliers) return;
-                    let cardScore = 0;
-                    Object.values(card.multipliers).forEach(multiplier => {
-                        cardScore += multiplier;
-                    });
-                    categoryScores[card.cardName] = cardScore;
+                    let score = 0;
+                    if (totalSpending > 0) {
+                        SPENDING_CATEGORIES.forEach(category => {
+                            const spending = annualSpending[category] || 0;
+                            if (spending === 0) return;
+                            let bestMult = card.multipliers['Everything Else'] || card.multipliers['Everything'] || 1;
+                            Object.entries(card.multipliers).forEach(([cat, mult]) => {
+                                const catLower = cat.toLowerCase();
+                                if (catLower.includes(category.toLowerCase()) || category.toLowerCase().includes(catLower.split(' ')[0])) {
+                                    if (mult > bestMult) bestMult = mult;
+                                }
+                            });
+                            score += spending * bestMult;
+                        });
+                    } else {
+                        Object.values(card.multipliers).forEach(mult => { score += mult; });
+                    }
+                    cardScores[card.cardName] = score;
                 });
-                return Object.entries(categoryScores)
-                    .sort((a, b) => b[1] - a[1])
-                    .slice(0, walletSize)
-                    .map(([name]) => name);
+                return Object.entries(cardScores).sort((a, b) => b[1] - a[1]).slice(0, walletSize).map(([name, score]) => ({ name, score: Math.round(score) }));
             };
 
             const getProfileName = (profileId) => {
@@ -871,105 +980,163 @@
                 return profile ? profile.name : 'Unknown';
             };
 
+            const getIssuerClass = (issuer) => {
+                if (!issuer) return '';
+                const i = issuer.toLowerCase();
+                if (i.includes('american express')) return 'issuer-amex';
+                if (i.includes('chase')) return 'issuer-chase';
+                if (i.includes('capital one')) return 'issuer-capital-one';
+                if (i.includes('citi')) return 'issuer-citi';
+                if (i.includes('barclays')) return 'issuer-barclays';
+                if (i.includes('bank of america')) return 'issuer-boa';
+                return '';
+            };
+
+            const getBenefitTypeClass = (type) => {
+                if (!type) return '';
+                switch (type.toLowerCase()) {
+                    case 'dining': return 'type-dining';
+                    case 'travel': return 'type-travel';
+                    case 'shop':   return 'type-shop';
+                    default: return '';
+                }
+            };
+
             const totalStats = getTotalStats();
 
-            const renderDashboard = () => (
+            const URGENCY_ORDER = { 'Monthly': 0, 'Quarterly': 1, 'Semi-Annual': 2, 'Annual': 3 };
+
+            const renderDashboard = () => {
+                // Pre-compute HUD benefits: sorted by urgency, optionally filtered to unused
+                const hudBenefits = [];
+                cards.forEach(card => {
+                    card.periodicBenefits.forEach((benefit, idx) => {
+                        if (!isCurrentPeriod(benefit)) return;
+                        const isUsed = isBenefitUsed(card.id, idx, benefit);
+                        if (showUnusedOnly && isUsed) return;
+                        hudBenefits.push({ card, benefit, originalIndex: idx, isUsed });
+                    });
+                });
+                hudBenefits.sort((a, b) =>
+                    (URGENCY_ORDER[a.benefit.frequency] || 0) - (URGENCY_ORDER[b.benefit.frequency] || 0)
+                );
+
+                return (
                 <>
                     <div className="stats">
                         <div className="stat-box">
-                            <div className="stat-label">Total Fees</div>
-                            <div className="stat-value">${totalStats.totalFees}</div>
-                            <div className="stat-sub">{cards.length} cards</div>
+                            <div className="stat-label">Annual Fees</div>
+                            <div className="stat-value">${totalStats.totalFees.toLocaleString()}</div>
+                            <div className="stat-sub">{cards.length} card{cards.length !== 1 ? 's' : ''}</div>
                         </div>
                         <div className="stat-box">
-                            <div className="stat-label">Recovered</div>
-                            <div className="stat-value">${Math.round(totalStats.totalRecovered)}</div>
-                            <div className="stat-sub">from benefits</div>
+                            <div className="stat-label">Recovered YTD</div>
+                            <div className="stat-value">${Math.round(totalStats.totalRecovered).toLocaleString()}</div>
+                            <div className="stat-sub">all periods</div>
                         </div>
                         <div className="stat-box">
                             <div className="stat-label">Recovery Rate</div>
                             <div className="stat-value">{Math.round(totalStats.overallRecovery)}%</div>
-                            <div className="stat-sub">
-                                {totalStats.overallRecovery >= 100 ? 'Fully covered' : 
-                                 `$${Math.round(totalStats.totalFees - totalStats.totalRecovered)} left`}
-                            </div>
+                            <div className="stat-sub">{totalStats.overallRecovery >= 100 ? 'Fees fully offset' : 'of annual fees'}</div>
+                        </div>
+                        <div className="stat-box">
+                            <div className="stat-label">Net Cost</div>
+                            <div className="stat-value">${Math.round(totalStats.netCost).toLocaleString()}</div>
+                            <div className="stat-sub">after recovery</div>
                         </div>
                     </div>
 
                     {cards.length > 0 && (
-                        <div style={{marginBottom: '2rem'}}>
+                        <div style={{marginBottom: '1rem'}}>
                             <div style={{
-                                background: 'rgba(255, 255, 255, 0.15)',
+                                background: 'rgba(255, 255, 255, 0.12)',
                                 backdropFilter: 'blur(20px)',
-                                borderRadius: '24px',
-                                border: '1px solid rgba(255, 255, 255, 0.3)',
-                                padding: '2rem',
-                                boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.4)'
+                                borderRadius: '16px',
+                                border: '1px solid rgba(255, 255, 255, 0.25)',
+                                padding: '0.875rem 1.25rem',
+                                boxShadow: '0 4px 16px 0 rgba(0, 0, 0, 0.4)'
                             }}>
-                                <h2 style={{
-                                    fontSize: '1.5rem',
-                                    fontWeight: 700,
-                                    marginBottom: '1.5rem',
-                                    filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.3))'
-                                }}>
-                                    Available Benefits HUD
-                                </h2>
-                                <div className="benefits-grid">
-                                    {cards.map(card => {
-                                        const currentBenefits = card.periodicBenefits.filter(b => isCurrentPeriod(b));
-                                        return currentBenefits.map((benefit, idx) => {
-                                            const originalIndex = card.periodicBenefits.indexOf(benefit);
-                                            const isUsed = isBenefitUsed(card.id, originalIndex, benefit);
-                                            
+                                <div className="hud-header">
+                                    <div className="hud-title" onClick={() => setHudExpanded(!hudExpanded)}>
+                                        Available Benefits HUD
+                                        <span style={{fontSize: '0.7rem', opacity: 0.6}}>{hudExpanded ? '▲' : '▼'}</span>
+                                        {!hudExpanded && (
+                                            <span style={{fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)', fontWeight: 400}}>
+                                                {hudBenefits.length} benefit{hudBenefits.length !== 1 ? 's' : ''} available this period
+                                            </span>
+                                        )}
+                                    </div>
+                                    {hudExpanded && (
+                                        <div className="hud-controls">
+                                            <button
+                                                className={`toggle-chip ${showUnusedOnly ? 'active' : ''}`}
+                                                onClick={() => setShowUnusedOnly(!showUnusedOnly)}
+                                            >
+                                                {showUnusedOnly ? 'Unused Only ✓' : 'Show All'}
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                                {hudExpanded && (
+                                    <div style={{marginTop: '0.75rem'}}>
+                                        {['Monthly', 'Quarterly', 'Semi-Annual', 'Annual'].map(freq => {
+                                            const freqBenefits = hudBenefits.filter(b => b.benefit.frequency === freq);
+                                            if (freqBenefits.length === 0) return null;
+                                            const isOpen = hudSections[freq];
+                                            const unusedCount = freqBenefits.filter(b => !b.isUsed).length;
+                                            const totalVal = freqBenefits.reduce((sum, b) => sum + (b.benefit.monetaryValue !== undefined ? b.benefit.monetaryValue : typeof b.benefit.value === 'number' ? b.benefit.value : 0), 0);
                                             return (
-                                                <div 
-                                                    key={`${card.id}-${originalIndex}`}
-                                                    className={`benefit ${isUsed ? 'used' : ''}`}
-                                                    onClick={() => toggleBenefit(card.id, originalIndex, benefit)}
-                                                >
-                                                    <div className="badge">{benefit.frequency}</div>
-                                                    <div className="benefit-name">{benefit.name}</div>
-                                                    <div style={{
-                                                        fontSize: '0.75rem',
-                                                        color: 'rgba(255, 255, 255, 0.6)',
-                                                        marginBottom: '0.25rem'
-                                                    }}>
-                                                        {card.cardName}
+                                                <div key={freq} style={{marginBottom: '0.25rem'}}>
+                                                    <div
+                                                        style={{display:'flex', alignItems:'center', gap:'0.6rem', cursor:'pointer', padding:'0.35rem 0.25rem', borderRadius:'6px', userSelect:'none'}}
+                                                        onClick={() => setHudSections(prev => ({...prev, [freq]: !prev[freq]}))}
+                                                    >
+                                                        <span style={{fontSize:'0.72rem', fontWeight:700, color:'rgba(255,255,255,0.85)'}}>{freq}</span>
+                                                        <span style={{fontSize:'0.65rem', color:'rgba(255,255,255,0.4)'}}>
+                                                            {unusedCount} unused · {freqBenefits.length} total{totalVal > 0 ? ` · $${Math.round(totalVal)}` : ''}
+                                                        </span>
+                                                        <span style={{marginLeft:'auto', fontSize:'0.6rem', opacity:0.45}}>{isOpen ? '▲' : '▼'}</span>
                                                     </div>
-                                                    <div className="benefit-type">{benefit.type}</div>
-                                                    <div className="benefit-value">
-                                                        ${typeof benefit.value === 'number' ? benefit.value : benefit.value}
-                                                    </div>
+                                                    {isOpen && (
+                                                        <div className="benefits-grid" style={{marginTop:'0.25rem', paddingTop:0, paddingLeft:0, paddingRight:0, paddingBottom:'0.25rem'}}>
+                                                            {freqBenefits.map(({ card, benefit, originalIndex, isUsed }) => (
+                                                                <div
+                                                                    key={`${card.id}-${originalIndex}`}
+                                                                    className={`benefit ${getBenefitTypeClass(benefit.type)} ${isUsed ? 'used' : ''}`}
+                                                                    onClick={() => toggleBenefit(card.id, originalIndex, benefit)}
+                                                                >
+                                                                    <div className="benefit-name">{benefit.name}</div>
+                                                                    <div style={{fontSize:'0.68rem', color:'rgba(255,255,255,0.45)', marginBottom:'0.15rem'}}>{card.cardName}</div>
+                                                                    <div className="benefit-value">
+                                                                        {benefit.monetaryValue !== undefined ? `$${benefit.monetaryValue}` : typeof benefit.value === 'number' ? `$${benefit.value}` : benefit.value}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             );
-                                        });
-                                    })}
-                                </div>
+                                        })}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
 
                     <div className="actions-bar">
                         <button className="btn" onClick={() => setShowAddCardModal(true)}>+ Add Card</button>
-                        <button className="btn" onClick={() => setShowProfileModal(true)}>Manage Profiles</button>
-                        <button className="btn" onClick={() => setShowDatabaseModal(true)}>Add Card to Database</button>
-                        <button className="btn" onClick={() => {
-                            const data = {
-                                profiles,
-                                cards,
-                                cardDatabase,
-                                usedBenefits,
-                                annualSpending,
-                                exportDate: new Date().toISOString()
-                            };
+                        <button className="btn btn-sm" onClick={() => setShowProfileModal(true)}>Profiles</button>
+                        <button className="btn btn-sm" onClick={() => setShowDatabaseModal(true)}>+ Database</button>
+                        <button className="btn btn-sm" onClick={() => {
+                            const data = { profiles, cards, cardDatabase, usedBenefits, annualSpending, exportDate: new Date().toISOString() };
                             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                             const url = URL.createObjectURL(blob);
                             const a = document.createElement('a');
                             a.href = url;
                             a.download = `credit-card-tracker-backup-${new Date().toISOString().split('T')[0]}.json`;
                             a.click();
-                        }}>Export Data</button>
-                        <button className="btn" onClick={() => setShowImportModal(true)}>Import Data</button>
+                        }}>Export</button>
+                        <button className="btn btn-sm" onClick={() => setShowImportModal(true)}>Import</button>
                     </div>
 
                     {cards.length === 0 ? (
@@ -981,17 +1148,23 @@
                             </div>
                         </div>
                     ) : (
-                        cards.map(card => {
+                        cards.map(wc => {
+                            const card = resolveCard(wc);
+                            if (!card.periodicBenefits) return null;
                             const stats = calculateCardStats(card);
                             const isExpanded = expandedCards[card.id];
                             const currentBenefits = card.periodicBenefits.filter(b => isCurrentPeriod(b));
-                            const availableCount = currentBenefits.filter((b, idx) => 
+                            const availableCount = currentBenefits.filter(b =>
                                 !isBenefitUsed(card.id, card.periodicBenefits.indexOf(b), b)
                             ).length;
+                            // Sort current-period benefits by urgency
+                            const sortedBenefits = [...currentBenefits].sort((a, b) =>
+                                (URGENCY_ORDER[a.frequency] || 0) - (URGENCY_ORDER[b.frequency] || 0)
+                            );
 
                             return (
                                 <div key={card.id} className="card-section">
-                                    <div className="card-header" onClick={() => toggleCard(card.id)}>
+                                    <div className={`card-header ${getIssuerClass(card.issuer)}`} onClick={() => toggleCard(card.id)}>
                                         <div className="card-header-left">
                                             <ProgressCircle percentage={stats.recovery} />
                                             <div>
@@ -1012,42 +1185,41 @@
                                                 <div className="card-stat-value">{availableCount}</div>
                                             </div>
                                             <div className="card-stat">
-                                                <div className="card-stat-label">Used</div>
-                                                <div className="card-stat-value">${Math.round(stats.usedValue)}</div>
+                                                <div className="card-stat-label">YTD</div>
+                                                <div className="card-stat-value">${Math.round(stats.usedAnnualValue)}</div>
                                             </div>
-                                            <button 
-                                                className="btn btn-sm"
+                                            <button
+                                                className="btn-icon"
+                                                title={`Remove ${card.cardName}`}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     if (confirm(`Remove ${card.cardName} from ${getProfileName(card.profileId)}?`)) {
                                                         removeCard(card.id);
                                                     }
                                                 }}
-                                                style={{marginLeft: '1rem'}}
                                             >
-                                                Remove
+                                                ✕
                                             </button>
                                             <div className={`toggle ${isExpanded ? 'open' : ''}`}>▼</div>
                                         </div>
                                     </div>
-                                    
+
                                     <div className={`benefits-container ${isExpanded ? 'open' : ''}`}>
                                         <div className="benefits-grid">
-                                            {currentBenefits.map((benefit, idx) => {
+                                            {sortedBenefits.map((benefit) => {
                                                 const originalIndex = card.periodicBenefits.indexOf(benefit);
                                                 const isUsed = isBenefitUsed(card.id, originalIndex, benefit);
-                                                
                                                 return (
-                                                    <div 
-                                                        key={originalIndex} 
-                                                        className={`benefit ${isUsed ? 'used' : ''}`}
+                                                    <div
+                                                        key={originalIndex}
+                                                        className={`benefit ${getBenefitTypeClass(benefit.type)} ${isUsed ? 'used' : ''}`}
                                                         onClick={() => toggleBenefit(card.id, originalIndex, benefit)}
                                                     >
                                                         <div className="badge">{benefit.frequency}</div>
                                                         <div className="benefit-name">{benefit.name}</div>
                                                         <div className="benefit-type">{benefit.type}</div>
                                                         <div className="benefit-value">
-                                                            ${typeof benefit.value === 'number' ? benefit.value : benefit.value}
+                                                            {benefit.monetaryValue !== undefined ? `$${benefit.monetaryValue}` : typeof benefit.value === 'number' ? `$${benefit.value}` : benefit.value}
                                                         </div>
                                                     </div>
                                                 );
@@ -1059,7 +1231,8 @@
                         })
                     )}
                 </>
-            );
+                );
+            };
 
             const renderDatabase = () => (
                 <>
@@ -1103,19 +1276,25 @@
                 const wallet5 = calculateOptimalWallet(5);
                 const wallet7 = calculateOptimalWallet(7);
 
+                const totalSpending = Object.values(annualSpending).reduce((a, b) => a + b, 0);
+                const usingSpendData = totalSpending > 0;
+
                 return (
                     <>
-                        <h2 style={{marginBottom: '2rem'}}>Wallet Optimization</h2>
+                        <h2 style={{marginBottom: '0.5rem', fontSize: '1.25rem'}}>Wallet Optimization</h2>
+                        <p style={{fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', marginBottom: '1.5rem'}}>
+                            Enter your annual spending per category to rank cards by estimated points earned.
+                        </p>
                         <div className="spending-grid">
                             {SPENDING_CATEGORIES.map(category => {
                                 const { card, multiplier } = getBestCardForCategory(category);
                                 const spending = annualSpending[category] || 0;
                                 const points = spending * multiplier;
-                                
+
                                 return (
                                     <div key={category} className="spending-input-group">
                                         <div className="spending-label">{category}</div>
-                                        <input 
+                                        <input
                                             type="number"
                                             className="spending-input"
                                             placeholder="$0"
@@ -1126,8 +1305,8 @@
                                             })}
                                         />
                                         {spending > 0 && (
-                                            <div style={{fontSize: '0.75rem', marginTop: '0.5rem', color: 'rgba(255,255,255,0.7)'}}>
-                                                Best: {card} ({multiplier}x) = {Math.round(points)} pts
+                                            <div style={{fontSize: '0.72rem', marginTop: '0.4rem', color: 'rgba(255,255,255,0.65)'}}>
+                                                Best: <strong style={{color: '#fff'}}>{card}</strong> · {multiplier}x · ~{Math.round(points).toLocaleString()} pts
                                             </div>
                                         )}
                                     </div>
@@ -1135,33 +1314,42 @@
                             })}
                         </div>
 
-                        <div style={{marginTop: '3rem'}}>
-                            <h3 style={{marginBottom: '1rem'}}>Optimal Wallets</h3>
-                            <div style={{display: 'grid', gap: '1rem'}}>
-                                <div className="card-option">
-                                    <div style={{fontWeight: 700, marginBottom: '0.5rem'}}>3-Card Daily Carry</div>
-                                    <div style={{display: 'flex', gap: '0.5rem', flexWrap: 'wrap'}}>
-                                        {wallet3.map(card => (
-                                            <span key={card} className="badge">{card}</span>
-                                        ))}
+                        <div style={{marginTop: '2rem'}}>
+                            <div style={{display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem'}}>
+                                <h3 style={{fontSize: '1rem'}}>Optimal Wallets</h3>
+                                <span style={{
+                                    fontSize: '0.68rem',
+                                    padding: '0.2rem 0.6rem',
+                                    background: usingSpendData ? 'rgba(16,185,129,0.25)' : 'rgba(255,255,255,0.1)',
+                                    border: `1px solid ${usingSpendData ? 'rgba(16,185,129,0.5)' : 'rgba(255,255,255,0.2)'}`,
+                                    borderRadius: '10px',
+                                    color: usingSpendData ? '#6ee7b7' : 'rgba(255,255,255,0.6)'
+                                }}>
+                                    {usingSpendData ? 'Spend-weighted' : 'No spend data — using multiplier sums'}
+                                </span>
+                            </div>
+                            <div style={{display: 'grid', gap: '0.75rem'}}>
+                                {[
+                                    { label: '3-Card Daily Carry', wallet: wallet3 },
+                                    { label: '5-Card Travel Setup', wallet: wallet5 },
+                                    { label: '7-Card Maximum', wallet: wallet7 },
+                                ].map(({ label, wallet }) => (
+                                    <div key={label} className="card-option">
+                                        <div style={{fontWeight: 700, marginBottom: '0.5rem', fontSize: '0.875rem'}}>{label}</div>
+                                        <div style={{display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center'}}>
+                                            {wallet.map(({ name, score }) => (
+                                                <span key={name} style={{display: 'flex', alignItems: 'center', gap: '0.3rem'}}>
+                                                    <span className="badge">{name}</span>
+                                                    {usingSpendData && (
+                                                        <span style={{fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)'}}>
+                                                            {score.toLocaleString()} pts
+                                                        </span>
+                                                    )}
+                                                </span>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="card-option">
-                                    <div style={{fontWeight: 700, marginBottom: '0.5rem'}}>5-Card Travel Setup</div>
-                                    <div style={{display: 'flex', gap: '0.5rem', flexWrap: 'wrap'}}>
-                                        {wallet5.map(card => (
-                                            <span key={card} className="badge">{card}</span>
-                                        ))}
-                                    </div>
-                                </div>
-                                <div className="card-option">
-                                    <div style={{fontWeight: 700, marginBottom: '0.5rem'}}>7-Card Maximum</div>
-                                    <div style={{display: 'flex', gap: '0.5rem', flexWrap: 'wrap'}}>
-                                        {wallet7.map(card => (
-                                            <span key={card} className="badge">{card}</span>
-                                        ))}
-                                    </div>
-                                </div>
+                                ))}
                             </div>
                         </div>
                     </>
@@ -1284,75 +1472,101 @@
                     )}
 
                     {showEditBenefitsModal && (
-                        <div className="modal-overlay" onClick={() => setShowEditBenefitsModal(false)}>
+                        <div className="modal-overlay" onClick={() => { setShowEditBenefitsModal(false); setEditingBenefitIdx(null); }}>
                             <div className="modal" onClick={e => e.stopPropagation()}>
-                                <h2>Edit Benefits: {editingCardName}</h2>
+                                <h2 style={{fontSize: '1.25rem', marginBottom: '1rem'}}>Edit Benefits: {editingCardName}</h2>
                                 <div className="benefit-list">
-                                    {cardDatabase[editingCardName]?.periodicBenefits.map((benefit, idx) => (
-                                        <div key={idx} className="benefit-list-item">
-                                            <div>
-                                                <div style={{fontWeight: 600}}>{benefit.name}</div>
-                                                <div style={{fontSize: '0.75rem', color: 'rgba(255,255,255,0.7)'}}>
-                                                    {benefit.frequency} • ${benefit.value}
+                                    {(cardDatabase[editingCardName]?.periodicBenefits || []).map((benefit, idx) => (
+                                        <div key={idx} className="benefit-list-item" style={{flexDirection: 'column', alignItems: 'stretch', gap: '0.5rem'}}>
+                                            {editingBenefitIdx === idx ? (
+                                                <>
+                                                    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem'}}>
+                                                        <input className="form-input" placeholder="Name"
+                                                            value={editingBenefitData.name}
+                                                            onChange={e => setEditingBenefitData({...editingBenefitData, name: e.target.value})} />
+                                                        <select className="form-select" value={editingBenefitData.type}
+                                                            onChange={e => setEditingBenefitData({...editingBenefitData, type: e.target.value})}>
+                                                            <option>Dining</option><option>Travel</option><option>Shop</option>
+                                                        </select>
+                                                        <select className="form-select" value={editingBenefitData.frequency}
+                                                            onChange={e => setEditingBenefitData({...editingBenefitData, frequency: e.target.value})}>
+                                                            <option>Monthly</option><option>Quarterly</option><option>Semi-Annual</option><option>Annual</option>
+                                                        </select>
+                                                        <input className="form-input" placeholder="Period (M1, Q2, H1…)"
+                                                            value={editingBenefitData.period || ''}
+                                                            onChange={e => setEditingBenefitData({...editingBenefitData, period: e.target.value || undefined})} />
+                                                        <input className="form-input" placeholder="Display value (text or $)"
+                                                            value={editingBenefitData.value}
+                                                            onChange={e => {
+                                                                const n = parseFloat(e.target.value);
+                                                                setEditingBenefitData({...editingBenefitData, value: isNaN(n) ? e.target.value : n});
+                                                            }} />
+                                                        <input type="number" className="form-input" placeholder="$ for stats (optional)"
+                                                            value={editingBenefitData.monetaryValue !== undefined ? editingBenefitData.monetaryValue : ''}
+                                                            onChange={e => setEditingBenefitData({...editingBenefitData,
+                                                                monetaryValue: e.target.value !== '' ? parseFloat(e.target.value) : undefined})} />
+                                                    </div>
+                                                    <div style={{display: 'flex', gap: '0.5rem'}}>
+                                                        <button className="btn btn-sm" onClick={() => {
+                                                            updateBenefitInCard(editingCardName, idx, editingBenefitData);
+                                                            setEditingBenefitIdx(null); setEditingBenefitData(null);
+                                                        }}>Save</button>
+                                                        <button className="btn btn-sm" onClick={() => { setEditingBenefitIdx(null); setEditingBenefitData(null); }}>Cancel</button>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                                    <div>
+                                                        <div style={{fontWeight: 600, fontSize: '0.875rem'}}>{benefit.name}</div>
+                                                        <div style={{fontSize: '0.72rem', color: 'rgba(255,255,255,0.55)'}}>
+                                                            {benefit.frequency}{benefit.period ? ` · ${benefit.period}` : ''} · {benefit.type} ·{' '}
+                                                            {benefit.monetaryValue !== undefined
+                                                                ? <span style={{color: '#6ee7b7'}}>${benefit.monetaryValue} <span style={{opacity:0.6}}>(≈ {typeof benefit.value === 'number' ? `$${benefit.value}` : benefit.value})</span></span>
+                                                                : (typeof benefit.value === 'number' ? `$${benefit.value}` : benefit.value)
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                    <div style={{display: 'flex', gap: '0.4rem', flexShrink: 0}}>
+                                                        <button className="btn btn-sm" onClick={() => {
+                                                            setEditingBenefitIdx(idx);
+                                                            setEditingBenefitData({...benefit});
+                                                        }}>Edit</button>
+                                                        <button className="btn btn-sm" onClick={() => removeBenefitFromCard(editingCardName, idx)}>✕</button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <button 
-                                                className="btn btn-sm" 
-                                                onClick={() => removeBenefitFromCard(editingCardName, idx)}
-                                            >
-                                                Remove
-                                            </button>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
-                                <div className="form-group">
-                                    <label className="form-label">Add Benefit</label>
-                                    <input 
-                                        className="form-input"
-                                        placeholder="Name"
-                                        value={newBenefitForm.name}
-                                        onChange={(e) => setNewBenefitForm({...newBenefitForm, name: e.target.value})}
-                                        style={{marginBottom: '0.5rem'}}
-                                    />
-                                    <select 
-                                        className="form-select"
-                                        value={newBenefitForm.type}
-                                        onChange={(e) => setNewBenefitForm({...newBenefitForm, type: e.target.value})}
-                                        style={{marginBottom: '0.5rem'}}
-                                    >
-                                        <option>Dining</option>
-                                        <option>Travel</option>
-                                        <option>Shop</option>
-                                    </select>
-                                    <select 
-                                        className="form-select"
-                                        value={newBenefitForm.frequency}
-                                        onChange={(e) => setNewBenefitForm({...newBenefitForm, frequency: e.target.value})}
-                                        style={{marginBottom: '0.5rem'}}
-                                    >
-                                        <option>Monthly</option>
-                                        <option>Quarterly</option>
-                                        <option>Semi-Annual</option>
-                                        <option>Annual</option>
-                                    </select>
-                                    <input 
-                                        type="number"
-                                        className="form-input"
-                                        placeholder="Value"
-                                        value={newBenefitForm.value}
-                                        onChange={(e) => setNewBenefitForm({...newBenefitForm, value: e.target.value})}
-                                        style={{marginBottom: '0.5rem'}}
-                                    />
-                                    <input 
-                                        className="form-input"
-                                        placeholder="Period (e.g., M2, Q1, H1)"
-                                        value={newBenefitForm.period}
-                                        onChange={(e) => setNewBenefitForm({...newBenefitForm, period: e.target.value})}
-                                    />
-                                </div>
-                                <div style={{display: 'flex', gap: '1rem'}}>
-                                    <button className="btn" onClick={addBenefitToCard}>Add Benefit</button>
-                                    <button className="btn" onClick={() => setShowEditBenefitsModal(false)}>Close</button>
+
+                                <div style={{marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)'}}>
+                                    <div style={{fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.6rem', color: 'rgba(255,255,255,0.7)'}}>Add Benefit</div>
+                                    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem', marginBottom: '0.75rem'}}>
+                                        <input className="form-input" placeholder="Name"
+                                            value={newBenefitForm.name}
+                                            onChange={e => setNewBenefitForm({...newBenefitForm, name: e.target.value})} />
+                                        <select className="form-select" value={newBenefitForm.type}
+                                            onChange={e => setNewBenefitForm({...newBenefitForm, type: e.target.value})}>
+                                            <option>Dining</option><option>Travel</option><option>Shop</option>
+                                        </select>
+                                        <select className="form-select" value={newBenefitForm.frequency}
+                                            onChange={e => setNewBenefitForm({...newBenefitForm, frequency: e.target.value})}>
+                                            <option>Monthly</option><option>Quarterly</option><option>Semi-Annual</option><option>Annual</option>
+                                        </select>
+                                        <input className="form-input" placeholder="Period (M1, Q2, H1…)"
+                                            value={newBenefitForm.period}
+                                            onChange={e => setNewBenefitForm({...newBenefitForm, period: e.target.value})} />
+                                        <input className="form-input" placeholder="Display value (text or $)"
+                                            value={newBenefitForm.value}
+                                            onChange={e => setNewBenefitForm({...newBenefitForm, value: e.target.value})} />
+                                        <input type="number" className="form-input" placeholder="$ for stats (optional)"
+                                            value={newBenefitForm.monetaryValue || ''}
+                                            onChange={e => setNewBenefitForm({...newBenefitForm, monetaryValue: e.target.value})} />
+                                    </div>
+                                    <div style={{display: 'flex', gap: '0.75rem'}}>
+                                        <button className="btn" onClick={addBenefitToCard}>Add Benefit</button>
+                                        <button className="btn" onClick={() => { setShowEditBenefitsModal(false); setEditingBenefitIdx(null); }}>Close</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
