@@ -7,6 +7,10 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Firebase compat SDK — works with Babel-in-browser without a module bundler -->
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -702,6 +706,22 @@
         .btn-danger:hover {
             background: rgba(239, 68, 68, 0.4);
         }
+
+        .sync-btn { transition: all 0.3s; }
+        .sync-btn.synced  { border-color: rgba(52, 211, 153, 0.5); color: #6ee7b7; }
+        .sync-btn.syncing { border-color: rgba(251, 191, 36, 0.5); color: #fcd34d; }
+        .sync-btn.offline { border-color: rgba(248, 113, 113, 0.4); color: #fca5a5; }
+
+        .sync-dot {
+            display: inline-block;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            margin-right: 0.4rem;
+            vertical-align: middle;
+        }
+        .sync-dot.synced  { background: #34d399; box-shadow: 0 0 6px rgba(52, 211, 153, 0.8); }
+        .sync-dot.syncing { background: #fbbf24; }
+        .sync-dot.offline { background: #f87171; }
     </style>
 </head>
 <body>
@@ -709,6 +729,20 @@
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
+
+        // ── Firebase init ──────────────────────────────────────────────────────────
+        firebase.initializeApp({
+            apiKey:            "AIzaSyCyDywOlrbNOQblCFliifUpbb14oJrr5P4",
+            authDomain:        "credit-card-tracker-alm.firebaseapp.com",
+            databaseURL:       "https://credit-card-tracker-alm-default-rtdb.firebaseio.com",
+            projectId:         "credit-card-tracker-alm",
+            storageBucket:     "credit-card-tracker-alm.firebasestorage.app",
+            messagingSenderId: "1050565099563",
+            appId:             "1:1050565099563:web:fcdcec75fc8468038f2a6e"
+        });
+        const db   = firebase.database();
+        const auth = firebase.auth();
+        // ──────────────────────────────────────────────────────────────────────────
 
         const INITIAL_CARD_DATABASE = 
 
@@ -771,8 +805,19 @@
 
             // Load-gate: prevents save effect from firing with empty state on first render
             const [hasLoaded, setHasLoaded] = useState(false);
-            // Debounce timer for localStorage writes
+            // Debounce timer for localStorage + Firebase writes
             const saveTimerRef = useRef(null);
+            // Prevents save → Firebase → listener → save loop
+            const skipNextSave = useRef(false);
+            // Ref mirror of syncCode so the save effect closure is never stale
+            const syncCodeRef = useRef('');
+
+            // Cloud sync state
+            const [syncCode, setSyncCode] = useState('');
+            const [syncInput, setSyncInput] = useState('');
+            const [showSyncModal, setShowSyncModal] = useState(false);
+            const [syncStatus, setSyncStatus] = useState('offline');
+            const [copiedSyncCode, setCopiedSyncCode] = useState(false);
             // Inline deletion confirmations (replaces native confirm())
             const [confirmDeleteCardId, setConfirmDeleteCardId] = useState(null);
             const [confirmDeleteProfileId, setConfirmDeleteProfileId] = useState(null);
@@ -791,6 +836,56 @@
             const [newBenefitForm, setNewBenefitForm] = useState({
                 name: '', type: 'Dining', frequency: 'Monthly', value: 0, period: ''
             });
+
+            // ── Firebase anonymous auth ────────────────────────────────────────────
+            // On first visit, Firebase assigns an anonymous UID that becomes the
+            // sync code. It is persisted to localStorage so it survives refreshes.
+            // On subsequent visits the saved code is restored immediately (before
+            // auth resolves) so there's no flicker.
+            useEffect(() => {
+                const saved = localStorage.getItem('sync-code');
+                if (saved) {
+                    setSyncCode(saved);
+                    syncCodeRef.current = saved;
+                }
+                auth.signInAnonymously().catch(err => console.error('Firebase auth error:', err));
+                const unsubscribe = auth.onAuthStateChanged(user => {
+                    if (user && !syncCodeRef.current) {
+                        const uid = user.uid;
+                        setSyncCode(uid);
+                        syncCodeRef.current = uid;
+                        localStorage.setItem('sync-code', uid);
+                    }
+                });
+                return () => unsubscribe();
+            }, []);
+
+            // ── Firebase real-time listener ────────────────────────────────────────
+            // Fires immediately with current remote value, then on every change.
+            // Sets skipNextSave so the save effect doesn't echo the incoming data
+            // back to Firebase (would cause an infinite loop).
+            useEffect(() => {
+                if (!syncCode) return;
+                syncCodeRef.current = syncCode;
+                const ref = db.ref('users/' + syncCode);
+                ref.on('value', snapshot => {
+                    const data = snapshot.val();
+                    if (data) {
+                        skipNextSave.current = true;
+                        setSyncStatus('synced');
+                        if (data.profiles)      setProfiles(data.profiles);
+                        if (data.cards)         setCards(data.cards);
+                        if (data.cardDatabase)  setCardDatabase(data.cardDatabase);
+                        if (data.usedBenefits)  setUsedBenefits(data.usedBenefits);
+                        if (data.annualSpending)setAnnualSpending(data.annualSpending);
+                    }
+                }, err => {
+                    console.error('Firebase listener error:', err);
+                    setSyncStatus('offline');
+                });
+                return () => ref.off('value');
+            }, [syncCode]);
+            // ──────────────────────────────────────────────────────────────────────
 
             useEffect(() => {
                 // Parse each key independently so a single corrupt entry doesn't
@@ -815,12 +910,19 @@
                 setHasLoaded(true);
             }, []);
 
-            // Debounced, load-gated save effect. Inlined to avoid stale-closure issues
-            // from a separate saveData function not being in the deps array.
-            // The 400 ms debounce also prevents flooding localStorage on every
-            // spending-input keystroke (#14).
+            // Debounced, load-gated save effect.
+            // - Skips if data arrived from Firebase (skipNextSave) to avoid echo loop.
+            // - Writes to localStorage immediately (within the 400 ms window).
+            // - Writes to Firebase under users/<syncCode> after the debounce.
+            // - syncCodeRef used instead of syncCode in deps to avoid refiring when
+            //   the sync code first resolves on auth (which could overwrite remote
+            //   data with stale local state before the listener has loaded it).
             useEffect(() => {
                 if (!hasLoaded) return;
+                if (skipNextSave.current) {
+                    skipNextSave.current = false;
+                    return;
+                }
                 clearTimeout(saveTimerRef.current);
                 saveTimerRef.current = setTimeout(() => {
                     try {
@@ -831,6 +933,18 @@
                         localStorage.setItem('annual-spending',JSON.stringify(annualSpending));
                     } catch (error) {
                         console.error('localStorage save failed (quota exceeded?):', error);
+                    }
+                    if (syncCodeRef.current) {
+                        setSyncStatus('syncing');
+                        db.ref('users/' + syncCodeRef.current).set({
+                            profiles, cards, cardDatabase, usedBenefits, annualSpending,
+                            lastUpdated: Date.now()
+                        })
+                        .then(() => setSyncStatus('synced'))
+                        .catch(err => {
+                            console.error('Firebase save error:', err);
+                            setSyncStatus('offline');
+                        });
                     }
                 }, 400);
                 return () => clearTimeout(saveTimerRef.current);
@@ -1228,6 +1342,13 @@
                             a.click();
                         }}>Export</button>
                         <button className="btn btn-sm" onClick={() => setShowImportModal(true)}>Import</button>
+                        <button
+                            className={`btn btn-sm sync-btn ${syncStatus}`}
+                            onClick={() => setShowSyncModal(true)}
+                        >
+                            <span className={`sync-dot ${syncStatus}`} />
+                            {syncStatus === 'synced' ? 'Synced' : syncStatus === 'syncing' ? 'Syncing…' : 'Sync'}
+                        </button>
                     </div>
 
                     {cards.length === 0 ? (
@@ -1770,6 +1891,81 @@
                                         </div>
                                     </>
                                 )}
+                            </div>
+                        </div>
+                    )}
+
+                    {showSyncModal && (
+                        <div className="modal-overlay" onClick={() => setShowSyncModal(false)}>
+                            <div className="modal" onClick={e => e.stopPropagation()}>
+                                <h2 style={{fontSize: '1.5rem'}}>Cloud Sync</h2>
+                                <p style={{fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', marginBottom: '1.5rem'}}>
+                                    Your data syncs automatically across devices. Share your sync code to access it anywhere.
+                                </p>
+
+                                <div className="form-group">
+                                    <label className="form-label">Your Sync Code</label>
+                                    <div style={{display: 'flex', gap: '0.5rem', alignItems: 'center'}}>
+                                        <input
+                                            className="form-input"
+                                            value={syncCode || 'Connecting…'}
+                                            readOnly
+                                            style={{fontFamily: 'monospace', fontSize: '0.72rem', letterSpacing: '0.03em'}}
+                                        />
+                                        <button
+                                            className="btn btn-sm"
+                                            style={{whiteSpace: 'nowrap', flexShrink: 0}}
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(syncCode);
+                                                setCopiedSyncCode(true);
+                                                setTimeout(() => setCopiedSyncCode(false), 2000);
+                                            }}
+                                        >{copiedSyncCode ? '✓ Copied' : 'Copy'}</button>
+                                    </div>
+                                    <p style={{fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.4rem'}}>
+                                        Enter this on any other device to sync your data there.
+                                    </p>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Link to Another Device</label>
+                                    <div style={{display: 'flex', gap: '0.5rem'}}>
+                                        <input
+                                            className="form-input"
+                                            placeholder="Paste sync code from your other device"
+                                            value={syncInput}
+                                            onChange={e => setSyncInput(e.target.value)}
+                                        />
+                                        <button
+                                            className="btn btn-sm"
+                                            style={{whiteSpace: 'nowrap', flexShrink: 0}}
+                                            onClick={() => {
+                                                const code = syncInput.trim();
+                                                if (code && code !== syncCode) {
+                                                    setSyncCode(code);
+                                                    syncCodeRef.current = code;
+                                                    localStorage.setItem('sync-code', code);
+                                                    setSyncInput('');
+                                                    setShowSyncModal(false);
+                                                }
+                                            }}
+                                        >Link</button>
+                                    </div>
+                                    <div style={{padding: '0.75rem', background: 'rgba(255,193,7,0.1)', borderRadius: '8px', marginTop: '0.75rem', fontSize: '0.8rem'}}>
+                                        ⚠️ Linking replaces your local data with the other device's synced data.
+                                    </div>
+                                </div>
+
+                                <div style={{display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.25rem'}}>
+                                    <span className={`sync-dot ${syncStatus}`} style={{flexShrink: 0}} />
+                                    <span style={{fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)'}}>
+                                        {syncStatus === 'synced'  ? 'Connected and synced'        :
+                                         syncStatus === 'syncing' ? 'Saving to cloud…'             :
+                                                                    'Offline — changes saved locally'}
+                                    </span>
+                                </div>
+
+                                <button className="btn" onClick={() => setShowSyncModal(false)}>Close</button>
                             </div>
                         </div>
                     )}
