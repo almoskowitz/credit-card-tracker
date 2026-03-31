@@ -660,13 +660,55 @@
             .cards-grid { grid-template-columns: 1fr; }
             .benefits-grid, .spending-grid { grid-template-columns: 1fr; }
         }
+
+        .form-error {
+            font-size: 0.75rem;
+            color: #f87171;
+            margin-top: 0.5rem;
+        }
+
+        .import-preview {
+            padding: 0.875rem;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-top: 0.75rem;
+            line-height: 1.6;
+        }
+
+        .import-success {
+            padding: 0.75rem;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #6ee7b7;
+            margin-top: 0.75rem;
+        }
+
+        .confirm-inline {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: rgba(239, 68, 68, 0.5);
+            color: #fca5a5;
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.4);
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useRef } = React;
 
         const INITIAL_CARD_DATABASE = 
 
@@ -705,29 +747,6 @@
             return false;
         };
 
-        function ProgressCircle({ percentage }) {
-            const size = 44;
-            const strokeWidth = 4;
-            const radius = (size - strokeWidth) / 2;
-            const circumference = 2 * Math.PI * radius;
-            const offset = circumference - (percentage / 100) * circumference;
-
-            return (
-                <div className="progress-circle">
-                    <svg className="progress-svg" viewBox={`0 0 ${size} ${size}`}>
-                        <circle className="progress-bg" cx={size/2} cy={size/2} r={radius} />
-                        <circle 
-                            className="progress-bar" 
-                            cx={size/2} cy={size/2} r={radius}
-                            strokeDasharray={circumference}
-                            strokeDashoffset={offset}
-                        />
-                    </svg>
-                    <div className="progress-text">{Math.round(percentage)}%</div>
-                </div>
-            );
-        }
-
         function App() {
             const [activeTab, setActiveTab] = useState('dashboard');
             const [profiles, setProfiles] = useState([]);
@@ -749,6 +768,21 @@
             const [showEditCardModal, setShowEditCardModal] = useState(false);
             const [showEditBenefitsModal, setShowEditBenefitsModal] = useState(false);
             const [showImportModal, setShowImportModal] = useState(false);
+
+            // Load-gate: prevents save effect from firing with empty state on first render
+            const [hasLoaded, setHasLoaded] = useState(false);
+            // Debounce timer for localStorage writes
+            const saveTimerRef = useRef(null);
+            // Inline deletion confirmations (replaces native confirm())
+            const [confirmDeleteCardId, setConfirmDeleteCardId] = useState(null);
+            const [confirmDeleteProfileId, setConfirmDeleteProfileId] = useState(null);
+            // Per-form validation errors
+            const [profileError, setProfileError] = useState('');
+            const [cardFormError, setCardFormError] = useState('');
+            const [benefitFormError, setBenefitFormError] = useState('');
+            // Import preview before applying
+            const [pendingImport, setPendingImport] = useState(null);
+            const [importSuccess, setImportSuccess] = useState(false);
             
             const [selectedProfile, setSelectedProfile] = useState('');
             const [newProfileName, setNewProfileName] = useState('');
@@ -759,134 +793,178 @@
             });
 
             useEffect(() => {
-                loadData();
+                // Parse each key independently so a single corrupt entry doesn't
+                // block the others from loading.
+                const tryLoad = (key, setter, label) => {
+                    try {
+                        const raw = localStorage.getItem(key);
+                        if (raw) setter(JSON.parse(raw));
+                    } catch (e) {
+                        console.error(`Failed to parse stored "${label}" — data may be corrupt:`, e);
+                    }
+                };
+                tryLoad('profiles',       setProfiles,     'profiles');
+                tryLoad('cards',          setCards,        'cards');
+                tryLoad('card-database',  setCardDatabase, 'card-database');
+                tryLoad('used-benefits',  setUsedBenefits, 'used-benefits');
+                tryLoad('annual-spending',setAnnualSpending,'annual-spending');
+                // Signal that load is complete. React 18 batches all the setters above
+                // plus this one into a single re-render, so hasLoaded becomes true at
+                // the same time as the loaded data — the save effect never fires with
+                // empty state.
+                setHasLoaded(true);
             }, []);
 
-            const loadData = () => {
-                try {
-                    const profilesData = localStorage.getItem('profiles');
-                    const cardsData = localStorage.getItem('cards');
-                    const databaseData = localStorage.getItem('card-database');
-                    const benefitsData = localStorage.getItem('used-benefits');
-                    const spendingData = localStorage.getItem('annual-spending');
-                    
-                    if (profilesData) setProfiles(JSON.parse(profilesData));
-                    if (cardsData) setCards(JSON.parse(cardsData));
-                    if (databaseData) setCardDatabase(JSON.parse(databaseData));
-                    if (benefitsData) setUsedBenefits(JSON.parse(benefitsData));
-                    if (spendingData) setAnnualSpending(JSON.parse(spendingData));
-                } catch (error) {
-                    console.log('No saved data');
-                }
-            };
-
-            const saveData = () => {
-                try {
-                    localStorage.setItem('profiles', JSON.stringify(profiles));
-                    localStorage.setItem('cards', JSON.stringify(cards));
-                    localStorage.setItem('card-database', JSON.stringify(cardDatabase));
-                    localStorage.setItem('used-benefits', JSON.stringify(usedBenefits));
-                    localStorage.setItem('annual-spending', JSON.stringify(annualSpending));
-                } catch (error) {
-                    console.error('Save error:', error);
-                }
-            };
-
+            // Debounced, load-gated save effect. Inlined to avoid stale-closure issues
+            // from a separate saveData function not being in the deps array.
+            // The 400 ms debounce also prevents flooding localStorage on every
+            // spending-input keystroke (#14).
             useEffect(() => {
-                if (profiles.length > 0 || cards.length > 0 || Object.keys(cardDatabase).length > 0) {
-                    saveData();
-                }
-            }, [profiles, cards, cardDatabase, usedBenefits, annualSpending]);
+                if (!hasLoaded) return;
+                clearTimeout(saveTimerRef.current);
+                saveTimerRef.current = setTimeout(() => {
+                    try {
+                        localStorage.setItem('profiles',       JSON.stringify(profiles));
+                        localStorage.setItem('cards',          JSON.stringify(cards));
+                        localStorage.setItem('card-database',  JSON.stringify(cardDatabase));
+                        localStorage.setItem('used-benefits',  JSON.stringify(usedBenefits));
+                        localStorage.setItem('annual-spending',JSON.stringify(annualSpending));
+                    } catch (error) {
+                        console.error('localStorage save failed (quota exceeded?):', error);
+                    }
+                }, 400);
+                return () => clearTimeout(saveTimerRef.current);
+            }, [hasLoaded, profiles, cards, cardDatabase, usedBenefits, annualSpending]);
 
             const addProfile = () => {
-                if (newProfileName.trim()) {
-                    setProfiles([...profiles, { id: `prof-${Date.now()}`, name: newProfileName.trim() }]);
-                    setNewProfileName('');
+                if (!newProfileName.trim()) {
+                    setProfileError('Profile name cannot be empty.');
+                    return;
                 }
+                setProfileError('');
+                setProfiles(prev => [...prev, { id: `prof-${Date.now()}`, name: newProfileName.trim() }]);
+                setNewProfileName('');
             };
 
             const deleteProfile = (profileId) => {
-                setProfiles(profiles.filter(p => p.id !== profileId));
-                setCards(cards.filter(c => c.profileId !== profileId));
+                setProfiles(prev => prev.filter(p => p.id !== profileId));
+                setCards(prev => prev.filter(c => c.profileId !== profileId));
+                setConfirmDeleteProfileId(null);
             };
 
             const addCard = (cardName, profileId) => {
                 if (cardDatabase[cardName] && profileId) {
-                    setCards([...cards, { id: `card-${Date.now()}`, profileId, cardName }]);
+                    setCards(prev => [...prev, { id: `card-${Date.now()}`, profileId, cardName }]);
                     setShowAddCardModal(false);
                     setSelectedProfile('');
                 }
             };
 
             const removeCard = (cardId) => {
-                setCards(cards.filter(c => c.id !== cardId));
+                setCards(prev => prev.filter(c => c.id !== cardId));
+                setConfirmDeleteCardId(null);
             };
 
             const addCardToDatabase = () => {
-                if (newCardForm.name && newCardForm.issuer) {
-                    setCardDatabase({
-                        ...cardDatabase,
-                        [newCardForm.name]: {
-                            issuer: newCardForm.issuer,
-                            annualFee: parseFloat(newCardForm.annualFee) || 0,
-                            periodicBenefits: [],
-                            multipliers: { "Everything Else": 1 }
-                        }
-                    });
-                    setNewCardForm({ name: '', issuer: '', annualFee: 0 });
-                    setShowDatabaseModal(false);
+                if (!newCardForm.name.trim()) {
+                    setCardFormError('Card name is required.');
+                    return;
                 }
+                if (!newCardForm.issuer.trim()) {
+                    setCardFormError('Issuer is required.');
+                    return;
+                }
+                setCardFormError('');
+                setCardDatabase(prev => ({
+                    ...prev,
+                    [newCardForm.name.trim()]: {
+                        issuer: newCardForm.issuer.trim(),
+                        annualFee: parseFloat(newCardForm.annualFee) || 0,
+                        periodicBenefits: [],
+                        multipliers: { "Everything Else": 1 }
+                    }
+                }));
+                setNewCardForm({ name: '', issuer: '', annualFee: 0 });
+                setShowDatabaseModal(false);
             };
 
             const addBenefitToCard = () => {
-                if (editingCardName && newBenefitForm.name) {
-                    const card = cardDatabase[editingCardName];
-                    const rawVal = newBenefitForm.value;
-                    const numVal = parseFloat(rawVal);
-                    const benefit = {
-                        name: newBenefitForm.name,
-                        type: newBenefitForm.type,
-                        frequency: newBenefitForm.frequency,
-                        value: isNaN(numVal) ? (rawVal || 0) : numVal,
-                        period: newBenefitForm.period || undefined,
-                    };
-                    if (newBenefitForm.monetaryValue) benefit.monetaryValue = parseFloat(newBenefitForm.monetaryValue);
-                    setCardDatabase({ ...cardDatabase, [editingCardName]: { ...card, periodicBenefits: [...(card.periodicBenefits || []), benefit] } });
-                    setNewBenefitForm({ name: '', type: 'Dining', frequency: 'Monthly', value: '', period: '' });
+                if (!editingCardName) return;
+                if (!newBenefitForm.name.trim()) {
+                    setBenefitFormError('Benefit name is required.');
+                    return;
                 }
+                setBenefitFormError('');
+                const rawVal = newBenefitForm.value;
+                const numVal = parseFloat(rawVal);
+                const benefit = {
+                    name: newBenefitForm.name.trim(),
+                    type: newBenefitForm.type,
+                    frequency: newBenefitForm.frequency,
+                    value: isNaN(numVal) ? (rawVal || 0) : numVal,
+                    period: newBenefitForm.period || undefined,
+                };
+                if (newBenefitForm.monetaryValue) benefit.monetaryValue = parseFloat(newBenefitForm.monetaryValue);
+                setCardDatabase(prev => {
+                    const card = prev[editingCardName];
+                    return { ...prev, [editingCardName]: { ...card, periodicBenefits: [...(card.periodicBenefits || []), benefit] } };
+                });
+                setNewBenefitForm({ name: '', type: 'Dining', frequency: 'Monthly', value: '', period: '' });
             };
 
             const updateBenefitInCard = (cardName, idx, updated) => {
-                const card = cardDatabase[cardName];
-                const updatedBenefits = card.periodicBenefits.map((b, i) => i === idx ? updated : b);
-                setCardDatabase({ ...cardDatabase, [cardName]: { ...card, periodicBenefits: updatedBenefits } });
+                setCardDatabase(prev => {
+                    const card = prev[cardName];
+                    const updatedBenefits = card.periodicBenefits.map((b, i) => i === idx ? updated : b);
+                    return { ...prev, [cardName]: { ...card, periodicBenefits: updatedBenefits } };
+                });
             };
 
             const removeBenefitFromCard = (cardName, benefitIndex) => {
-                const card = cardDatabase[cardName];
-                setCardDatabase({ ...cardDatabase, [cardName]: { ...card, periodicBenefits: card.periodicBenefits.filter((_, i) => i !== benefitIndex) } });
+                setCardDatabase(prev => {
+                    const card = prev[cardName];
+                    return { ...prev, [cardName]: { ...card, periodicBenefits: card.periodicBenefits.filter((_, i) => i !== benefitIndex) } };
+                });
             };
 
+            // Stage the import for preview; don't apply yet.
             const importData = (event) => {
                 const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        try {
-                            const imported = JSON.parse(e.target.result);
-                            if (imported.profiles) setProfiles(imported.profiles);
-                            if (imported.cards) setCards(imported.cards);
-                            if (imported.cardDatabase) setCardDatabase(imported.cardDatabase);
-                            if (imported.usedBenefits) setUsedBenefits(imported.usedBenefits);
-                            if (imported.annualSpending) setAnnualSpending(imported.annualSpending);
-                            setShowImportModal(false);
-                            alert('Data imported successfully!');
-                        } catch (error) {
-                            alert('Error importing data. Please check the file format.');
+                if (!file) return;
+                // Reset the input so the same file can be re-selected after cancel
+                event.target.value = '';
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const parsed = JSON.parse(e.target.result);
+                        // Basic shape validation before staging
+                        if (
+                            (parsed.profiles !== undefined && !Array.isArray(parsed.profiles)) ||
+                            (parsed.cards !== undefined && !Array.isArray(parsed.cards))
+                        ) {
+                            setPendingImport({ error: 'File structure is invalid. Expected profiles and cards to be arrays.' });
+                            return;
                         }
-                    };
-                    reader.readAsText(file);
-                }
+                        setPendingImport(parsed);
+                        setImportSuccess(false);
+                    } catch {
+                        setPendingImport({ error: 'Could not parse file. Make sure it is a valid JSON backup.' });
+                    }
+                };
+                reader.readAsText(file);
+            };
+
+            // Actually apply a staged import. All five setters are batched by React 18
+            // automatic batching even though we're inside a click handler (not async).
+            const applyImport = () => {
+                if (!pendingImport || pendingImport.error) return;
+                if (pendingImport.profiles)    setProfiles(pendingImport.profiles);
+                if (pendingImport.cards)       setCards(pendingImport.cards);
+                if (pendingImport.cardDatabase)setCardDatabase(pendingImport.cardDatabase);
+                if (pendingImport.usedBenefits)setUsedBenefits(pendingImport.usedBenefits);
+                if (pendingImport.annualSpending)setAnnualSpending(pendingImport.annualSpending);
+                setPendingImport(null);
+                setImportSuccess(true);
             };
 
             const toggleCard = (cardId) => {
@@ -1189,16 +1267,27 @@
                                             </div>
                                             <div className="card-issuer">{card.issuer}</div>
                                         </div>
-                                        <button
-                                            className="btn-icon"
-                                            title={`Remove ${card.cardName}`}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                if (confirm(`Remove ${card.cardName} from ${getProfileName(card.profileId)}?`)) {
-                                                    removeCard(card.id);
-                                                }
-                                            }}
-                                        >✕</button>
+                                        {confirmDeleteCardId === card.id ? (
+                                            <span className="confirm-inline" onClick={e => e.stopPropagation()}>
+                                                <button
+                                                    className="btn btn-sm btn-danger"
+                                                    onClick={(e) => { e.stopPropagation(); removeCard(card.id); }}
+                                                >Remove</button>
+                                                <button
+                                                    className="btn btn-sm"
+                                                    onClick={(e) => { e.stopPropagation(); setConfirmDeleteCardId(null); }}
+                                                >Cancel</button>
+                                            </span>
+                                        ) : (
+                                            <button
+                                                className="btn-icon"
+                                                title={`Remove ${card.cardName}`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setConfirmDeleteCardId(card.id);
+                                                }}
+                                            >✕</button>
+                                        )}
                                         <div className={`toggle ${isExpanded ? 'open' : ''}`}>▼</div>
                                     </div>
 
@@ -1452,66 +1541,78 @@
                     )}
 
                     {showProfileModal && (
-                        <div className="modal-overlay" onClick={() => setShowProfileModal(false)}>
+                        <div className="modal-overlay" onClick={() => { setShowProfileModal(false); setConfirmDeleteProfileId(null); setProfileError(''); }}>
                             <div className="modal" onClick={e => e.stopPropagation()}>
                                 <h2>Manage Profiles</h2>
                                 <div className="profile-list">
                                     {profiles.map(profile => (
                                         <div key={profile.id} className="profile-item">
                                             <div>{profile.name}</div>
-                                            <button className="btn btn-sm" onClick={() => deleteProfile(profile.id)}>Delete</button>
+                                            {confirmDeleteProfileId === profile.id ? (
+                                                <span className="confirm-inline">
+                                                    <button className="btn btn-sm btn-danger" onClick={() => deleteProfile(profile.id)}>
+                                                        Delete + {cards.filter(c => c.profileId === profile.id).length} card(s)
+                                                    </button>
+                                                    <button className="btn btn-sm" onClick={() => setConfirmDeleteProfileId(null)}>Cancel</button>
+                                                </span>
+                                            ) : (
+                                                <button className="btn btn-sm" onClick={() => setConfirmDeleteProfileId(profile.id)}>Delete</button>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">New Profile</label>
-                                    <input 
+                                    <input
                                         className="form-input"
                                         placeholder="Name"
                                         value={newProfileName}
-                                        onChange={(e) => setNewProfileName(e.target.value)}
+                                        onChange={(e) => { setNewProfileName(e.target.value); setProfileError(''); }}
+                                        onKeyDown={(e) => e.key === 'Enter' && addProfile()}
                                     />
+                                    {profileError && <div className="form-error">{profileError}</div>}
                                 </div>
                                 <div style={{display: 'flex', gap: '1rem'}}>
                                     <button className="btn" onClick={addProfile}>Add</button>
-                                    <button className="btn" onClick={() => setShowProfileModal(false)}>Close</button>
+                                    <button className="btn" onClick={() => { setShowProfileModal(false); setConfirmDeleteProfileId(null); setProfileError(''); }}>Close</button>
                                 </div>
                             </div>
                         </div>
                     )}
 
                     {showDatabaseModal && (
-                        <div className="modal-overlay" onClick={() => setShowDatabaseModal(false)}>
+                        <div className="modal-overlay" onClick={() => { setShowDatabaseModal(false); setCardFormError(''); }}>
                             <div className="modal" onClick={e => e.stopPropagation()}>
                                 <h2>Add Card to Database</h2>
                                 <div className="form-group">
                                     <label className="form-label">Card Name</label>
-                                    <input 
+                                    <input
                                         className="form-input"
                                         value={newCardForm.name}
-                                        onChange={(e) => setNewCardForm({...newCardForm, name: e.target.value})}
+                                        onChange={(e) => { setNewCardForm({...newCardForm, name: e.target.value}); setCardFormError(''); }}
                                     />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Issuer</label>
-                                    <input 
+                                    <input
                                         className="form-input"
                                         value={newCardForm.issuer}
-                                        onChange={(e) => setNewCardForm({...newCardForm, issuer: e.target.value})}
+                                        onChange={(e) => { setNewCardForm({...newCardForm, issuer: e.target.value}); setCardFormError(''); }}
                                     />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Annual Fee</label>
-                                    <input 
+                                    <input
                                         type="number"
                                         className="form-input"
                                         value={newCardForm.annualFee}
                                         onChange={(e) => setNewCardForm({...newCardForm, annualFee: e.target.value})}
                                     />
                                 </div>
-                                <div style={{display: 'flex', gap: '1rem'}}>
+                                {cardFormError && <div className="form-error">{cardFormError}</div>}
+                                <div style={{display: 'flex', gap: '1rem', marginTop: '0.5rem'}}>
                                     <button className="btn" onClick={addCardToDatabase}>Add</button>
-                                    <button className="btn" onClick={() => setShowDatabaseModal(false)}>Close</button>
+                                    <button className="btn" onClick={() => { setShowDatabaseModal(false); setCardFormError(''); }}>Close</button>
                                 </div>
                             </div>
                         </div>
@@ -1590,7 +1691,7 @@
                                     <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem', marginBottom: '0.75rem'}}>
                                         <input className="form-input" placeholder="Name"
                                             value={newBenefitForm.name}
-                                            onChange={e => setNewBenefitForm({...newBenefitForm, name: e.target.value})} />
+                                            onChange={e => { setNewBenefitForm({...newBenefitForm, name: e.target.value}); setBenefitFormError(''); }} />
                                         <select className="form-select" value={newBenefitForm.type}
                                             onChange={e => setNewBenefitForm({...newBenefitForm, type: e.target.value})}>
                                             <option>Dining</option><option>Travel</option><option>Shop</option>
@@ -1609,9 +1710,10 @@
                                             value={newBenefitForm.monetaryValue || ''}
                                             onChange={e => setNewBenefitForm({...newBenefitForm, monetaryValue: e.target.value})} />
                                     </div>
+                                    {benefitFormError && <div className="form-error" style={{marginBottom: '0.5rem'}}>{benefitFormError}</div>}
                                     <div style={{display: 'flex', gap: '0.75rem'}}>
                                         <button className="btn" onClick={addBenefitToCard}>Add Benefit</button>
-                                        <button className="btn" onClick={() => { setShowEditBenefitsModal(false); setEditingBenefitIdx(null); }}>Close</button>
+                                        <button className="btn" onClick={() => { setShowEditBenefitsModal(false); setEditingBenefitIdx(null); setBenefitFormError(''); }}>Close</button>
                                     </div>
                                 </div>
                             </div>
@@ -1619,22 +1721,55 @@
                     )}
 
                     {showImportModal && (
-                        <div className="modal-overlay" onClick={() => setShowImportModal(false)}>
+                        <div className="modal-overlay" onClick={() => { setShowImportModal(false); setPendingImport(null); setImportSuccess(false); }}>
                             <div className="modal" onClick={e => e.stopPropagation()}>
                                 <h2>Import Data</h2>
-                                <div className="form-group">
-                                    <label className="form-label">Select backup file (JSON)</label>
-                                    <input 
-                                        type="file"
-                                        accept=".json"
-                                        className="form-input"
-                                        onChange={importData}
-                                    />
-                                </div>
-                                <div style={{padding: '1rem', background: 'rgba(255,193,7,0.1)', borderRadius: '8px', marginTop: '1rem'}}>
-                                    <strong>⚠️ Warning:</strong> Importing will replace all current data. Make sure to export your current data first!
-                                </div>
-                                <button className="btn" onClick={() => setShowImportModal(false)} style={{marginTop: '1rem'}}>Cancel</button>
+
+                                {importSuccess ? (
+                                    <>
+                                        <div className="import-success">✓ Data imported successfully.</div>
+                                        <button className="btn" onClick={() => { setShowImportModal(false); setImportSuccess(false); }} style={{marginTop: '1rem'}}>Close</button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="form-group">
+                                            <label className="form-label">Select backup file (JSON)</label>
+                                            <input
+                                                type="file"
+                                                accept=".json"
+                                                className="form-input"
+                                                onChange={importData}
+                                            />
+                                        </div>
+
+                                        {pendingImport && !pendingImport.error && (
+                                            <div className="import-preview">
+                                                <strong>Preview — will replace current data with:</strong><br/>
+                                                {pendingImport.profiles   ? `${pendingImport.profiles.length} profile(s)` : 'no profiles'} ·{' '}
+                                                {pendingImport.cards      ? `${pendingImport.cards.length} card(s)` : 'no cards'} ·{' '}
+                                                {pendingImport.cardDatabase ? `${Object.keys(pendingImport.cardDatabase).length} database entries` : 'no database'}<br/>
+                                                {pendingImport.exportDate && <span style={{fontSize:'0.75rem', opacity:0.6}}>Exported: {new Date(pendingImport.exportDate).toLocaleString()}</span>}
+                                            </div>
+                                        )}
+
+                                        {pendingImport?.error && (
+                                            <div className="form-error" style={{marginTop: '0.75rem'}}>{pendingImport.error}</div>
+                                        )}
+
+                                        {!pendingImport && (
+                                            <div style={{padding: '1rem', background: 'rgba(255,193,7,0.1)', borderRadius: '8px', marginTop: '1rem', fontSize: '0.875rem'}}>
+                                                <strong>⚠️ Warning:</strong> Importing will replace all current data. Export first to be safe.
+                                            </div>
+                                        )}
+
+                                        <div style={{display: 'flex', gap: '1rem', marginTop: '1rem'}}>
+                                            {pendingImport && !pendingImport.error && (
+                                                <button className="btn btn-danger" onClick={applyImport}>Apply Import</button>
+                                            )}
+                                            <button className="btn" onClick={() => { setShowImportModal(false); setPendingImport(null); }}>Cancel</button>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                     )}
