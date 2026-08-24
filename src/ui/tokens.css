@@ -88,6 +88,18 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
+
+  /* .tabbar is `position: fixed`, so .app-scroll needs matching bottom padding
+     to keep scrolled content clear of it. Sum of TabBar.css's actual box model
+     (measured via getBoundingClientRect, not assumed): 1px border-top +
+     9px top padding + [.tab content: 3px+3px padding, 23px icon, 4px icon/label
+     gap, 16px rendered line-height of the 13px label -- this stack is 49px
+     total, taller than --target-min's 44px floor, so the min-height token
+     alone would undercount it] + the bottom safe-area padding from
+     credit-card-tracker-8li. */
+  --tabbar-h: calc(
+    1px + 9px + 3px + 23px + 4px + 16px + 3px + max(calc(var(--safe-bottom) * 0.5), 10px)
+  );
 }
 
 *,
