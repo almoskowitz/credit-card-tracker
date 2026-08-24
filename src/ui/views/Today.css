@@ -1,0 +1,320 @@
+.msr-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  padding: 18px 18px 10px;
+}
+.msr-head .lbl {
+  font-size: var(--fs-13);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-1);
+}
+.msr-head .note {
+  margin-left: auto;
+  font-size: var(--fs-13);
+  color: var(--text-2);
+  letter-spacing: 0.02em;
+}
+
+.msr-strip {
+  display: flex;
+  gap: var(--sp-3);
+  overflow-x: auto;
+  padding: 0 18px 4px;
+  scroll-snap-type: x mandatory;
+}
+.msr-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.msr {
+  flex: 0 0 302px;
+  scroll-snap-align: start;
+  padding: 15px 16px 16px;
+}
+
+.msr-top {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  margin-bottom: 2px;
+}
+.msr-card {
+  font-size: var(--fs-15);
+  color: var(--text-1);
+  font-weight: 500;
+}
+.msr-bonus {
+  font-size: var(--fs-17);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin-top: 3px;
+  color: var(--text-0);
+}
+.msr-tag {
+  margin-left: auto;
+  font-size: var(--fs-13);
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  padding: 3px 7px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  flex: none;
+}
+.msr-tag.r {
+  background: var(--red-dim);
+  color: var(--red);
+  border: 1px solid color-mix(in srgb, var(--red) 32%, transparent);
+}
+.msr-tag.g {
+  background: var(--mint-dim);
+  color: var(--mint);
+  border: 1px solid color-mix(in srgb, var(--mint) 28%, transparent);
+}
+.msr-amt {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 11px 0 8px;
+}
+.msr-amt b {
+  font-size: var(--fs-22);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-0);
+}
+.msr-amt em {
+  font-style: normal;
+  font-size: var(--fs-13);
+  color: var(--text-2);
+}
+.msr-meta {
+  margin-top: 10px;
+  font-size: var(--fs-15);
+  color: var(--text-1);
+}
+.msr-meta .hot {
+  color: var(--red);
+  font-weight: 650;
+}
+.msr-meta .cool {
+  color: var(--mint);
+  font-weight: 650;
+}
+
+.sec-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 22px 18px 9px;
+}
+.sec-head .lbl {
+  font-size: var(--fs-13);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.sec-head .cnt {
+  font-size: var(--fs-13);
+  font-weight: 700;
+  color: var(--text-2);
+  background: var(--glass-1);
+  border-radius: var(--r-pill);
+  padding: 2px 7px;
+  min-width: 20px;
+  text-align: center;
+}
+.sec-head .tot {
+  margin-left: auto;
+  font-size: var(--fs-15);
+  color: var(--text-2);
+}
+
+.rows {
+  padding: 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 72px;
+  padding: 12px 6px 12px 18px;
+  background: var(--glass-1);
+  border-radius: var(--r-md);
+  box-shadow: inset 0 0 0 1px var(--border);
+  overflow: hidden;
+  transition:
+    opacity var(--t-slow) ease-out,
+    background var(--t-base);
+  animation: row-enter var(--t-slow) ease-out;
+}
+
+@keyframes row-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.row .edge {
+  position: absolute;
+  left: 6px;
+  top: 12px;
+  bottom: 12px;
+  width: 4px;
+  border-radius: var(--r-pill);
+  background: var(--acc, var(--issuer-default));
+  opacity: 0.9;
+}
+
+.rmain {
+  flex: 1;
+  min-width: 0;
+}
+.rname {
+  font-size: var(--fs-17);
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-0);
+}
+.rsub {
+  font-size: var(--fs-13);
+  color: var(--text-2);
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.rsub .w {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pill {
+  font-size: var(--fs-13);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--amber-dim);
+  color: var(--amber);
+  border: 1px solid color-mix(in srgb, var(--amber) 28%, transparent);
+  flex: none;
+}
+.pill.hot {
+  background: var(--red-dim);
+  color: var(--red);
+  border-color: color-mix(in srgb, var(--red) 30%, transparent);
+}
+.rval {
+  font-size: var(--fs-17);
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  flex: none;
+  color: var(--text-0);
+}
+.row.done .rname,
+.row.done .rval {
+  color: var(--text-2);
+}
+.row.done .rval {
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+}
+.row.done {
+  opacity: 0.55;
+}
+
+.done-head {
+  width: calc(100% - 36px);
+  margin: 22px 18px 0;
+  padding: 13px 16px;
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--white) 3.5%, transparent);
+  box-shadow: inset 0 0 0 1px var(--border-soft);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  opacity: 0.62;
+  transition: opacity var(--t-base);
+  border: 0;
+  min-height: var(--target-min);
+}
+.done-head:active {
+  opacity: 0.85;
+}
+.done-head .lbl {
+  font-size: var(--fs-13);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.done-head .cnt {
+  font-size: var(--fs-13);
+  font-weight: 700;
+  color: var(--text-2);
+  background: var(--glass-1);
+  border-radius: var(--r-pill);
+  padding: 2px 7px;
+}
+.done-head .tot {
+  margin-left: auto;
+  font-size: var(--fs-15);
+  color: var(--text-2);
+}
+.done-head .chev {
+  width: 14px;
+  height: 14px;
+  margin-left: 2px;
+  color: var(--text-2);
+  transition: transform var(--t-slow) ease-out;
+  flex: none;
+}
+.done-head.open .chev {
+  transform: rotate(180deg);
+}
+
+.done-list {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0.42;
+  transition:
+    max-height var(--t-slow) ease-out,
+    opacity var(--t-base) ease-out,
+    padding var(--t-slow) ease-out;
+  padding: 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.done-list.open {
+  max-height: 2000px;
+  padding: 10px 18px 0;
+}
+
+.today-empty {
+  padding: 60px 24px;
+  text-align: center;
+  color: var(--text-2);
+  font-size: var(--fs-15);
+}

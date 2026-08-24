@@ -1,0 +1,133 @@
+/* ============================================================
+   DESIGN TOKENS — the single source of colour, type, spacing and
+   motion values for the whole app. See design.md §7.
+   No other file under src/ui/ may hold a colour or font-size literal.
+   ============================================================ */
+:root {
+  /* ground */
+  --bg-0: #0b1220;
+  --bg-1: #0f1729;
+  --glass-1: rgba(255, 255, 255, 0.05); /* flat list surfaces */
+  --glass-2: rgba(255, 255, 255, 0.09); /* raised: sheets, MSR cards, tab bar */
+  --border: rgba(255, 255, 255, 0.1); /* 1px translucent hairline */
+  --border-soft: rgba(255, 255, 255, 0.06);
+  --scrim: rgba(4, 8, 18, 0.58);
+
+  /* text */
+  --text-0: #f2f5fa;
+  --text-1: rgba(242, 245, 250, 0.72);
+  --text-2: rgba(242, 245, 250, 0.45);
+
+  /* semantic accents — exactly one meaning each, never decorative */
+  --mint: #4ade9b; /* done / redeemed */
+  --mint-dim: rgba(74, 222, 155, 0.16);
+  --amber: #f5b544; /* expiring soon */
+  --amber-dim: rgba(245, 181, 68, 0.16);
+  --red: #f4635b; /* at risk / missed */
+  --red-dim: rgba(244, 99, 91, 0.16);
+  --sky: #56b6f0; /* informational */
+  --sky-dim: rgba(86, 182, 240, 0.16);
+  --violet: #9d7cf5; /* optimizer only */
+  --violet-dim: rgba(157, 124, 245, 0.16);
+
+  /* neutrals — every translucent overlay elsewhere is `color-mix(in srgb, var(--white|--black|--<accent>) N%, transparent)` off one of these, so no other file needs a literal colour */
+  --white: #ffffff;
+  --black: #000000;
+  --on-mint: #08301f; /* text/icon ink for anything drawn on a mint-filled surface */
+
+  /* opaque chrome surfaces that aren't simple tints of --white/--black */
+  --sheet-bg: rgba(18, 26, 46, 0.86);
+  --toast-bg: rgba(22, 32, 54, 0.86);
+
+  /* issuer accents — carried over unchanged from the v2 `.issuer-*` classes */
+  --issuer-amex: #c9a357;
+  --issuer-chase: #1a8fe3;
+  --issuer-capital-one: #e04535;
+  --issuer-citi: #0073cf;
+  --issuer-barclays: #00aeef;
+  --issuer-bank-of-america: #cc1f36;
+  --issuer-default: var(--text-2);
+
+  /* type scale — 28 / 22 / 17 / 15 / 13, 17px floor for anything actionable */
+  --fs-28: 28px;
+  --fs-22: 22px;
+  --fs-17: 17px;
+  --fs-15: 15px;
+  --fs-13: 13px;
+
+  /* spacing */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-7: 32px;
+
+  /* radii */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 16px;
+  --r-xl: 18px;
+  --r-2xl: 26px;
+  --r-pill: 999px;
+
+  /* touch targets */
+  --target-min: 44px;
+  --target-toggle: 56px;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-fast: 150ms;
+  --t-base: 180ms;
+  --t-slow: 220ms;
+
+  /* safe area */
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, var(--bg-0) 0%, var(--bg-1) 100%);
+  background-attachment: fixed;
+  color: var(--text-0);
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Inter, system-ui,
+    sans-serif;
+  font-size: var(--fs-17);
+  overscroll-behavior-y: none;
+}
+
+button,
+input {
+  font-family: inherit;
+  color: inherit;
+}
+
+.money {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,64 @@
+.tap-toggle {
+  flex: none;
+  width: var(--target-toggle);
+  height: var(--target-toggle);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  position: relative;
+  padding: 0;
+}
+
+.tap-toggle .ring {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--white) 18%, transparent);
+  transition: border-color var(--t-base);
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+
+.tap-toggle .fill {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: var(--mint);
+  transform: scale(0);
+  transition: transform 190ms var(--spring);
+}
+
+.tap-toggle svg {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.tap-toggle svg path {
+  stroke: var(--on-mint);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  stroke-dasharray: 22;
+  stroke-dashoffset: 22;
+  transition: stroke-dashoffset 160ms ease-out;
+}
+
+.tap-toggle[aria-pressed='true'] .ring {
+  border-color: var(--mint);
+}
+.tap-toggle[aria-pressed='true'] .fill {
+  transform: scale(1);
+}
+.tap-toggle[aria-pressed='true'] svg path {
+  stroke-dashoffset: 0;
+  transition-delay: 60ms;
+}
+.tap-toggle:active .ring {
+  transform: scale(0.92);
+}

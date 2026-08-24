@@ -1,0 +1,108 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.app-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.app-loading {
+  display: grid;
+  place-items: center;
+  height: 100dvh;
+  color: var(--text-2);
+  font-size: var(--fs-17);
+}
+
+.connection-banner {
+  flex: none;
+  padding: 10px 18px;
+  background: var(--red-dim);
+  color: var(--red);
+  font-size: var(--fs-13);
+  font-weight: 600;
+  text-align: center;
+  box-shadow: inset 0 -1px 0 var(--border);
+}
+
+.hdr {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: 12px 18px 12px;
+  background: color-mix(in srgb, var(--bg-0) 62%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  backdrop-filter: blur(20px) saturate(140%);
+  box-shadow: inset 0 -1px 0 var(--border);
+}
+
+.hdr h1 {
+  font-size: var(--fs-28);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.hdr .h-month {
+  font-size: var(--fs-17);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.hdr .h-sub {
+  font-size: var(--fs-13);
+  color: var(--text-2);
+  margin-top: 2px;
+}
+
+.chip-profile {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 50%;
+  background: var(--violet-dim);
+  border: 1px solid color-mix(in srgb, var(--violet) 34%, transparent);
+  color: var(--violet);
+  font-size: var(--fs-13);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.chip-profile::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+}
+
+.dot-live {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--mint);
+  border: 2px solid var(--bg-0);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--mint) 80%, transparent);
+}
+
+.dot-live.unreachable {
+  background: var(--red);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--red) 80%, transparent);
+}
