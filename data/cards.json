@@ -1,0 +1,1255 @@
+{
+  "schemaVersion": 1,
+  "updated": "2026-08-24",
+  "categories": [
+    {
+      "slug": "dining",
+      "name": "Dining"
+    },
+    {
+      "slug": "supermarkets",
+      "name": "Supermarkets"
+    },
+    {
+      "slug": "gas",
+      "name": "Gas Stations"
+    },
+    {
+      "slug": "travel",
+      "name": "Travel"
+    },
+    {
+      "slug": "hotels",
+      "name": "Hotels"
+    },
+    {
+      "slug": "flights",
+      "name": "Flights"
+    },
+    {
+      "slug": "office-supply",
+      "name": "Office Supply"
+    },
+    {
+      "slug": "telecom",
+      "name": "Internet / Cable / Phone"
+    },
+    {
+      "slug": "shipping",
+      "name": "Shipping"
+    },
+    {
+      "slug": "drugstores",
+      "name": "Drugstores"
+    },
+    {
+      "slug": "rideshare",
+      "name": "Rideshare"
+    },
+    {
+      "slug": "streaming",
+      "name": "Streaming"
+    },
+    {
+      "slug": "everything-else",
+      "name": "Everything Else"
+    },
+    {
+      "slug": "other",
+      "name": "Other"
+    }
+  ],
+  "cards": [
+    {
+      "slug": "amex-platinum",
+      "name": "Amex Platinum",
+      "issuer": "American Express",
+      "annualFee": 695,
+      "benefits": [
+        {
+          "name": "Uber Cash",
+          "value": 15,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "dining",
+          "valueOverrides": {
+            "M12": 20
+          }
+        },
+        {
+          "name": "Digital Entertainment",
+          "value": 25,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "other"
+        },
+        {
+          "name": "Lululemon",
+          "value": 75,
+          "displayValue": null,
+          "cadence": "quarterly",
+          "anchor": "calendar",
+          "category": "other"
+        },
+        {
+          "name": "Resy Credit",
+          "value": 100,
+          "displayValue": null,
+          "cadence": "quarterly",
+          "anchor": "calendar",
+          "category": "dining"
+        },
+        {
+          "name": "Saks Fifth Avenue",
+          "value": 50,
+          "displayValue": null,
+          "cadence": "semiannual",
+          "anchor": "calendar",
+          "category": "other"
+        },
+        {
+          "name": "Hotel Credit (FHR/THC)",
+          "value": 300,
+          "displayValue": null,
+          "cadence": "semiannual",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Airline Fee Credit",
+          "value": 200,
+          "displayValue": null,
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Walmart+ Membership",
+          "value": 155,
+          "displayValue": null,
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "other"
+        },
+        {
+          "name": "CLEAR Credit",
+          "value": 209,
+          "displayValue": null,
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Oura Ring Credit",
+          "value": 200,
+          "displayValue": null,
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "other"
+        }
+      ],
+      "earnRates": [
+        {
+          "category": "flights",
+          "rate": 5,
+          "notes": "Booked via Amex Travel"
+        },
+        {
+          "category": "hotels",
+          "rate": 5,
+          "notes": "Booked via Amex Travel"
+        },
+        {
+          "category": "everything-else",
+          "rate": 1,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": []
+    },
+    {
+      "slug": "business-platinum",
+      "name": "Business Platinum",
+      "issuer": "American Express",
+      "annualFee": 895,
+      "benefits": [
+        {
+          "name": "Dell Credit",
+          "value": 16.67,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "other"
+        },
+        {
+          "name": "Adobe Credit",
+          "value": 20.83,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "other"
+        },
+        {
+          "name": "Indeed Credit",
+          "value": 30,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "other"
+        },
+        {
+          "name": "Wireless Credit",
+          "value": 10,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "other"
+        },
+        {
+          "name": "Hotel Credit (FHR/THC)",
+          "value": 300,
+          "displayValue": null,
+          "cadence": "semiannual",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Hilton For Business",
+          "value": 100,
+          "displayValue": null,
+          "cadence": "semiannual",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Airline Fee Credit",
+          "value": 200,
+          "displayValue": null,
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "CLEAR Credit",
+          "value": 209,
+          "displayValue": null,
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel"
+        }
+      ],
+      "earnRates": [
+        {
+          "category": "flights",
+          "rate": 5,
+          "notes": "Booked via Amex Travel"
+        },
+        {
+          "category": "hotels",
+          "rate": 5,
+          "notes": "Booked via Amex Travel"
+        },
+        {
+          "category": "other",
+          "rate": 2,
+          "notes": "Construction/Hardware; Electronics; Software/Cloud"
+        },
+        {
+          "category": "shipping",
+          "rate": 2,
+          "notes": null
+        },
+        {
+          "category": "everything-else",
+          "rate": 2,
+          "notes": "Purchases $5k+; Everything Else"
+        }
+      ],
+      "caps": [],
+      "spendThresholds": []
+    },
+    {
+      "slug": "amex-gold",
+      "name": "Amex Gold",
+      "issuer": "American Express",
+      "annualFee": 325,
+      "benefits": [
+        {
+          "name": "Uber Cash",
+          "value": 10,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "dining"
+        },
+        {
+          "name": "Grubhub/Dining Credit",
+          "value": 10,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "dining"
+        },
+        {
+          "name": "Dunkin' Credit",
+          "value": 7,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "dining"
+        },
+        {
+          "name": "Resy Credit",
+          "value": 50,
+          "displayValue": null,
+          "cadence": "semiannual",
+          "anchor": "calendar",
+          "category": "dining"
+        }
+      ],
+      "earnRates": [
+        {
+          "category": "dining",
+          "rate": 4,
+          "notes": null
+        },
+        {
+          "category": "supermarkets",
+          "rate": 4,
+          "notes": null
+        },
+        {
+          "category": "everything-else",
+          "rate": 1,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": []
+    },
+    {
+      "slug": "business-gold",
+      "name": "Business Gold",
+      "issuer": "American Express",
+      "annualFee": 375,
+      "benefits": [
+        {
+          "name": "FedEx/Grubhub/Office Supply",
+          "value": 20,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "other"
+        },
+        {
+          "name": "Walmart+ Membership",
+          "value": 12.95,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "other"
+        }
+      ],
+      "earnRates": [
+        {
+          "category": "other",
+          "rate": 4,
+          "notes": "Top 2 spend categories, automatic"
+        },
+        {
+          "category": "travel",
+          "rate": 3,
+          "notes": "Booked via Amex Travel"
+        },
+        {
+          "category": "everything-else",
+          "rate": 1,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": []
+    },
+    {
+      "slug": "chase-sapphire-reserve",
+      "name": "Chase Sapphire Reserve",
+      "issuer": "Chase",
+      "annualFee": 550,
+      "benefits": [
+        {
+          "name": "DoorDash Restaurant",
+          "value": 5,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "dining"
+        },
+        {
+          "name": "DoorDash Non-Restaurant 1",
+          "value": 10,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "other"
+        },
+        {
+          "name": "DoorDash Non-Restaurant 2",
+          "value": 10,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "other"
+        },
+        {
+          "name": "Lyft Credit",
+          "value": 10,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Peloton Membership",
+          "value": 10,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "other"
+        },
+        {
+          "name": "The Edit Hotel Credit",
+          "value": 250,
+          "displayValue": null,
+          "cadence": "semiannual",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Sapphire Tables Credit",
+          "value": 150,
+          "displayValue": null,
+          "cadence": "semiannual",
+          "anchor": "calendar",
+          "category": "dining"
+        },
+        {
+          "name": "StubHub/viagogo Credit",
+          "value": 150,
+          "displayValue": null,
+          "cadence": "semiannual",
+          "anchor": "calendar",
+          "category": "dining"
+        },
+        {
+          "name": "Chase Travel Credit",
+          "value": 300,
+          "displayValue": null,
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Apple TV+ & Music",
+          "value": 250,
+          "displayValue": null,
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "other"
+        }
+      ],
+      "earnRates": [
+        {
+          "category": "travel",
+          "rate": 8,
+          "notes": "Booked via Chase Travel"
+        },
+        {
+          "category": "flights",
+          "rate": 4,
+          "notes": "Booked direct with the airline"
+        },
+        {
+          "category": "hotels",
+          "rate": 4,
+          "notes": "Booked direct with the hotel"
+        },
+        {
+          "category": "dining",
+          "rate": 3,
+          "notes": null
+        },
+        {
+          "category": "everything-else",
+          "rate": 1,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": []
+    },
+    {
+      "slug": "hilton-honors-aspire",
+      "name": "Hilton Honors Aspire",
+      "issuer": "American Express",
+      "annualFee": 550,
+      "benefits": [
+        {
+          "name": "Dining Credit",
+          "value": 25,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "dining"
+        },
+        {
+          "name": "Airline Credit",
+          "value": 50,
+          "displayValue": null,
+          "cadence": "quarterly",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Hilton Resort Credit",
+          "value": 200,
+          "displayValue": null,
+          "cadence": "semiannual",
+          "anchor": "calendar",
+          "category": "travel"
+        }
+      ],
+      "earnRates": [
+        {
+          "category": "hotels",
+          "rate": 14,
+          "notes": "Hilton properties"
+        },
+        {
+          "category": "dining",
+          "rate": 7,
+          "notes": "Dining (US Restaurants); Dining (US Takeout/Delivery)"
+        },
+        {
+          "category": "flights",
+          "rate": 7,
+          "notes": null
+        },
+        {
+          "category": "travel",
+          "rate": 7,
+          "notes": "Car rentals"
+        },
+        {
+          "category": "everything-else",
+          "rate": 3,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": [
+        {
+          "label": "Second Free Night",
+          "requirement": 30000,
+          "anchor": "calendar"
+        },
+        {
+          "label": "Third Free Night",
+          "requirement": 60000,
+          "anchor": "calendar"
+        }
+      ]
+    },
+    {
+      "slug": "hilton-honors-surpass",
+      "name": "Hilton Honors Surpass",
+      "issuer": "American Express",
+      "annualFee": 150,
+      "benefits": [
+        {
+          "name": "Hilton Credit",
+          "value": 50,
+          "displayValue": null,
+          "cadence": "quarterly",
+          "anchor": "calendar",
+          "category": "travel"
+        }
+      ],
+      "earnRates": [
+        {
+          "category": "hotels",
+          "rate": 12,
+          "notes": "Hilton properties"
+        },
+        {
+          "category": "supermarkets",
+          "rate": 6,
+          "notes": "US only"
+        },
+        {
+          "category": "dining",
+          "rate": 6,
+          "notes": "US restaurants only"
+        },
+        {
+          "category": "gas",
+          "rate": 6,
+          "notes": "US only"
+        },
+        {
+          "category": "everything-else",
+          "rate": 3,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": [
+        {
+          "label": "Free Night Award",
+          "requirement": 15000,
+          "anchor": "calendar"
+        },
+        {
+          "label": "Diamond Status",
+          "requirement": 40000,
+          "anchor": "calendar"
+        }
+      ]
+    },
+    {
+      "slug": "marriott-bonvoy-brilliant",
+      "name": "Marriott Bonvoy Brilliant",
+      "issuer": "American Express",
+      "annualFee": 650,
+      "benefits": [
+        {
+          "name": "Dining Credit",
+          "value": 25,
+          "displayValue": null,
+          "cadence": "monthly",
+          "anchor": "calendar",
+          "category": "dining"
+        },
+        {
+          "name": "Free Night Award",
+          "value": null,
+          "displayValue": "Up to 85k pts",
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel"
+        }
+      ],
+      "earnRates": [
+        {
+          "category": "hotels",
+          "rate": 10,
+          "notes": "Marriott properties"
+        },
+        {
+          "category": "dining",
+          "rate": 5,
+          "notes": "US only"
+        },
+        {
+          "category": "everything-else",
+          "rate": 3,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": [
+        {
+          "label": "Earned Choice Award",
+          "requirement": 60000,
+          "anchor": "calendar"
+        }
+      ]
+    },
+    {
+      "slug": "marriott-bonvoy-bold",
+      "name": "Marriott Bonvoy Bold",
+      "issuer": "Chase",
+      "annualFee": 0,
+      "benefits": [],
+      "earnRates": [
+        {
+          "category": "hotels",
+          "rate": 14,
+          "notes": "Marriott properties"
+        },
+        {
+          "category": "supermarkets",
+          "rate": 2,
+          "notes": null
+        },
+        {
+          "category": "telecom",
+          "rate": 2,
+          "notes": null
+        },
+        {
+          "category": "rideshare",
+          "rate": 2,
+          "notes": null
+        },
+        {
+          "category": "dining",
+          "rate": 2,
+          "notes": "Food delivery"
+        },
+        {
+          "category": "everything-else",
+          "rate": 1,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": [
+        {
+          "label": "Free Night Award",
+          "requirement": 15000,
+          "anchor": "calendar"
+        }
+      ]
+    },
+    {
+      "slug": "world-of-hyatt",
+      "name": "World of Hyatt",
+      "issuer": "Chase",
+      "annualFee": 99,
+      "benefits": [
+        {
+          "name": "Free Night Award",
+          "value": null,
+          "displayValue": "Cat 1-4",
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel"
+        }
+      ],
+      "earnRates": [
+        {
+          "category": "hotels",
+          "rate": 9,
+          "notes": "Hyatt properties"
+        },
+        {
+          "category": "dining",
+          "rate": 4,
+          "notes": null
+        },
+        {
+          "category": "travel",
+          "rate": 2,
+          "notes": "Airline / car rental / cruise"
+        },
+        {
+          "category": "other",
+          "rate": 2,
+          "notes": "Fitness / gym"
+        },
+        {
+          "category": "streaming",
+          "rate": 2,
+          "notes": null
+        },
+        {
+          "category": "everything-else",
+          "rate": 1,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": [
+        {
+          "label": "Additional Free Night",
+          "requirement": 15000,
+          "anchor": "calendar"
+        }
+      ]
+    },
+    {
+      "slug": "venture-x",
+      "name": "Venture X",
+      "issuer": "Capital One",
+      "annualFee": 395,
+      "benefits": [
+        {
+          "name": "Capital One Travel Credit",
+          "value": 300,
+          "displayValue": null,
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel"
+        }
+      ],
+      "earnRates": [
+        {
+          "category": "hotels",
+          "rate": 10,
+          "notes": "Booked via Capital One Travel; incl. rental cars"
+        },
+        {
+          "category": "everything-else",
+          "rate": 2,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": []
+    },
+    {
+      "slug": "strata-premier",
+      "name": "Strata Premier",
+      "issuer": "Citi",
+      "annualFee": 95,
+      "benefits": [
+        {
+          "name": "Hotel Credit",
+          "value": 100,
+          "displayValue": null,
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel"
+        }
+      ],
+      "earnRates": [
+        {
+          "category": "everything-else",
+          "rate": 1,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": []
+    },
+    {
+      "slug": "jetblue-plus",
+      "name": "Jetblue Plus",
+      "issuer": "Barclays",
+      "annualFee": 99,
+      "benefits": [
+        {
+          "name": "JetBlue Vacations Credit",
+          "value": 100,
+          "displayValue": null,
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel"
+        }
+      ],
+      "earnRates": [
+        {
+          "category": "flights",
+          "rate": 6,
+          "notes": "JetBlue purchases"
+        },
+        {
+          "category": "dining",
+          "rate": 2,
+          "notes": null
+        },
+        {
+          "category": "supermarkets",
+          "rate": 2,
+          "notes": null
+        },
+        {
+          "category": "everything-else",
+          "rate": 1,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": [
+        {
+          "label": "Mosaic Status",
+          "requirement": 50000,
+          "anchor": "calendar"
+        }
+      ]
+    },
+    {
+      "slug": "ritz-carlton-rewards-visa",
+      "name": "Ritz Carlton Rewards Visa",
+      "issuer": "Chase",
+      "annualFee": 450,
+      "benefits": [
+        {
+          "name": "Airline Fee Credit",
+          "value": 300,
+          "displayValue": null,
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Free Night Award",
+          "value": null,
+          "displayValue": "Up to 100k pts",
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Club Level Upgrade Certificates",
+          "value": null,
+          "displayValue": "3 Certificates",
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel"
+        }
+      ],
+      "earnRates": [
+        {
+          "category": "hotels",
+          "rate": 10,
+          "notes": "Marriott properties"
+        },
+        {
+          "category": "everything-else",
+          "rate": 3,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": []
+    },
+    {
+      "slug": "atmos-rewards-summit",
+      "name": "Atmos Rewards Summit",
+      "issuer": "Bank of America",
+      "annualFee": 395,
+      "benefits": [
+        {
+          "name": "Alaska Lounge Pass 1",
+          "value": 35,
+          "displayValue": null,
+          "cadence": "quarterly",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Alaska Lounge Pass 2",
+          "value": 35,
+          "displayValue": null,
+          "cadence": "quarterly",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Wi-Fi Pass 1",
+          "value": 8,
+          "displayValue": null,
+          "cadence": "quarterly",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Wi-Fi Pass 2",
+          "value": 8,
+          "displayValue": null,
+          "cadence": "quarterly",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Companion Certificate",
+          "value": null,
+          "displayValue": "25,000 pts",
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel"
+        }
+      ],
+      "earnRates": [
+        {
+          "category": "everything-else",
+          "rate": 1,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": [
+        {
+          "label": "Global 100K Companion Award",
+          "requirement": 60000,
+          "anchor": "anniversary"
+        }
+      ]
+    },
+    {
+      "slug": "chase-freedom",
+      "name": "Chase Freedom",
+      "issuer": "Chase",
+      "annualFee": 0,
+      "benefits": [],
+      "earnRates": [
+        {
+          "category": "other",
+          "rate": 5,
+          "notes": "Rotating quarterly 5% categories"
+        },
+        {
+          "category": "drugstores",
+          "rate": 3,
+          "notes": null
+        },
+        {
+          "category": "dining",
+          "rate": 3,
+          "notes": null
+        },
+        {
+          "category": "everything-else",
+          "rate": 1,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": []
+    },
+    {
+      "slug": "chase-freedom-unlimited",
+      "name": "Chase Freedom Unlimited",
+      "issuer": "Chase",
+      "annualFee": 0,
+      "benefits": [],
+      "earnRates": [
+        {
+          "category": "travel",
+          "rate": 5,
+          "notes": "Booked via Chase Travel"
+        },
+        {
+          "category": "dining",
+          "rate": 3,
+          "notes": null
+        },
+        {
+          "category": "drugstores",
+          "rate": 3,
+          "notes": null
+        },
+        {
+          "category": "rideshare",
+          "rate": 2,
+          "notes": "Lyft only"
+        },
+        {
+          "category": "everything-else",
+          "rate": 1.5,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": []
+    },
+    {
+      "slug": "ink-business-cash",
+      "name": "Ink Business Cash",
+      "issuer": "Chase",
+      "annualFee": 0,
+      "benefits": [],
+      "earnRates": [
+        {
+          "category": "office-supply",
+          "rate": 5,
+          "notes": null
+        },
+        {
+          "category": "telecom",
+          "rate": 5,
+          "notes": null
+        },
+        {
+          "category": "gas",
+          "rate": 5,
+          "notes": null
+        },
+        {
+          "category": "dining",
+          "rate": 2,
+          "notes": null
+        },
+        {
+          "category": "everything-else",
+          "rate": 1,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": []
+    },
+    {
+      "slug": "ink-business-preferred",
+      "name": "Ink Business Preferred",
+      "issuer": "Chase",
+      "annualFee": 95,
+      "benefits": [],
+      "earnRates": [
+        {
+          "category": "travel",
+          "rate": 3,
+          "notes": null
+        },
+        {
+          "category": "shipping",
+          "rate": 3,
+          "notes": null
+        },
+        {
+          "category": "telecom",
+          "rate": 3,
+          "notes": null
+        },
+        {
+          "category": "other",
+          "rate": 3,
+          "notes": "Advertising"
+        },
+        {
+          "category": "rideshare",
+          "rate": 5,
+          "notes": "Lyft only"
+        },
+        {
+          "category": "everything-else",
+          "rate": 1,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": []
+    },
+    {
+      "slug": "ink-business-unlimited",
+      "name": "Ink Business Unlimited",
+      "issuer": "Chase",
+      "annualFee": 0,
+      "benefits": [],
+      "earnRates": [
+        {
+          "category": "everything-else",
+          "rate": 1.5,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": []
+    },
+    {
+      "slug": "blue-business-plus",
+      "name": "Blue Business Plus",
+      "issuer": "American Express",
+      "annualFee": 0,
+      "benefits": [],
+      "earnRates": [
+        {
+          "category": "everything-else",
+          "rate": 2,
+          "notes": "Everything (up to $50k); Over $50k"
+        }
+      ],
+      "caps": [],
+      "spendThresholds": []
+    },
+    {
+      "slug": "delta-blue",
+      "name": "Delta Blue",
+      "issuer": "American Express",
+      "annualFee": 0,
+      "benefits": [],
+      "earnRates": [
+        {
+          "category": "flights",
+          "rate": 2,
+          "notes": "Delta purchases"
+        },
+        {
+          "category": "dining",
+          "rate": 2,
+          "notes": "US restaurants only"
+        },
+        {
+          "category": "everything-else",
+          "rate": 1,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": []
+    },
+    {
+      "slug": "citi-aadvantage-business",
+      "name": "Citi AAdvantage Business",
+      "issuer": "Citi",
+      "annualFee": 99,
+      "benefits": [],
+      "earnRates": [
+        {
+          "category": "flights",
+          "rate": 2,
+          "notes": "American Airlines purchases"
+        },
+        {
+          "category": "telecom",
+          "rate": 2,
+          "notes": null
+        },
+        {
+          "category": "gas",
+          "rate": 2,
+          "notes": null
+        },
+        {
+          "category": "travel",
+          "rate": 2,
+          "notes": "Car rentals"
+        },
+        {
+          "category": "everything-else",
+          "rate": 1,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": [
+        {
+          "label": "Companion Certificate",
+          "requirement": 30000,
+          "anchor": "anniversary"
+        }
+      ]
+    },
+    {
+      "slug": "aadvantage-aviator-red",
+      "name": "AAdvantage Aviator Red",
+      "issuer": "Barclays",
+      "annualFee": 99,
+      "benefits": [],
+      "earnRates": [
+        {
+          "category": "flights",
+          "rate": 2,
+          "notes": "American Airlines purchases"
+        },
+        {
+          "category": "everything-else",
+          "rate": 1,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": [
+        {
+          "label": "Companion Certificate",
+          "requirement": 20000,
+          "anchor": "anniversary"
+        }
+      ]
+    }
+  ]
+}
