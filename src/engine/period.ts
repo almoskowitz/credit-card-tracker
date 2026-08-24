@@ -110,3 +110,31 @@ export function resolveBenefitValue(benefit: Benefit, period: Period): number | 
 export function ledgerKey(benefitId: string, periodKey: string): string {
   return `${benefitId}|${periodKey}`;
 }
+
+const PAST_PERIOD_WINDOW: Record<Cadence, number> = { monthly: 12, quarterly: 8, semiannual: 4, annual: 3 };
+
+export function defaultPastPeriodCount(cadence: Cadence): number {
+  return PAST_PERIOD_WINDOW[cadence];
+}
+
+/**
+ * The `count` periods strictly before the one `now` falls in, most recent first — walking
+ * backward one period at a time via `periodFor` so cadence and anchor (including anniversary
+ * rollover) are respected exactly as they are for the live period. No floor at `card.opened`:
+ * logging usage from before a card was added to the app is intentional, not a bug.
+ */
+export function pastPeriods(
+  benefit: Benefit,
+  card: Card | null | undefined,
+  now: Date = new Date(),
+  count: number = defaultPastPeriodCount(benefit.cadence),
+): Period[] {
+  const periods: Period[] = [];
+  let boundary = periodFor(benefit, card, now).start;
+  for (let i = 0; i < count; i++) {
+    const p = periodFor(benefit, card, new Date(boundary.getTime() - 1));
+    periods.push(p);
+    boundary = p.start;
+  }
+  return periods;
+}

@@ -5,6 +5,8 @@ import {
   periodFor,
   resolveBenefitValue,
   ledgerKey,
+  pastPeriods,
+  defaultPastPeriodCount,
   type Benefit,
   type Card,
 } from '../src/engine/period';
@@ -239,5 +241,72 @@ describe('PE-10 — key format snapshot', () => {
 
   it('the ledger key composes benefit id and period key', () => {
     expect(ledgerKey('b-123', '2026-07')).toBe('b-123|2026-07');
+  });
+});
+
+describe('defaultPastPeriodCount', () => {
+  it('gives the documented window per cadence', () => {
+    expect(defaultPastPeriodCount('monthly')).toBe(12);
+    expect(defaultPastPeriodCount('quarterly')).toBe(8);
+    expect(defaultPastPeriodCount('semiannual')).toBe(4);
+    expect(defaultPastPeriodCount('annual')).toBe(3);
+  });
+});
+
+describe('pastPeriods', () => {
+  it('lists 12 prior calendar months, most recent first, contiguous with no gaps', () => {
+    const b = benefit('monthly', 'calendar');
+    const periods = pastPeriods(b, undefined, local(2026, 8, 20, 9));
+    expect(periods).toHaveLength(12);
+    expect(periods[0].key).toBe('2026-07');
+    expect(periods[11].key).toBe('2025-08');
+    // strictly excludes the current (August 2026) period
+    expect(periods.some((p) => p.key === '2026-08')).toBe(false);
+    for (let i = 0; i < periods.length - 1; i++) {
+      expect(periods[i + 1].end).toEqual(periods[i].start);
+    }
+  });
+
+  it('lists prior calendar quarters and semiannual windows', () => {
+    const q = benefit('quarterly', 'calendar');
+    const qPeriods = pastPeriods(q, undefined, local(2026, 8, 20));
+    expect(qPeriods).toHaveLength(8);
+    expect(qPeriods[0].key).toBe('2026-04');
+    expect(qPeriods[1].key).toBe('2026-01');
+
+    const h = benefit('semiannual', 'calendar');
+    const hPeriods = pastPeriods(h, undefined, local(2026, 8, 20));
+    expect(hPeriods).toHaveLength(4);
+    expect(hPeriods[0].key).toBe('2026-01');
+    expect(hPeriods[1].key).toBe('2025-07');
+  });
+
+  it('lists prior calendar years for an annual benefit', () => {
+    const a = benefit('annual', 'calendar');
+    const periods = pastPeriods(a, undefined, local(2026, 8, 20));
+    expect(periods.map((p) => p.key)).toEqual(['2025-01', '2024-01', '2023-01']);
+  });
+
+  it('respects an anniversary anchor, including its Jan-31 rollover quirk, walking backward', () => {
+    const card: Card = { anniversary: '2026-01-31' };
+    const b = benefit('quarterly', 'anniversary');
+    const periods = pastPeriods(b, card, local(2026, 8, 15), 3);
+    expect(periods.map((p) => p.key)).toEqual(['A2026-04-30', 'A2026-01-31', 'A2025-10-31']);
+    for (let i = 0; i < periods.length - 1; i++) {
+      expect(periods[i + 1].end).toEqual(periods[i].start);
+    }
+  });
+
+  it('does not floor at any card.opened date — walks arbitrarily far back', () => {
+    const b = benefit('annual', 'calendar');
+    const periods = pastPeriods(b, undefined, local(2026, 8, 20), 30);
+    expect(periods).toHaveLength(30);
+    expect(periods[29].key).toBe('1996-01');
+  });
+
+  it('accepts an explicit count override smaller than the cadence default', () => {
+    const b = benefit('monthly', 'calendar');
+    const periods = pastPeriods(b, undefined, local(2026, 8, 20), 2);
+    expect(periods.map((p) => p.key)).toEqual(['2026-07', '2026-06']);
   });
 });

@@ -103,7 +103,6 @@ function SearchTier({
         placeholder="Search by name or issuer"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        autoFocus
       />
       <div className="cs-results">
         {results.length === 0 && <div className="cd-empty">No matches.</div>}

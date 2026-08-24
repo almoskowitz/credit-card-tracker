@@ -1,10 +1,20 @@
 import { useState, type Dispatch } from 'react';
 import { useStore, type StoreAction } from '../../state/store';
 import { cardBreakevenFor } from '../../state/selectors';
-import { ledgerKey, parseLocalDate, periodFor, resolveBenefitValue, type Anchor, type Cadence } from '../../engine/period';
+import {
+  ledgerKey,
+  parseLocalDate,
+  pastPeriods,
+  periodFor,
+  resolveBenefitValue,
+  type Anchor,
+  type Cadence,
+  type Period,
+} from '../../engine/period';
 import type { Benefit, Cap, Card, EarnRate, Msr } from '../../state/schema';
 import { Sheet } from '../components/Sheet';
 import { ProgressBar, type ProgressVariant } from '../components/ProgressBar';
+import { TapToggle } from '../components/TapToggle';
 import { CATEGORIES, categoryName } from '../../catalog/categories';
 import type { Catalog, CatalogCard } from '../../catalog/catalog';
 import catalogData from '../../../data/cards.json';
@@ -33,6 +43,19 @@ function capitalize(s: string): string {
   return s.slice(0, 1).toUpperCase() + s.slice(1);
 }
 
+/** A human label for one period, tailored to how it maps to real dates for this benefit's anchor. */
+function periodLabel(benefit: Benefit, period: Period): string {
+  if (benefit.anchor === 'anniversary') {
+    const inclusiveEnd = new Date(period.end.getTime() - 1);
+    return `${shortDate(period.start)} – ${shortDate(inclusiveEnd)}`;
+  }
+  const year = period.start.getFullYear();
+  if (benefit.cadence === 'monthly') return monthYear(period.start);
+  if (benefit.cadence === 'quarterly') return `Q${Math.floor(period.start.getMonth() / 3) + 1} ${year}`;
+  if (benefit.cadence === 'semiannual') return `H${Math.floor(period.start.getMonth() / 6) + 1} ${year}`;
+  return `${year}`;
+}
+
 function ChevronIcon() {
   return (
     <svg className="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -57,6 +80,7 @@ export function CardDetail({ cardId, open, onClose }: CardDetailProps) {
   const [expandedEarnRateId, setExpandedEarnRateId] = useState<string | null>(null);
   const [expandedCapId, setExpandedCapId] = useState<string | null>(null);
   const [addingMsr, setAddingMsr] = useState(false);
+  const [pastPeriodsBenefitId, setPastPeriodsBenefitId] = useState<string | null>(null);
 
   const card = cardId ? (state.cards.find((c) => c.id === cardId) ?? null) : null;
 
@@ -76,6 +100,7 @@ export function CardDetail({ cardId, open, onClose }: CardDetailProps) {
   const catalogCard = card.slug ? (CATALOG.cards.find((c) => c.slug === card.slug) ?? null) : null;
   const toBreakEven = Math.max(0, (card.fee ?? 0) - be.recovered);
   const opened = parseLocalDate(card.opened);
+  const pastPeriodsBenefit = benefits.find((b) => b.id === pastPeriodsBenefitId) ?? null;
 
   function patchCard(patch: Partial<Omit<Card, 'id'>>) {
     dispatch({ type: 'UPDATE_CARD', id: card!.id, patch });
@@ -116,161 +141,171 @@ export function CardDetail({ cardId, open, onClose }: CardDetailProps) {
   }
 
   return (
-    <Sheet open={open} onClose={onClose} ariaLabel={card.name}>
-      <div className="sheet-top">
-        <div>
-          <h2>{card.name}</h2>
-          <div className="s">
-            {card.issuer}
-            {opened ? ` · opened ${monthYear(opened)}` : ''}
+    <>
+      <Sheet open={open} onClose={onClose} ariaLabel={card.name}>
+        <div className="sheet-top">
+          <div>
+            <h2>{card.name}</h2>
+            <div className="s">
+              {card.issuer}
+              {opened ? ` · opened ${monthYear(opened)}` : ''}
+            </div>
+          </div>
+          <button type="button" onClick={onClose}>
+            Done
+          </button>
+        </div>
+
+        <div className="meter-wrap">
+          <div className="mrow">
+            <b className="money">{usd(be.recovered)} recovered</b>
+            <span className="money">{toBreakEven > 0 ? `${usd(toBreakEven)} to break even` : 'Break-even reached'}</span>
+          </div>
+          <ProgressBar value={be.recoveryPct} variant={barVariant(be.recoveryPct)} tick tall />
+          <div className="meter-foot">
+            <span className="money">{pct(be.recoveryPct)} of fee</span>
+            <span className="money">{usd(card.fee ?? 0)} fee</span>
           </div>
         </div>
-        <button type="button" onClick={onClose}>
-          Done
-        </button>
-      </div>
 
-      <div className="meter-wrap">
-        <div className="mrow">
-          <b className="money">{usd(be.recovered)} recovered</b>
-          <span className="money">{toBreakEven > 0 ? `${usd(toBreakEven)} to break even` : 'Break-even reached'}</span>
+        <div className="sh-lbl">Benefits</div>
+        <div className="bl-list">
+          {benefits.length === 0 && <div className="cd-empty">No benefits yet.</div>}
+          {benefits.map((b) => (
+            <BenefitRow
+              key={b.id}
+              benefit={b}
+              cardAnniversary={card.anniversary}
+              state={state}
+              dispatch={dispatch}
+              expanded={expandedBenefitId === b.id}
+              onToggleExpand={() => setExpandedBenefitId((id) => (id === b.id ? null : b.id))}
+              onOpenPastPeriods={() => setPastPeriodsBenefitId(b.id)}
+            />
+          ))}
         </div>
-        <ProgressBar value={be.recoveryPct} variant={barVariant(be.recoveryPct)} tick tall />
-        <div className="meter-foot">
-          <span className="money">{pct(be.recoveryPct)} of fee</span>
-          <span className="money">{usd(card.fee ?? 0)} fee</span>
+        <div className="chips">
+          <button type="button" className="chip sky" onClick={() => setAddingMsr((v) => !v)}>
+            + Add MSR
+          </button>
+          <button type="button" className="chip ghost" onClick={addBenefit}>
+            + Add benefit
+          </button>
         </div>
-      </div>
 
-      <div className="sh-lbl">Benefits</div>
-      <div className="bl-list">
-        {benefits.length === 0 && <div className="cd-empty">No benefits yet.</div>}
-        {benefits.map((b) => (
-          <BenefitRow
-            key={b.id}
-            benefit={b}
-            cardAnniversary={card.anniversary}
-            state={state}
-            dispatch={dispatch}
-            expanded={expandedBenefitId === b.id}
-            onToggleExpand={() => setExpandedBenefitId((id) => (id === b.id ? null : b.id))}
-          />
-        ))}
-      </div>
-      <div className="chips">
-        <button type="button" className="chip sky" onClick={() => setAddingMsr((v) => !v)}>
-          + Add MSR
-        </button>
-        <button type="button" className="chip ghost" onClick={addBenefit}>
-          + Add benefit
-        </button>
-      </div>
+        {addingMsr && (
+          <AddMsrForm catalogCard={catalogCard} cardId={card.id} dispatch={dispatch} onDone={() => setAddingMsr(false)} />
+        )}
 
-      {addingMsr && (
-        <AddMsrForm catalogCard={catalogCard} cardId={card.id} dispatch={dispatch} onDone={() => setAddingMsr(false)} />
-      )}
+        {msrs.length > 0 && (
+          <>
+            <div className="sh-lbl">Minimum spend</div>
+            <div className="bl-list">
+              {msrs.map((m) => (
+                <MsrRow
+                  key={m.id}
+                  msr={m}
+                  dispatch={dispatch}
+                  expanded={expandedMsrId === m.id}
+                  onToggleExpand={() => setExpandedMsrId((id) => (id === m.id ? null : m.id))}
+                />
+              ))}
+            </div>
+          </>
+        )}
 
-      {msrs.length > 0 && (
-        <>
-          <div className="sh-lbl">Minimum spend</div>
-          <div className="bl-list">
-            {msrs.map((m) => (
-              <MsrRow
-                key={m.id}
-                msr={m}
-                dispatch={dispatch}
-                expanded={expandedMsrId === m.id}
-                onToggleExpand={() => setExpandedMsrId((id) => (id === m.id ? null : m.id))}
-              />
-            ))}
+        <div className="sh-lbl">Earn rates</div>
+        <div className="bl-list">
+          {earnRates.length === 0 && <div className="cd-empty">No earn rates yet.</div>}
+          {earnRates.map((e) => (
+            <EarnRateRow
+              key={e.id}
+              earnRate={e}
+              dispatch={dispatch}
+              expanded={expandedEarnRateId === e.id}
+              onToggleExpand={() => setExpandedEarnRateId((id) => (id === e.id ? null : e.id))}
+            />
+          ))}
+        </div>
+        <div className="chips">
+          <button type="button" className="chip ghost" onClick={addEarnRate}>
+            + Add earn rate
+          </button>
+        </div>
+
+        <div className="sh-lbl">Caps</div>
+        <div className="bl-list">
+          {caps.length === 0 && <div className="cd-empty">None — the catalog carries no cap data.</div>}
+          {caps.map((c) => (
+            <CapRow
+              key={c.id}
+              cap={c}
+              dispatch={dispatch}
+              expanded={expandedCapId === c.id}
+              onToggleExpand={() => setExpandedCapId((id) => (id === c.id ? null : c.id))}
+            />
+          ))}
+        </div>
+        <div className="chips">
+          <button type="button" className="chip ghost" onClick={addCap}>
+            + Add cap
+          </button>
+        </div>
+
+        <div className="sh-lbl">Card details</div>
+        <div className="mrows">
+          <div className="mr-edit">
+            <span>Name</span>
+            <input value={card.name} onChange={(e) => patchCard({ name: e.target.value })} />
           </div>
-        </>
-      )}
+          <div className="mr-edit">
+            <span>Issuer</span>
+            <input value={card.issuer} onChange={(e) => patchCard({ issuer: e.target.value })} />
+          </div>
+          <div className="mr-edit">
+            <span>Annual fee</span>
+            <input
+              type="number"
+              inputMode="decimal"
+              className="money"
+              value={card.fee ?? ''}
+              placeholder="—"
+              onChange={(e) => patchCard({ fee: numberInputToValue(e.target.value) })}
+            />
+          </div>
+          <div className="mr-edit">
+            <span>Anniversary</span>
+            <input type="date" value={card.anniversary ?? ''} onChange={(e) => patchCard({ anniversary: e.target.value || null })} />
+          </div>
+          <div className="mr-edit">
+            <span>Opened</span>
+            <input type="date" value={card.opened ?? ''} onChange={(e) => patchCard({ opened: e.target.value || null })} />
+          </div>
+          <div className="mr-edit">
+            <span>Closed</span>
+            <input type="date" value={card.closed ?? ''} onChange={(e) => patchCard({ closed: e.target.value || null })} />
+          </div>
+        </div>
 
-      <div className="sh-lbl">Earn rates</div>
-      <div className="bl-list">
-        {earnRates.length === 0 && <div className="cd-empty">No earn rates yet.</div>}
-        {earnRates.map((e) => (
-          <EarnRateRow
-            key={e.id}
-            earnRate={e}
-            dispatch={dispatch}
-            expanded={expandedEarnRateId === e.id}
-            onToggleExpand={() => setExpandedEarnRateId((id) => (id === e.id ? null : e.id))}
-          />
-        ))}
-      </div>
-      <div className="chips">
-        <button type="button" className="chip ghost" onClick={addEarnRate}>
-          + Add earn rate
+        <button
+          type="button"
+          className="cd-remove"
+          onClick={() => {
+            dispatch({ type: 'DELETE_CARD', id: card.id });
+            onClose();
+          }}
+        >
+          Remove card
         </button>
-      </div>
-
-      <div className="sh-lbl">Caps</div>
-      <div className="bl-list">
-        {caps.length === 0 && <div className="cd-empty">None — the catalog carries no cap data.</div>}
-        {caps.map((c) => (
-          <CapRow
-            key={c.id}
-            cap={c}
-            dispatch={dispatch}
-            expanded={expandedCapId === c.id}
-            onToggleExpand={() => setExpandedCapId((id) => (id === c.id ? null : c.id))}
-          />
-        ))}
-      </div>
-      <div className="chips">
-        <button type="button" className="chip ghost" onClick={addCap}>
-          + Add cap
-        </button>
-      </div>
-
-      <div className="sh-lbl">Card details</div>
-      <div className="mrows">
-        <div className="mr-edit">
-          <span>Name</span>
-          <input value={card.name} onChange={(e) => patchCard({ name: e.target.value })} />
-        </div>
-        <div className="mr-edit">
-          <span>Issuer</span>
-          <input value={card.issuer} onChange={(e) => patchCard({ issuer: e.target.value })} />
-        </div>
-        <div className="mr-edit">
-          <span>Annual fee</span>
-          <input
-            type="number"
-            inputMode="decimal"
-            className="money"
-            value={card.fee ?? ''}
-            placeholder="—"
-            onChange={(e) => patchCard({ fee: numberInputToValue(e.target.value) })}
-          />
-        </div>
-        <div className="mr-edit">
-          <span>Anniversary</span>
-          <input type="date" value={card.anniversary ?? ''} onChange={(e) => patchCard({ anniversary: e.target.value || null })} />
-        </div>
-        <div className="mr-edit">
-          <span>Opened</span>
-          <input type="date" value={card.opened ?? ''} onChange={(e) => patchCard({ opened: e.target.value || null })} />
-        </div>
-        <div className="mr-edit">
-          <span>Closed</span>
-          <input type="date" value={card.closed ?? ''} onChange={(e) => patchCard({ closed: e.target.value || null })} />
-        </div>
-      </div>
-
-      <button
-        type="button"
-        className="cd-remove"
-        onClick={() => {
-          dispatch({ type: 'DELETE_CARD', id: card.id });
-          onClose();
-        }}
-      >
-        Remove card
-      </button>
-    </Sheet>
+      </Sheet>
+      <PastPeriodsSheet
+        benefit={pastPeriodsBenefit}
+        cardAnniversary={card.anniversary}
+        redemptions={state.redemptions}
+        dispatch={dispatch}
+        onClose={() => setPastPeriodsBenefitId(null)}
+      />
+    </>
   );
 }
 
@@ -281,9 +316,10 @@ interface BenefitRowProps {
   dispatch: Dispatch<StoreAction>;
   expanded: boolean;
   onToggleExpand: () => void;
+  onOpenPastPeriods: () => void;
 }
 
-function BenefitRow({ benefit, cardAnniversary, state, dispatch, expanded, onToggleExpand }: BenefitRowProps) {
+function BenefitRow({ benefit, cardAnniversary, state, dispatch, expanded, onToggleExpand, onOpenPastPeriods }: BenefitRowProps) {
   const now = new Date();
   const period = periodFor(benefit, { anniversary: cardAnniversary }, now);
   const value = resolveBenefitValue(benefit, period);
@@ -408,9 +444,14 @@ function BenefitRow({ benefit, cardAnniversary, state, dispatch, expanded, onTog
             </div>
           )}
 
-          <button type="button" className="editor-delete" onClick={() => dispatch({ type: 'DELETE_BENEFIT', id: benefit.id })}>
-            Delete benefit
-          </button>
+          <div className="editor-foot">
+            <button type="button" className="editor-delete" onClick={() => dispatch({ type: 'DELETE_BENEFIT', id: benefit.id })}>
+              Delete benefit
+            </button>
+            <button type="button" className="chip ghost" onClick={onOpenPastPeriods}>
+              Past periods
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -445,8 +486,8 @@ function MsrRow({ msr, dispatch, expanded, onToggleExpand }: MsrRowProps) {
       {expanded && (
         <div className="editor">
           <label className="editor-field">
-            <span>Label</span>
-            <input value={msr.label} onChange={(e) => patch({ label: e.target.value })} />
+            <span>Name</span>
+            <input value={msr.label} onChange={(e) => patch({ label: e.target.value })} placeholder="e.g. Welcome offer" />
           </label>
           <div className="editor-row2">
             <label className="editor-field">
@@ -648,8 +689,8 @@ function AddMsrForm({ catalogCard, cardId, dispatch, onDone }: AddMsrFormProps) 
         </div>
       )}
       <label className="editor-field">
-        <span>Label</span>
-        <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Sign-up bonus" />
+        <span>Name</span>
+        <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="e.g. Welcome offer" />
       </label>
       <div className="editor-row2">
         <label className="editor-field">
@@ -679,5 +720,107 @@ function AddMsrForm({ catalogCard, cardId, dispatch, onDone }: AddMsrFormProps) 
         </button>
       </div>
     </div>
+  );
+}
+
+interface PastPeriodsSheetProps {
+  benefit: Benefit | null;
+  cardAnniversary: string | null;
+  redemptions: Record<string, number>;
+  dispatch: Dispatch<StoreAction>;
+  onClose: () => void;
+}
+
+/**
+ * A benefit's recent past periods (including ones before card.opened — pre-dating a card add
+ * is intentional, not a bug), each togglable used/unused with an editable amount. Writes
+ * through the same SET_REDEMPTION/DELETE_REDEMPTION ledger the live period uses, so recovery
+ * numbers move immediately without any new state shape.
+ */
+function PastPeriodsSheet({ benefit, cardAnniversary, redemptions, dispatch, onClose }: PastPeriodsSheetProps) {
+  const open = benefit !== null;
+  const now = new Date();
+  const periods = benefit ? pastPeriods(benefit, { anniversary: cardAnniversary }, now) : [];
+
+  function amountFor(periodKey: string): number | null {
+    const key = benefit ? ledgerKey(benefit.id, periodKey) : '';
+    return Object.prototype.hasOwnProperty.call(redemptions, key) ? redemptions[key] : null;
+  }
+
+  function setAmount(periodKey: string, amount: number | null) {
+    if (!benefit) return;
+    if (amount === null) dispatch({ type: 'DELETE_REDEMPTION', benefitId: benefit.id, periodKey });
+    else dispatch({ type: 'SET_REDEMPTION', benefitId: benefit.id, periodKey, amount });
+  }
+
+  function markAllShown() {
+    if (!benefit) return;
+    for (const period of periods) {
+      if (amountFor(period.key) === null) {
+        dispatch({ type: 'SET_REDEMPTION', benefitId: benefit.id, periodKey: period.key, amount: resolveBenefitValue(benefit, period) ?? 0 });
+      }
+    }
+  }
+
+  function clearAllShown() {
+    if (!benefit) return;
+    for (const period of periods) {
+      if (amountFor(period.key) !== null) {
+        dispatch({ type: 'DELETE_REDEMPTION', benefitId: benefit.id, periodKey: period.key });
+      }
+    }
+  }
+
+  return (
+    <Sheet open={open} onClose={onClose} ariaLabel={benefit ? `Past periods — ${benefit.name}` : 'Past periods'}>
+      {benefit && (
+        <>
+          <div className="sheet-top">
+            <div>
+              <h2>Past periods</h2>
+              <div className="s">{benefit.name}</div>
+            </div>
+            <button type="button" onClick={onClose}>
+              Done
+            </button>
+          </div>
+
+          <div className="chips">
+            <button type="button" className="chip ghost" onClick={markAllShown}>
+              Mark all shown used
+            </button>
+            <button type="button" className="chip ghost" onClick={clearAllShown}>
+              Clear all shown
+            </button>
+          </div>
+
+          <div className="pp-list">
+            {periods.map((period) => {
+              const amount = amountFor(period.key);
+              const used = amount !== null;
+              const defaultAmount = resolveBenefitValue(benefit, period);
+              return (
+                <div key={period.key} className="pp-row">
+                  <div className="pp-label">{periodLabel(benefit, period)}</div>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    className="money"
+                    value={amount ?? ''}
+                    placeholder={defaultAmount != null ? String(defaultAmount) : '—'}
+                    onChange={(e) => setAmount(period.key, numberInputToValue(e.target.value))}
+                  />
+                  <TapToggle
+                    checked={used}
+                    label="Mark used"
+                    onToggle={() => setAmount(period.key, used ? null : (defaultAmount ?? 0))}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </Sheet>
   );
 }
