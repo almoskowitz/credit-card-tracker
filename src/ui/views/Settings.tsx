@@ -4,6 +4,7 @@ import { useToast } from '../components/Toast';
 import { Sheet } from '../components/Sheet';
 import { validateState, type State } from '../../state/schema';
 import { getLastSyncedAt, retry } from '../../storage/api';
+import { numberInputToValue } from '../format';
 import cardSchemaMd from '../../../docs/card-schema.md?raw';
 import '../../App.css';
 import '../shared.css';
@@ -43,6 +44,7 @@ export function Settings({ activeProfileId, onSetActiveProfile }: SettingsProps)
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [profilesOpen, setProfilesOpen] = useState(false);
+  const [valuationsOpen, setValuationsOpen] = useState(false);
   const [schemaOpen, setSchemaOpen] = useState(false);
   const [pendingImport, setPendingImport] = useState<{ state: State; summary: string } | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
@@ -119,6 +121,21 @@ export function Settings({ activeProfileId, onSetActiveProfile }: SettingsProps)
               onSetActiveProfile={onSetActiveProfile}
               showToast={showToast}
             />
+          </div>
+        )}
+        <button type="button" className="li" onClick={() => setValuationsOpen((v) => !v)}>
+          Point valuations
+          <span className="r">
+            {state.rewardCurrencies.length} currenc{state.rewardCurrencies.length === 1 ? 'y' : 'ies'}
+            <ChevronIcon />
+          </span>
+        </button>
+        {valuationsOpen && (
+          <div className="settings-panel">
+            <div className="settings-note">
+              Estimated cents of value per point — editable estimates, not guaranteed or objectively correct.
+            </div>
+            <PointValuationsList state={state} dispatch={dispatch} />
           </div>
         )}
         <button type="button" className="li" onClick={exportJson}>
@@ -199,6 +216,86 @@ export function Settings({ activeProfileId, onSetActiveProfile }: SettingsProps)
         </div>
         <pre className="schema-doc">{cardSchemaMd}</pre>
       </Sheet>
+    </div>
+  );
+}
+
+interface PointValuationsListProps {
+  state: State;
+  dispatch: Dispatch<StoreAction>;
+}
+
+function PointValuationsList({ state, dispatch }: PointValuationsListProps) {
+  const [addingNew, setAddingNew] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newCpp, setNewCpp] = useState('');
+
+  function patchCpp(id: string, raw: string) {
+    const centsPerPoint = numberInputToValue(raw);
+    if (centsPerPoint === null) return;
+    dispatch({ type: 'UPDATE_REWARD_CURRENCY', id, patch: { centsPerPoint } });
+  }
+
+  function addCurrency() {
+    if (newName.trim() === '') return;
+    dispatch({
+      type: 'ADD_REWARD_CURRENCY',
+      rewardCurrency: { id: crypto.randomUUID(), name: newName.trim(), centsPerPoint: numberInputToValue(newCpp) ?? 1.0 },
+    });
+    setNewName('');
+    setNewCpp('');
+    setAddingNew(false);
+  }
+
+  return (
+    <div className="settings-profiles">
+      {state.rewardCurrencies.map((rc) => (
+        <div key={rc.id} className="profile-row">
+          <span className="valuation-name">{rc.name}</span>
+          <input
+            className="valuation-input"
+            type="number"
+            inputMode="decimal"
+            step="0.05"
+            min="0"
+            value={rc.centsPerPoint}
+            onChange={(e) => patchCpp(rc.id, e.target.value)}
+            aria-label={`${rc.name} cents per point`}
+          />
+          <span className="valuation-unit">¢/pt</span>
+        </div>
+      ))}
+      {addingNew ? (
+        <div className="profile-row">
+          <input
+            className="profile-rename-input"
+            value={newName}
+            autoFocus
+            placeholder="Currency name"
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') addCurrency();
+            }}
+          />
+          <input
+            className="valuation-input"
+            type="number"
+            inputMode="decimal"
+            step="0.05"
+            min="0"
+            placeholder="1.0"
+            value={newCpp}
+            onChange={(e) => setNewCpp(e.target.value)}
+          />
+          <button type="button" className="chip sky" onClick={addCurrency}>
+            Add
+          </button>
+        </div>
+      ) : (
+        <button type="button" className="chip ghost settings-add-profile" onClick={() => setAddingNew(true)}>
+          + New currency
+        </button>
+      )}
     </div>
   );
 }

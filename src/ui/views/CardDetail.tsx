@@ -285,6 +285,19 @@ export function CardDetail({ cardId, open, onClose }: CardDetailProps) {
             <span>Closed</span>
             <input type="date" value={card.closed ?? ''} onChange={(e) => patchCard({ closed: e.target.value || null })} />
           </div>
+          <div className="mr-edit">
+            <span>Rewards currency</span>
+            <select
+              value={card.rewardCurrency ?? 'cash'}
+              onChange={(e) => patchCard({ rewardCurrency: e.target.value })}
+            >
+              {state.rewardCurrencies.map((rc) => (
+                <option key={rc.id} value={rc.id}>
+                  {rc.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <button

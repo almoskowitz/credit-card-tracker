@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { StoreProvider, useStore } from './state/store';
-import { defaultState, defaultRewardCurrencies, type State } from './state/schema';
+import { defaultState, normalizeState, type State } from './state/schema';
 import { load } from './storage/api';
 import { ToastProvider, useToast } from './ui/components/Toast';
 import { TabBar, type TabId } from './ui/components/TabBar';
@@ -27,11 +27,9 @@ async function resolveInitialState(): Promise<State> {
     state = defaultState();
   }
   // The server stores/returns a raw JSON blob with no schema validation -- a row saved before
-  // this feature shipped won't have rewardCurrencies at all, so it's backfilled here rather
-  // than at every read site.
-  if (!Array.isArray(state.rewardCurrencies)) {
-    state = { ...state, rewardCurrencies: defaultRewardCurrencies() };
-  }
+  // this feature shipped won't have rewardCurrencies at all, so it's backfilled here. (The
+  // reducer's REPLACE_STATE case does the same for 409 recovery / foreground refresh.)
+  state = normalizeState(state);
   if (import.meta.env.DEV && state.cards.length === 0 && new URLSearchParams(location.search).has('seed')) {
     const { devSeed } = await import('./ui/devSeed');
     state = await devSeed(state);

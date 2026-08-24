@@ -198,7 +198,8 @@
 .mr-edit:last-child {
   border-bottom: 0;
 }
-.mr-edit input {
+.mr-edit input,
+.mr-edit select {
   margin-left: auto;
   text-align: right;
   background: none;

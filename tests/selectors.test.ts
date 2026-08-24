@@ -22,6 +22,7 @@ function makeCard(overrides: Partial<Card> = {}): Card {
     anniversary: null,
     opened: null,
     closed: null,
+    rewardCurrency: null,
     ...overrides,
   };
 }

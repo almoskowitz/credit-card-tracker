@@ -2,7 +2,8 @@ import { useStore } from '../../state/store';
 import { cardsForProfile, portfolioBreakevenForProfile } from '../../state/selectors';
 import { bestCardForCategory, optimalWalletScored, type OptimizerCard } from '../../engine/optimizer';
 import { CATEGORIES } from '../../catalog/categories';
-import { usd, pct, numberInputToValue, initials } from '../format';
+import type { Card, State } from '../../state/schema';
+import { usd, pct, centsPerDollar, numberInputToValue, initials } from '../format';
 import '../../App.css';
 import '../shared.css';
 import './Insights.css';
@@ -13,6 +14,14 @@ function pad2(n: number): string {
 
 function monthKey(d: Date): string {
   return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`;
+}
+
+/** A card with no rewardCurrency set (or one that no longer matches a known currency) is
+ * treated as cash/1.0 -- this must not change ranking for any card that predates this feature. */
+function centsPerPointFor(state: State, card: Card): number {
+  if (!card.rewardCurrency) return 1.0;
+  const currency = state.rewardCurrencies.find((rc) => rc.id === card.rewardCurrency);
+  return currency ? currency.centsPerPoint : 1.0;
 }
 
 function DonutIcon({ value }: { value: number }) {
@@ -55,6 +64,7 @@ export function Insights({ profileId, onProfileTap }: InsightsProps) {
   const optimizerCards: OptimizerCard[] = cards.map((c) => ({
     id: c.id,
     earnRates: state.earnRates.filter((e) => e.cardId === c.id).map((e) => ({ category: e.category, rate: e.rate })),
+    centsPerPoint: centsPerPointFor(state, c),
   }));
 
   const monthKeyStr = monthKey(now);
@@ -110,7 +120,8 @@ export function Insights({ profileId, onProfileTap }: InsightsProps) {
                 <>
                   <div className="n">{cardName(best.card.id)}</div>
                   <div className="m">
-                    {best.rate}× {best.fallback && <span className="fallback-tag">fallback</span>}
+                    {best.rate}× <span className="m-value">{centsPerDollar(best.value)}</span>
+                    {best.fallback && <span className="fallback-tag">fallback</span>}
                   </div>
                 </>
               ) : (
@@ -167,13 +178,18 @@ function WalletSuggestion({
   cardName: (id: string) => string;
 }) {
   const scored = optimalWalletScored(cards, spend, size);
+  const hasSpend = Object.keys(spend).length > 0;
   return (
     <div className="suggest">
       <h3>{size}-card wallet</h3>
       {scored.map((s) => (
         <div key={s.card.id} className="sl">
           <b>{cardName(s.card.id)}</b>
-          <em>score {Math.round(s.score).toLocaleString('en-US')}</em>
+          {/* With spend data, `score` is cents of estimated value earned (rate x
+              centsPerPoint x amount) -- genuinely dollar-denominated once normalized, so it's
+              shown as a value rather than an opaque score. Without spend data it's an
+              unweighted, unitless sum of normalized rates -- still just for ranking. */}
+          <em>{hasSpend ? `~${usd(s.score / 100)} est. value` : `score ${Math.round(s.score).toLocaleString('en-US')}`}</em>
         </div>
       ))}
     </div>

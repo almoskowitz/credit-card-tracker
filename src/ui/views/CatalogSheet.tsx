@@ -218,6 +218,7 @@ function BlankTier({ profileId, dispatch, onDone }: { profileId: string; dispatc
       anniversary: null,
       opened: null,
       closed: null,
+      rewardCurrency: null,
     };
     dispatch({ type: 'ADD_CARD', card });
     onDone();

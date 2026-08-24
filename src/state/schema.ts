@@ -140,6 +140,17 @@ export function defaultRewardCurrencies(): RewardCurrency[] {
   return SEED_REWARD_CURRENCIES.map((c) => ({ ...c }));
 }
 
+/**
+ * Backfills `rewardCurrencies` for state arriving raw from the server -- GET /api/state
+ * returns whatever JSON blob is stored, unvalidated, so a row saved before this feature
+ * shipped won't have the array at all. Called at every point server state enters the store
+ * (initial load, 409 recovery, foreground refresh) so no read site has to guard for it.
+ */
+export function normalizeState(state: State): State {
+  if (Array.isArray(state.rewardCurrencies)) return state;
+  return { ...state, rewardCurrencies: defaultRewardCurrencies() };
+}
+
 export function defaultState(): State {
   const profileId = crypto.randomUUID();
   return {

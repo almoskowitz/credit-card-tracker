@@ -1,4 +1,4 @@
-import type { Benefit, Cap, Card, EarnRate, Msr, Profile, RewardCurrency, SpendCategory, State } from './schema';
+import { normalizeState, type Benefit, type Cap, type Card, type EarnRate, type Msr, type Profile, type RewardCurrency, type SpendCategory, type State } from './schema';
 import { ledgerKey } from '../engine/period';
 
 export type Action =
@@ -58,7 +58,7 @@ function withoutRedemptionsFor(redemptions: State['redemptions'], benefitIds: Re
 export function reduceState(state: State, action: Action): State {
   switch (action.type) {
     case 'REPLACE_STATE':
-      return action.state;
+      return normalizeState(action.state);
 
     // A user-initiated whole-blob import: unlike REPLACE_STATE, this IS a mutation — it goes
     // through the connection guard and triggers exactly one PUT, same as any other edit.

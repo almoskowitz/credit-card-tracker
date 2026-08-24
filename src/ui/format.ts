@@ -36,6 +36,11 @@ export function pct(n: number): string {
   return `${Number.isInteger(rounded) ? rounded.toFixed(0) : rounded.toFixed(1)}%`;
 }
 
+/** Estimated cents-of-value-per-dollar, one decimal place — "8.0¢/$". */
+export function centsPerDollar(n: number): string {
+  return `~${n.toFixed(1)}¢/$`;
+}
+
 /** Empty string becomes null; otherwise passed through unchanged ("YYYY-MM-DD" from a date input). */
 export function dateInputToValue(s: string): string | null {
   return s === '' ? null : s;

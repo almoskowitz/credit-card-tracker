@@ -49,10 +49,39 @@
   margin: 8px 0 14px;
 }
 
+.settings-note {
+  font-size: var(--fs-13);
+  color: var(--text-2);
+  margin: 0 0 12px;
+}
+
 .settings-profiles {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+.valuation-name {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-1);
+  font-size: var(--fs-15);
+  font-weight: 600;
+}
+.valuation-input {
+  width: 64px;
+  min-height: var(--target-min);
+  padding: 0 8px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--white) 4%, transparent);
+  color: var(--text-0);
+  font-size: var(--fs-15);
+  font-family: inherit;
+  text-align: right;
+}
+.valuation-unit {
+  font-size: var(--fs-13);
+  color: var(--text-2);
 }
 .profile-row {
   display: flex;
