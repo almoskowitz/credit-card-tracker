@@ -130,7 +130,7 @@ describe('msrsForProfile', () => {
       requirement: 4000,
       deadline: '2026-07-01',
       spent: 0,
-      bonusValue: 500,
+      bonuses: [],
       notes: null,
       ...overrides,
     };

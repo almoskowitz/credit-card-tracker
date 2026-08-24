@@ -44,7 +44,12 @@ export interface Cap {
   periodKey: string;
 }
 
-export type BonusUnit = 'cash' | 'points' | 'miles';
+export interface BonusComponent {
+  id: string;
+  label: string;
+  value: number | null;
+  unit: string; // free-text — "cash", "points", "miles", "cert", etc. Formatted as usd() only when "cash".
+}
 
 export interface Msr {
   id: string;
@@ -53,8 +58,7 @@ export interface Msr {
   requirement: number;
   deadline: string; // "YYYY-MM-DD"
   spent: number;
-  bonusValue: number | null;
-  bonusUnit?: BonusUnit; // absent means "cash" — kept optional so old records don't break
+  bonuses: BonusComponent[];
   notes: string | null;
 }
 

@@ -11,7 +11,7 @@ import {
   type Cadence,
   type Period,
 } from '../../engine/period';
-import type { Benefit, BonusUnit, Cap, Card, EarnRate, Msr } from '../../state/schema';
+import type { Benefit, BonusComponent, Cap, Card, EarnRate, Msr } from '../../state/schema';
 import { Sheet } from '../components/Sheet';
 import { ProgressBar, type ProgressVariant } from '../components/ProgressBar';
 import { TapToggle } from '../components/TapToggle';
@@ -25,11 +25,6 @@ import './CardDetail.css';
 const CATALOG = catalogData as unknown as Catalog;
 const CADENCES: Cadence[] = ['monthly', 'quarterly', 'semiannual', 'annual'];
 const ANCHORS: Anchor[] = ['calendar', 'anniversary'];
-const BONUS_UNITS: { value: BonusUnit; label: string }[] = [
-  { value: 'cash', label: 'Cash' },
-  { value: 'points', label: 'Points' },
-  { value: 'miles', label: 'Miles' },
-];
 
 function barVariant(recoveryPct: number): ProgressVariant {
   if (recoveryPct >= 85) return 'mint';
@@ -472,6 +467,7 @@ interface MsrRowProps {
 
 function MsrRow({ msr, dispatch, expanded, onToggleExpand }: MsrRowProps) {
   const deadline = parseLocalDate(msr.deadline);
+  const bonusText = formatBonus(msr.bonuses);
   function patch(p: Partial<Msr>) {
     dispatch({ type: 'UPDATE_MSR', id: msr.id, patch: p });
   }
@@ -484,7 +480,7 @@ function MsrRow({ msr, dispatch, expanded, onToggleExpand }: MsrRowProps) {
           <div className="bc">
             {usd(msr.spent)} of {usd(msr.requirement)}
             {deadline ? ` · due ${shortDate(deadline)}` : ''}
-            {msr.bonusValue != null ? ` · ${formatBonus(msr.bonusValue, msr.bonusUnit ?? 'cash')} bonus` : ''}
+            {bonusText ? ` · ${bonusText} bonus` : ''}
           </div>
         </div>
         <ChevronIcon />
@@ -509,33 +505,65 @@ function MsrRow({ msr, dispatch, expanded, onToggleExpand }: MsrRowProps) {
             <span>Deadline</span>
             <input type="date" value={msr.deadline} onChange={(e) => patch({ deadline: e.target.value })} />
           </label>
-          <div className="editor-row2">
-            <label className="editor-field">
-              <span>Bonus value</span>
-              <input
-                type="number"
-                inputMode="decimal"
-                value={msr.bonusValue ?? ''}
-                placeholder="optional"
-                onChange={(e) => patch({ bonusValue: numberInputToValue(e.target.value) })}
-              />
-            </label>
-            <label className="editor-field">
-              <span>Bonus unit</span>
-              <select value={msr.bonusUnit ?? 'cash'} onChange={(e) => patch({ bonusUnit: e.target.value as BonusUnit })}>
-                {BONUS_UNITS.map((u) => (
-                  <option key={u.value} value={u.value}>
-                    {u.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+          <BonusListEditor bonuses={msr.bonuses} onChange={(bonuses) => patch({ bonuses })} />
           <button type="button" className="editor-delete" onClick={() => dispatch({ type: 'DELETE_MSR', id: msr.id })}>
             Delete MSR
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+interface BonusListEditorProps {
+  bonuses: BonusComponent[];
+  onChange: (bonuses: BonusComponent[]) => void;
+}
+
+/** Repeatable add/remove list of free-form bonus components (label + value + unit) for an MSR's welcome offer. */
+function BonusListEditor({ bonuses, onChange }: BonusListEditorProps) {
+  function patchRow(id: string, p: Partial<BonusComponent>) {
+    onChange(bonuses.map((b) => (b.id === id ? { ...b, ...p } : b)));
+  }
+  function removeRow(id: string) {
+    onChange(bonuses.filter((b) => b.id !== id));
+  }
+  function addRow() {
+    onChange([...bonuses, { id: crypto.randomUUID(), label: '', value: null, unit: 'points' }]);
+  }
+  return (
+    <div className="bonus-list">
+      <span className="editor-overrides-lbl">Bonus components</span>
+      {bonuses.map((b) => (
+        <div className="bonus-row" key={b.id}>
+          <input
+            className="bonus-label"
+            value={b.label}
+            placeholder="e.g. Free night cert"
+            onChange={(e) => patchRow(b.id, { label: e.target.value })}
+          />
+          <input
+            className="bonus-value"
+            type="number"
+            inputMode="decimal"
+            value={b.value ?? ''}
+            placeholder="value"
+            onChange={(e) => patchRow(b.id, { value: numberInputToValue(e.target.value) })}
+          />
+          <input
+            className="bonus-unit"
+            value={b.unit}
+            placeholder="unit"
+            onChange={(e) => patchRow(b.id, { unit: e.target.value })}
+          />
+          <button type="button" className="bonus-remove" aria-label="Remove bonus component" onClick={() => removeRow(b.id)}>
+            &times;
+          </button>
+        </div>
+      ))}
+      <button type="button" className="chip ghost bonus-add" onClick={addRow}>
+        + Add bonus component
+      </button>
     </div>
   );
 }
@@ -660,8 +688,7 @@ function AddMsrForm({ catalogCard, cardId, dispatch, onDone }: AddMsrFormProps) 
   const [label, setLabel] = useState('');
   const [requirement, setRequirement] = useState('');
   const [deadline, setDeadline] = useState('');
-  const [bonusValue, setBonusValue] = useState('');
-  const [bonusUnit, setBonusUnit] = useState<BonusUnit>('cash');
+  const [bonuses, setBonuses] = useState<BonusComponent[]>([]);
   const [touched, setTouched] = useState(false);
 
   const requirementNum = numberInputToValue(requirement);
@@ -679,8 +706,7 @@ function AddMsrForm({ catalogCard, cardId, dispatch, onDone }: AddMsrFormProps) 
         requirement: requirementNum,
         deadline,
         spent: 0,
-        bonusValue: numberInputToValue(bonusValue),
-        bonusUnit,
+        bonuses,
         notes: null,
       },
     });
@@ -725,22 +751,7 @@ function AddMsrForm({ catalogCard, cardId, dispatch, onDone }: AddMsrFormProps) 
           />
         </label>
       </div>
-      <div className="editor-row2">
-        <label className="editor-field">
-          <span>Bonus value</span>
-          <input type="number" inputMode="decimal" value={bonusValue} onChange={(e) => setBonusValue(e.target.value)} placeholder="optional" />
-        </label>
-        <label className="editor-field">
-          <span>Bonus unit</span>
-          <select value={bonusUnit} onChange={(e) => setBonusUnit(e.target.value as BonusUnit)}>
-            {BONUS_UNITS.map((u) => (
-              <option key={u.value} value={u.value}>
-                {u.label}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+      <BonusListEditor bonuses={bonuses} onChange={setBonuses} />
       <div className="editor-actions">
         <button type="button" className="chip ghost" onClick={onDone}>
           Cancel

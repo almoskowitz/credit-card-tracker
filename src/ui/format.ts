@@ -1,4 +1,4 @@
-import type { BonusUnit } from '../state/schema';
+import type { BonusComponent } from '../state/schema';
 
 export function usd(n: number): string {
   const rounded = Math.round(n * 100) / 100;
@@ -48,9 +48,18 @@ export function numberInputToValue(s: string): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-/** Money-formats cash amounts; renders points/miles as a plain thousands-separated number with a unit suffix. */
-export function formatBonus(value: number, unit: BonusUnit = 'cash'): string {
-  if (unit === 'cash') return usd(value);
-  const suffix = unit === 'points' ? 'pts' : 'mi';
-  return `${Math.round(value).toLocaleString('en-US')} ${suffix}`;
+/**
+ * Money-formats a "cash" unit; renders anything else as a plain thousands-separated number
+ * plus the free-text unit ("80,000 points", "1 cert"). Falls back to the label when there's
+ * no numeric value to show (a purely descriptive component like a companion pass).
+ */
+export function formatBonusComponent(component: BonusComponent): string {
+  const { value, unit, label } = component;
+  if (value == null) return label;
+  return unit === 'cash' ? usd(value) : `${Math.round(value).toLocaleString('en-US')} ${unit}`;
+}
+
+/** Joins 0, 1, or many bonus components into a single summary fragment ("" when empty). */
+export function formatBonus(bonuses: BonusComponent[]): string {
+  return bonuses.map(formatBonusComponent).join(' + ');
 }

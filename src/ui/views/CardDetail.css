@@ -104,6 +104,44 @@
   flex-wrap: wrap;
 }
 
+.bonus-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.bonus-row {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr 0.8fr auto;
+  gap: 6px;
+  align-items: center;
+}
+.bonus-row input {
+  min-height: var(--target-min);
+  padding: 0 10px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--white) 4%, transparent);
+  color: var(--text-0);
+  font-size: var(--fs-15);
+  font-family: inherit;
+  min-width: 0;
+}
+.bonus-remove {
+  width: var(--target-min);
+  height: var(--target-min);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-2);
+  font-size: var(--fs-17);
+  line-height: 1;
+  cursor: pointer;
+  font-family: inherit;
+}
+.bonus-add {
+  align-self: flex-start;
+}
+
 .editor-overrides {
   display: flex;
   flex-direction: column;

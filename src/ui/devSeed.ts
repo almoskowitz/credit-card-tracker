@@ -61,7 +61,7 @@ export async function devSeed(state: State): Promise<State> {
         requirement: msr.requirement,
         deadline: isoDaysFromNow(msr.daysOut),
         spent: msr.spent,
-        bonusValue: null,
+        bonuses: [],
         notes: null,
       },
     });
