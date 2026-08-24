@@ -98,7 +98,7 @@
      alone would undercount it] + the bottom safe-area padding from
      credit-card-tracker-8li. */
   --tabbar-h: calc(
-    1px + 9px + 3px + 23px + 4px + 16px + 3px + max(calc(var(--safe-bottom) * 0.5), 10px)
+    1px + 9px + 3px + 23px + 4px + 16px + 3px + 8px
   );
 }
 
