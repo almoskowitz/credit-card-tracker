@@ -116,6 +116,8 @@
   align-items: center;
 }
 .bonus-row input {
+  width: 100%;
+  min-width: 0;
   min-height: var(--target-min);
   padding: 0 10px;
   border-radius: var(--r-sm);
@@ -124,7 +126,6 @@
   color: var(--text-0);
   font-size: var(--fs-15);
   font-family: inherit;
-  min-width: 0;
 }
 .bonus-remove {
   width: var(--target-min);
@@ -162,8 +163,11 @@
   gap: 2px;
   font-size: var(--fs-13);
   color: var(--text-2);
+  min-width: 0;
 }
 .override-field input {
+  width: 100%;
+  min-width: 0;
   min-height: var(--target-min);
   padding: 0 8px;
   border-radius: var(--r-sm);

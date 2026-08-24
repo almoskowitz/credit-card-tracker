@@ -136,8 +136,11 @@
   gap: 4px;
   font-size: var(--fs-13);
   color: var(--text-2);
+  min-width: 0;
 }
 .spend-field input {
+  width: 100%;
+  min-width: 0;
   min-height: var(--target-min);
   padding: 0 12px;
   border-radius: var(--r-sm);

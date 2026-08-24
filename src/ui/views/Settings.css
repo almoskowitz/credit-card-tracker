@@ -96,6 +96,7 @@
 }
 .profile-rename-input {
   flex: 1;
+  min-width: 0;
   min-height: var(--target-min);
   padding: 0 10px;
   border-radius: var(--r-sm);

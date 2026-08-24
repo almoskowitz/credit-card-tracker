@@ -91,10 +91,13 @@
   gap: 4px;
   font-size: var(--fs-13);
   color: var(--text-2);
+  min-width: 0;
 }
 .editor-field input,
 .editor-field select,
 .editor-field textarea {
+  width: 100%;
+  min-width: 0;
   min-height: var(--target-min);
   padding: 10px 12px;
   border-radius: var(--r-sm);
