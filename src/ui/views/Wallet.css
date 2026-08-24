@@ -1,0 +1,112 @@
+.btn-round {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--glass-1);
+  color: var(--text-0);
+  font-size: var(--fs-22);
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-weight: 300;
+  padding: 0;
+}
+/* Visual circle stays 34px (matches .chip-profile); the invisible ::after pads the actual
+   hit target out to the 44px minimum without disturbing the header's layout. */
+.btn-round::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+}
+
+.wallet-rows {
+  padding-top: 16px;
+}
+
+.wcard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: var(--target-min);
+  padding: 15px 16px 15px 20px;
+  background: var(--glass-1);
+  border-radius: var(--r-lg);
+  box-shadow: inset 0 0 0 1px var(--border);
+  cursor: pointer;
+  transition:
+    background var(--t-base),
+    transform 120ms ease-out;
+  border: 0;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+.wcard:active {
+  transform: scale(0.985);
+  background: var(--glass-2);
+}
+
+.wcard .edge {
+  position: absolute;
+  left: 7px;
+  top: 14px;
+  bottom: 14px;
+  width: 4px;
+  border-radius: var(--r-pill);
+  background: var(--acc, var(--issuer-default));
+}
+
+.wmain {
+  flex: 1;
+  min-width: 0;
+}
+.wname {
+  font-size: var(--fs-17);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-0);
+}
+.wsub {
+  font-size: var(--fs-13);
+  color: var(--text-2);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wallet-bar {
+  margin-top: 10px;
+}
+.wpct {
+  font-size: var(--fs-15);
+  font-weight: 700;
+  flex: none;
+  letter-spacing: -0.01em;
+}
+.c-mint {
+  color: var(--mint);
+}
+.c-amber {
+  color: var(--amber);
+}
+.c-red {
+  color: var(--red);
+}
+
+.wallet-empty,
+.wallet-hint {
+  padding: 18px 24px 0;
+  font-size: var(--fs-13);
+  color: var(--text-2);
+  text-align: center;
+}
+.wallet-empty {
+  padding: 60px 24px;
+  font-size: var(--fs-15);
+}

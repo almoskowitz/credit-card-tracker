@@ -1,0 +1,173 @@
+.cs-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: var(--sp-4);
+  border-radius: var(--r-pill);
+  background: var(--glass-1);
+  padding: 4px;
+}
+.cs-tab {
+  flex: 1;
+  min-height: var(--target-min);
+  border: 0;
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--text-2);
+  font-size: var(--fs-13);
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+.cs-tab.active {
+  background: var(--glass-2);
+  color: var(--text-0);
+}
+
+.cs-search-input {
+  width: 100%;
+  min-height: var(--target-min);
+  padding: 0 14px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--white) 4%, transparent);
+  color: var(--text-0);
+  font-size: var(--fs-17);
+  font-family: inherit;
+  margin-bottom: var(--sp-3);
+}
+
+.cs-results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.cs-result {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--target-min);
+  padding: 12px 14px 12px 20px;
+  border-radius: var(--r-md);
+  background: var(--glass-1);
+  box-shadow: inset 0 0 0 1px var(--border);
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+.cs-result .edge {
+  position: absolute;
+  left: 7px;
+  top: 10px;
+  bottom: 10px;
+  width: 4px;
+  border-radius: var(--r-pill);
+  background: var(--acc, var(--issuer-default));
+}
+.cs-result-main {
+  flex: 1;
+  min-width: 0;
+}
+.cs-result-name {
+  font-size: var(--fs-15);
+  font-weight: 600;
+  color: var(--text-0);
+}
+.cs-result-sub {
+  font-size: var(--fs-13);
+  color: var(--text-2);
+  margin-top: 2px;
+}
+.cs-add {
+  flex: none;
+  font-size: var(--fs-13);
+  font-weight: 700;
+  color: var(--sky);
+}
+
+.cs-paste,
+.cs-blank {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.cs-textarea {
+  width: 100%;
+  min-height: 160px;
+  padding: 12px 14px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--white) 4%, transparent);
+  color: var(--text-0);
+  font-size: var(--fs-15);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  resize: vertical;
+}
+
+.cs-errors {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cs-errors li {
+  font-size: var(--fs-13);
+  color: var(--red);
+  background: var(--red-dim);
+  border-radius: var(--r-sm);
+  padding: 8px 10px;
+}
+
+.cs-preview {
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--white) 4.5%, transparent);
+  box-shadow: inset 0 0 0 1px var(--border);
+  padding: 14px 15px;
+}
+.cs-preview-name {
+  font-size: var(--fs-17);
+  font-weight: 650;
+  color: var(--text-0);
+}
+.cs-preview-sub {
+  font-size: var(--fs-13);
+  color: var(--text-2);
+  margin-top: 3px;
+}
+.cs-preview-benefits {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cs-preview-benefits li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: var(--fs-15);
+  color: var(--text-0);
+  border-bottom: 1px solid var(--border-soft);
+  padding-bottom: 8px;
+}
+.cs-preview-benefits li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.cs-preview-cadence {
+  color: var(--text-2);
+  font-size: var(--fs-13);
+}
+.cs-preview-benefits li > span:last-child {
+  margin-left: auto;
+  font-weight: 600;
+}

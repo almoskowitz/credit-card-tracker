@@ -1,0 +1,197 @@
+/* Shared sheet/form primitives reused by CardDetail, CatalogSheet, Insights, and Settings. */
+
+.sheet-top {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+.sheet-top h2 {
+  font-size: var(--fs-22);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.sheet-top .s {
+  font-size: var(--fs-13);
+  color: var(--text-2);
+  margin-top: 3px;
+}
+.sheet-top button {
+  margin-left: auto;
+  background: none;
+  border: 0;
+  color: var(--sky);
+  font-size: var(--fs-15);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  padding: var(--sp-2) 0;
+  min-height: var(--target-min);
+}
+
+.sh-lbl {
+  font-size: var(--fs-13);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  margin: 20px 0 9px;
+}
+
+.cd-empty {
+  font-size: var(--fs-13);
+  color: var(--text-2);
+  padding: 8px 2px 4px;
+}
+
+.chips {
+  display: flex;
+  gap: 9px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.chip {
+  min-height: var(--target-min);
+  padding: 0 15px;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-15);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  background: transparent;
+  color: var(--text-1);
+}
+.chip.sky {
+  border: 1px dashed color-mix(in srgb, var(--sky) 55%, transparent);
+  color: var(--sky);
+}
+.chip.ghost {
+  border: 1px solid var(--border);
+  color: var(--text-1);
+}
+.chip:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.editor {
+  padding: 12px 4px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.editor-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--fs-13);
+  color: var(--text-2);
+}
+.editor-field input,
+.editor-field select,
+.editor-field textarea {
+  min-height: var(--target-min);
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--white) 4%, transparent);
+  color: var(--text-0);
+  font-size: var(--fs-17);
+  font-family: inherit;
+}
+.editor-field input.invalid {
+  border-color: color-mix(in srgb, var(--red) 55%, transparent);
+}
+.editor-row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.editor-delete {
+  align-self: flex-start;
+  background: none;
+  border: 0;
+  color: var(--red);
+  font-size: var(--fs-13);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  min-height: var(--target-min);
+  padding: 0;
+}
+
+.list {
+  margin: 0;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--glass-1);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+.li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 56px;
+  padding: 0 var(--sp-4);
+  border-bottom: 1px solid var(--border-soft);
+  cursor: pointer;
+  font-size: var(--fs-17);
+  color: var(--text-0);
+  background: none;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  transition: background var(--t-base);
+}
+.li:last-child {
+  border-bottom: 0;
+}
+.li:active {
+  background: var(--glass-2);
+}
+.li .r {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-2);
+  font-size: var(--fs-15);
+  flex: none;
+}
+.li .chev {
+  width: 14px;
+  height: 14px;
+  color: var(--text-2);
+  flex: none;
+}
+.li .sdot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--mint);
+  box-shadow:
+    0 0 0 4px var(--mint-dim),
+    0 0 10px color-mix(in srgb, var(--mint) 70%, transparent);
+  flex: none;
+}
+.li .sdot.off {
+  background: var(--red);
+  box-shadow:
+    0 0 0 4px var(--red-dim),
+    0 0 10px color-mix(in srgb, var(--red) 70%, transparent);
+}

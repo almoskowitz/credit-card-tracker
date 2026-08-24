@@ -27,3 +27,21 @@ export function initials(name: string): string {
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
+
+/** One decimal place, trimmed to a whole number when exact — 57.6%, 62.5%, 100%. */
+export function pct(n: number): string {
+  const rounded = Math.round(n * 10) / 10;
+  return `${Number.isInteger(rounded) ? rounded.toFixed(0) : rounded.toFixed(1)}%`;
+}
+
+/** Empty string becomes null; otherwise passed through unchanged ("YYYY-MM-DD" from a date input). */
+export function dateInputToValue(s: string): string | null {
+  return s === '' ? null : s;
+}
+
+/** Empty string becomes null; a valid number is returned, otherwise null. */
+export function numberInputToValue(s: string): number | null {
+  if (s.trim() === '') return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+}
