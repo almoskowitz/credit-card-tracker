@@ -110,7 +110,3 @@ export function resolveBenefitValue(benefit: Benefit, period: Period): number | 
 export function ledgerKey(benefitId: string, periodKey: string): string {
   return `${benefitId}|${periodKey}`;
 }
-
-export function periodsPerYear(cadence: Cadence): number {
-  return 12 / MONTHS[cadence];
-}
