@@ -72,7 +72,7 @@
           "displayValue": null,
           "cadence": "monthly",
           "anchor": "calendar",
-          "category": "dining",
+          "category": "rideshare",
           "valueOverrides": {
             "M12": 20
           }
@@ -83,7 +83,7 @@
           "displayValue": null,
           "cadence": "monthly",
           "anchor": "calendar",
-          "category": "other"
+          "category": "streaming"
         },
         {
           "name": "Lululemon",
@@ -178,25 +178,25 @@
       "benefits": [
         {
           "name": "Dell Credit",
-          "value": 16.67,
+          "value": 150,
           "displayValue": null,
-          "cadence": "monthly",
+          "cadence": "annual",
           "anchor": "calendar",
           "category": "other"
         },
         {
           "name": "Adobe Credit",
-          "value": 20.83,
+          "value": 250,
           "displayValue": null,
-          "cadence": "monthly",
+          "cadence": "annual",
           "anchor": "calendar",
           "category": "other"
         },
         {
           "name": "Indeed Credit",
-          "value": 30,
+          "value": 90,
           "displayValue": null,
-          "cadence": "monthly",
+          "cadence": "quarterly",
           "anchor": "calendar",
           "category": "other"
         },
@@ -206,7 +206,7 @@
           "displayValue": null,
           "cadence": "monthly",
           "anchor": "calendar",
-          "category": "other"
+          "category": "telecom"
         },
         {
           "name": "Hotel Credit (FHR/THC)",
@@ -218,9 +218,9 @@
         },
         {
           "name": "Hilton For Business",
-          "value": 100,
+          "value": 50,
           "displayValue": null,
-          "cadence": "semiannual",
+          "cadence": "quarterly",
           "anchor": "calendar",
           "category": "travel"
         },
@@ -234,11 +234,19 @@
         },
         {
           "name": "CLEAR Credit",
-          "value": 209,
+          "value": 219,
           "displayValue": null,
           "cadence": "annual",
           "anchor": "calendar",
           "category": "travel"
+        },
+        {
+          "name": "ChatGPT Business Credit",
+          "value": 300,
+          "displayValue": null,
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "other"
         }
       ],
       "earnRates": [
@@ -283,7 +291,7 @@
           "displayValue": null,
           "cadence": "monthly",
           "anchor": "calendar",
-          "category": "dining"
+          "category": "rideshare"
         },
         {
           "name": "Grubhub/Dining Credit",
@@ -351,6 +359,14 @@
           "cadence": "monthly",
           "anchor": "calendar",
           "category": "other"
+        },
+        {
+          "name": "ChatGPT Business Credit",
+          "value": 300,
+          "displayValue": null,
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "other"
         }
       ],
       "earnRates": [
@@ -409,7 +425,7 @@
           "displayValue": null,
           "cadence": "monthly",
           "anchor": "calendar",
-          "category": "travel"
+          "category": "rideshare"
         },
         {
           "name": "Peloton Membership",
@@ -441,7 +457,7 @@
           "displayValue": null,
           "cadence": "semiannual",
           "anchor": "calendar",
-          "category": "dining"
+          "category": "other"
         },
         {
           "name": "Chase Travel Credit",
@@ -457,7 +473,7 @@
           "displayValue": null,
           "cadence": "annual",
           "anchor": "calendar",
-          "category": "other"
+          "category": "streaming"
         }
       ],
       "earnRates": [
@@ -497,12 +513,12 @@
       "annualFee": 550,
       "benefits": [
         {
-          "name": "Dining Credit",
-          "value": 25,
+          "name": "CLEAR Credit",
+          "value": 219,
           "displayValue": null,
-          "cadence": "monthly",
+          "cadence": "annual",
           "anchor": "calendar",
-          "category": "dining"
+          "category": "travel"
         },
         {
           "name": "Airline Credit",
@@ -517,6 +533,14 @@
           "value": 200,
           "displayValue": null,
           "cadence": "semiannual",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Waldorf Astoria/Conrad Credit",
+          "value": 100,
+          "displayValue": null,
+          "cadence": "annual",
           "anchor": "calendar",
           "category": "travel"
         }
@@ -888,7 +912,7 @@
         {
           "name": "Free Night Award",
           "value": null,
-          "displayValue": "Up to 100k pts",
+          "displayValue": "Up to 85k pts",
           "cadence": "annual",
           "anchor": "calendar",
           "category": "travel"
@@ -897,6 +921,14 @@
           "name": "Club Level Upgrade Certificates",
           "value": null,
           "displayValue": "3 Certificates",
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Property Credit (Dining/Spa)",
+          "value": 100,
+          "displayValue": null,
           "cadence": "annual",
           "anchor": "calendar",
           "category": "travel"
@@ -925,7 +957,7 @@
       "benefits": [
         {
           "name": "Alaska Lounge Pass 1",
-          "value": 35,
+          "value": 65,
           "displayValue": null,
           "cadence": "quarterly",
           "anchor": "calendar",
@@ -933,7 +965,7 @@
         },
         {
           "name": "Alaska Lounge Pass 2",
-          "value": 35,
+          "value": 65,
           "displayValue": null,
           "cadence": "quarterly",
           "anchor": "calendar",
