@@ -28,6 +28,7 @@ export interface CatalogCard {
   name: string;
   issuer: string;
   annualFee: number | null;
+  rewardCurrency?: string | null;
   benefits: CatalogBenefit[];
   earnRates: CatalogEarnRate[];
   caps: never[];
@@ -65,6 +66,7 @@ export function copyCardFromCatalog(catalogCard: CatalogCard, profileId: string)
     anniversary: null,
     opened: null,
     closed: null,
+    rewardCurrency: catalogCard.rewardCurrency ?? null,
   };
 
   const benefits: Benefit[] = catalogCard.benefits.map((b) => ({

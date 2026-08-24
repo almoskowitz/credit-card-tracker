@@ -65,6 +65,7 @@
       "name": "Amex Platinum",
       "issuer": "American Express",
       "annualFee": 695,
+      "rewardCurrency": "membership-rewards",
       "benefits": [
         {
           "name": "Uber Cash",
@@ -175,6 +176,7 @@
       "name": "Business Platinum",
       "issuer": "American Express",
       "annualFee": 895,
+      "rewardCurrency": "membership-rewards",
       "benefits": [
         {
           "name": "Dell Credit",
@@ -284,6 +286,7 @@
       "name": "Amex Gold",
       "issuer": "American Express",
       "annualFee": 325,
+      "rewardCurrency": "membership-rewards",
       "benefits": [
         {
           "name": "Uber Cash",
@@ -343,6 +346,7 @@
       "name": "Business Gold",
       "issuer": "American Express",
       "annualFee": 375,
+      "rewardCurrency": "membership-rewards",
       "benefits": [
         {
           "name": "FedEx/Grubhub/Office Supply",
@@ -394,6 +398,7 @@
       "name": "Chase Sapphire Reserve",
       "issuer": "Chase",
       "annualFee": 550,
+      "rewardCurrency": "ultimate-rewards",
       "benefits": [
         {
           "name": "DoorDash Restaurant",
@@ -511,6 +516,7 @@
       "name": "Hilton Honors Aspire",
       "issuer": "American Express",
       "annualFee": 550,
+      "rewardCurrency": "hilton-honors",
       "benefits": [
         {
           "name": "CLEAR Credit",
@@ -591,6 +597,7 @@
       "name": "Hilton Honors Surpass",
       "issuer": "American Express",
       "annualFee": 150,
+      "rewardCurrency": "hilton-honors",
       "benefits": [
         {
           "name": "Hilton Credit",
@@ -647,6 +654,7 @@
       "name": "Marriott Bonvoy Brilliant",
       "issuer": "American Express",
       "annualFee": 650,
+      "rewardCurrency": "marriott-bonvoy",
       "benefits": [
         {
           "name": "Dining Credit",
@@ -696,6 +704,7 @@
       "name": "Marriott Bonvoy Bold",
       "issuer": "Chase",
       "annualFee": 0,
+      "rewardCurrency": "marriott-bonvoy",
       "benefits": [],
       "earnRates": [
         {
@@ -743,6 +752,7 @@
       "name": "World of Hyatt",
       "issuer": "Chase",
       "annualFee": 99,
+      "rewardCurrency": "world-of-hyatt",
       "benefits": [
         {
           "name": "Free Night Award",
@@ -799,6 +809,7 @@
       "name": "Venture X",
       "issuer": "Capital One",
       "annualFee": 395,
+      "rewardCurrency": "capital-one-miles",
       "benefits": [
         {
           "name": "Capital One Travel Credit",
@@ -829,6 +840,7 @@
       "name": "Strata Premier",
       "issuer": "Citi",
       "annualFee": 95,
+      "rewardCurrency": "citi-thankyou",
       "benefits": [
         {
           "name": "Hotel Credit",
@@ -854,6 +866,7 @@
       "name": "Jetblue Plus",
       "issuer": "Barclays",
       "annualFee": 99,
+      "rewardCurrency": "jetblue-trueblue",
       "benefits": [
         {
           "name": "JetBlue Vacations Credit",
@@ -900,6 +913,7 @@
       "name": "Ritz Carlton Rewards Visa",
       "issuer": "Chase",
       "annualFee": 450,
+      "rewardCurrency": "marriott-bonvoy",
       "benefits": [
         {
           "name": "Airline Fee Credit",
@@ -954,6 +968,7 @@
       "name": "Atmos Rewards Summit",
       "issuer": "Bank of America",
       "annualFee": 395,
+      "rewardCurrency": "atmos-rewards",
       "benefits": [
         {
           "name": "Alaska Lounge Pass 1",
@@ -1017,6 +1032,7 @@
       "name": "Chase Freedom",
       "issuer": "Chase",
       "annualFee": 0,
+      "rewardCurrency": "cash",
       "benefits": [],
       "earnRates": [
         {
@@ -1048,6 +1064,7 @@
       "name": "Chase Freedom Unlimited",
       "issuer": "Chase",
       "annualFee": 0,
+      "rewardCurrency": "cash",
       "benefits": [],
       "earnRates": [
         {
@@ -1084,6 +1101,7 @@
       "name": "Ink Business Cash",
       "issuer": "Chase",
       "annualFee": 0,
+      "rewardCurrency": "cash",
       "benefits": [],
       "earnRates": [
         {
@@ -1120,6 +1138,7 @@
       "name": "Ink Business Preferred",
       "issuer": "Chase",
       "annualFee": 95,
+      "rewardCurrency": "ultimate-rewards",
       "benefits": [],
       "earnRates": [
         {
@@ -1161,6 +1180,7 @@
       "name": "Ink Business Unlimited",
       "issuer": "Chase",
       "annualFee": 0,
+      "rewardCurrency": "cash",
       "benefits": [],
       "earnRates": [
         {
@@ -1177,6 +1197,7 @@
       "name": "Blue Business Plus",
       "issuer": "American Express",
       "annualFee": 0,
+      "rewardCurrency": "membership-rewards",
       "benefits": [],
       "earnRates": [
         {
@@ -1193,6 +1214,7 @@
       "name": "Delta Blue",
       "issuer": "American Express",
       "annualFee": 0,
+      "rewardCurrency": "delta-skymiles",
       "benefits": [],
       "earnRates": [
         {
@@ -1219,6 +1241,7 @@
       "name": "Citi AAdvantage Business",
       "issuer": "Citi",
       "annualFee": 99,
+      "rewardCurrency": "aadvantage",
       "benefits": [],
       "earnRates": [
         {
@@ -1261,6 +1284,7 @@
       "name": "AAdvantage Aviator Red",
       "issuer": "Barclays",
       "annualFee": 99,
+      "rewardCurrency": "aadvantage",
       "benefits": [],
       "earnRates": [
         {

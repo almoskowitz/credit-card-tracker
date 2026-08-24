@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { bestCardForCategory, effectiveRate, optimalWallet, type OptimizerCard, type Spend } from '../src/engine/optimizer';
+import { bestCardForCategory, effectiveRate, optimalWallet, optimalWalletScored, type OptimizerCard, type Spend } from '../src/engine/optimizer';
 
 describe('bestCardForCategory', () => {
   it('is an exact lookup with no substring matching', () => {
@@ -19,6 +19,55 @@ describe('bestCardForCategory', () => {
     const noRateCard: OptimizerCard = { id: 'c2', earnRates: [{ category: 'gas', rate: 5 }] };
     expect(effectiveRate(fallbackCard, 'dining')).toBe(2);
     expect(effectiveRate(noRateCard, 'dining')).toBe(1);
+  });
+});
+
+describe('cross-currency ranking (point valuation)', () => {
+  // Amex Membership Rewards card: 4x, ~2.0 cents/pt -> 8.0 cents/$
+  const mrCard: OptimizerCard = {
+    id: 'mr-card',
+    earnRates: [{ category: 'hotels', rate: 4 }],
+    centsPerPoint: 2.0,
+  };
+  // Hilton Honors card: 10x, ~0.5 cents/pt -> 5.0 cents/$ -- higher raw rate, lower real value
+  const hiltonCard: OptimizerCard = {
+    id: 'hilton-card',
+    earnRates: [{ category: 'hotels', rate: 10 }],
+    centsPerPoint: 0.5,
+  };
+
+  it('bestCardForCategory ranks by normalized value, not raw rate', () => {
+    const best = bestCardForCategory([hiltonCard, mrCard], 'hotels');
+    expect(best?.card.id).toBe('mr-card');
+    expect(best?.rate).toBe(4);
+    expect(best?.value).toBeCloseTo(8.0);
+
+    const hiltonEntry = bestCardForCategory([hiltonCard], 'hotels');
+    expect(hiltonEntry?.value).toBeCloseTo(5.0);
+  });
+
+  it('wallet-size scoring (no spend data) ranks by normalized value, not raw rate sum', () => {
+    const wallet = optimalWallet([hiltonCard, mrCard], {}, 1);
+    expect(wallet.map((c) => c.id)).toEqual(['mr-card']);
+  });
+
+  it('wallet-size scoring (with spend data) ranks by normalized value, not raw rate', () => {
+    const spend: Spend = { '2026-01': { hotels: 1000 } };
+    // mrCard:     1000 * 4  * 2.0 = 8000 (cents of value)
+    // hiltonCard: 1000 * 10 * 0.5 = 5000 (cents of value)
+    const scored = optimalWalletScored([hiltonCard, mrCard], spend, 2);
+    expect(scored.map((s) => s.card.id)).toEqual(['mr-card', 'hilton-card']);
+    expect(scored[0].score).toBeCloseTo(8000);
+    expect(scored[1].score).toBeCloseTo(5000);
+  });
+
+  it('back-compat: a card with no centsPerPoint set defaults to 1.0 (cash) and ranks exactly as before', () => {
+    const legacyCardA: OptimizerCard = { id: 'legacy-a', earnRates: [{ category: 'dining', rate: 3 }] };
+    const legacyCardB: OptimizerCard = { id: 'legacy-b', earnRates: [{ category: 'dining', rate: 2 }] };
+    const best = bestCardForCategory([legacyCardB, legacyCardA], 'dining');
+    expect(best?.card.id).toBe('legacy-a');
+    expect(best?.rate).toBe(3);
+    expect(best?.value).toBe(3);
   });
 });
 

@@ -12,7 +12,7 @@ const ANCHOR_OPTIONS = ANCHORS.join('|');
 const CATEGORY_OPTIONS = () => Array.from(CATEGORY_SLUGS).join(', ');
 
 const BENEFIT_FIELDS = ['name', 'value', 'displayValue', 'cadence', 'anchor', 'category', 'valueOverrides'] as const;
-const CARD_FIELDS = ['slug', 'name', 'issuer', 'annualFee', 'benefits', 'earnRates', 'caps', 'spendThresholds'] as const;
+const CARD_FIELDS = ['slug', 'name', 'issuer', 'annualFee', 'rewardCurrency', 'benefits', 'earnRates', 'caps', 'spendThresholds'] as const;
 const EARN_RATE_FIELDS = ['category', 'rate', 'notes'] as const;
 const SPEND_THRESHOLD_FIELDS = ['label', 'requirement', 'anchor'] as const;
 
@@ -173,6 +173,9 @@ export function validateCatalogCard(value: unknown): CardValidation {
   if (!('annualFee' in value) || (value.annualFee !== null && typeof value.annualFee !== 'number')) {
     errors.push('annualFee must be number|null');
   }
+  if ('rewardCurrency' in value && value.rewardCurrency !== undefined && value.rewardCurrency !== null && typeof value.rewardCurrency !== 'string') {
+    errors.push('rewardCurrency must be string|null');
+  }
 
   const benefits: CatalogBenefit[] = [];
   if (!Array.isArray(value.benefits)) {
@@ -220,6 +223,7 @@ export function validateCatalogCard(value: unknown): CardValidation {
       name: value.name as string,
       issuer: value.issuer as string,
       annualFee: (value.annualFee as number | null) ?? null,
+      rewardCurrency: (value.rewardCurrency as string | null | undefined) ?? null,
       benefits,
       earnRates,
       caps: [],

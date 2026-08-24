@@ -16,6 +16,8 @@ this document disagree, that disagreement is a bug in the importer.
   "name": "Amex Platinum",
   "issuer": "American Express",
   "annualFee": 695,                     // number, or null if unknown (never 0 for "unknown")
+  "rewardCurrency": "membership-rewards", // optional -- a RewardCurrency id (Settings > Point
+                                         // valuations); omit or null defaults to "cash"
   "benefits": [
     {
       "name": "Uber Cash",
@@ -56,6 +58,7 @@ this document disagree, that disagreement is a bug in the importer.
 | `name` | string | yes | Display name |
 | `issuer` | string | yes | e.g. "American Express", "Chase" |
 | `annualFee` | number \| null | yes | `null` means unknown, never `0` for "unknown" |
+| `rewardCurrency` | string \| null | no | A `RewardCurrency` id (see Settings > Point valuations); omitted or `null` means "cash" |
 | `benefits` | array | yes | May be empty |
 | `benefits[].name` | string | yes | |
 | `benefits[].value` | number \| null | yes | Dollar value per period, or `null` |

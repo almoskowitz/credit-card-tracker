@@ -17,6 +17,14 @@ export interface Card {
   anniversary: string | null; // "YYYY-MM-DD"
   opened: string | null; // "YYYY-MM-DD"
   closed: string | null; // "YYYY-MM-DD"
+  rewardCurrency: string | null; // RewardCurrency id; null/missing treated as "cash"
+}
+
+/** A point/mile program's estimated value. centsPerPoint is a user-editable estimate, not a fact. */
+export interface RewardCurrency {
+  id: string;
+  name: string;
+  centsPerPoint: number;
 }
 
 export interface Benefit {
@@ -89,6 +97,7 @@ export interface State {
   categories: SpendCategory[];
   spend: Spend;
   earnRates: EarnRate[];
+  rewardCurrencies: RewardCurrency[];
 }
 
 export const SEED_CATEGORY_NAMES = [
@@ -108,6 +117,29 @@ export const SEED_CATEGORY_NAMES = [
   'Other',
 ] as const;
 
+// Seed cents-per-point estimates, roughly in line with published TPG/NerdWallet-style
+// valuations at the time this feature shipped (2026). These are DEFAULTS the user can edit
+// in Settings, not claimed as objectively correct.
+const SEED_REWARD_CURRENCIES: readonly RewardCurrency[] = [
+  { id: 'cash', name: 'Cash', centsPerPoint: 1.0 },
+  { id: 'membership-rewards', name: 'Amex Membership Rewards', centsPerPoint: 2.0 },
+  { id: 'ultimate-rewards', name: 'Chase Ultimate Rewards', centsPerPoint: 2.0 },
+  { id: 'capital-one-miles', name: 'Capital One Miles', centsPerPoint: 1.85 },
+  { id: 'citi-thankyou', name: 'Citi ThankYou Points', centsPerPoint: 1.9 },
+  { id: 'hilton-honors', name: 'Hilton Honors', centsPerPoint: 0.5 },
+  { id: 'world-of-hyatt', name: 'World of Hyatt', centsPerPoint: 1.7 },
+  { id: 'marriott-bonvoy', name: 'Marriott Bonvoy', centsPerPoint: 0.7 },
+  { id: 'delta-skymiles', name: 'Delta SkyMiles', centsPerPoint: 1.2 },
+  { id: 'jetblue-trueblue', name: 'JetBlue TrueBlue', centsPerPoint: 1.3 },
+  { id: 'atmos-rewards', name: 'Atmos Rewards', centsPerPoint: 1.4 },
+  { id: 'aadvantage', name: 'American AAdvantage', centsPerPoint: 1.4 },
+];
+
+/** A fresh, independently-mutable copy of the seed reward-currency list. */
+export function defaultRewardCurrencies(): RewardCurrency[] {
+  return SEED_REWARD_CURRENCIES.map((c) => ({ ...c }));
+}
+
 export function defaultState(): State {
   const profileId = crypto.randomUUID();
   return {
@@ -121,6 +153,7 @@ export function defaultState(): State {
     categories: SEED_CATEGORY_NAMES.map((name) => ({ id: crypto.randomUUID(), name, budget: null })),
     spend: {},
     earnRates: [],
+    rewardCurrencies: defaultRewardCurrencies(),
   };
 }
 
@@ -160,5 +193,13 @@ export function validateState(data: unknown): State {
     }
   }
 
-  return obj as unknown as State;
+  // rewardCurrencies predates schemaVersion 2 users of this app but postdates schemaVersion 2
+  // itself -- an export made before this feature shipped is still valid v2 state, so a missing
+  // array is backfilled with the seed list rather than rejected.
+  if ('rewardCurrencies' in obj && !Array.isArray(obj.rewardCurrencies)) {
+    throw new Error('State.rewardCurrencies must be an array');
+  }
+  const rewardCurrencies = Array.isArray(obj.rewardCurrencies) ? (obj.rewardCurrencies as RewardCurrency[]) : defaultRewardCurrencies();
+
+  return { ...(obj as unknown as State), rewardCurrencies };
 }

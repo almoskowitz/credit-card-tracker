@@ -1,4 +1,4 @@
-import type { Benefit, Cap, Card, EarnRate, Msr, Profile, SpendCategory, State } from './schema';
+import type { Benefit, Cap, Card, EarnRate, Msr, Profile, RewardCurrency, SpendCategory, State } from './schema';
 import { ledgerKey } from '../engine/period';
 
 export type Action =
@@ -27,7 +27,9 @@ export type Action =
   | { type: 'SET_SPEND'; month: string; categoryId: string; amount: number }
   | { type: 'ADD_EARN_RATE'; earnRate: EarnRate }
   | { type: 'UPDATE_EARN_RATE'; id: string; patch: Partial<Omit<EarnRate, 'id' | 'cardId'>> }
-  | { type: 'DELETE_EARN_RATE'; id: string };
+  | { type: 'DELETE_EARN_RATE'; id: string }
+  | { type: 'ADD_REWARD_CURRENCY'; rewardCurrency: RewardCurrency }
+  | { type: 'UPDATE_REWARD_CURRENCY'; id: string; patch: Partial<Omit<RewardCurrency, 'id'>> };
 
 /** REPLACE_STATE is system-driven (load, 409 recovery, foreground refresh) — never a user mutation. */
 export const NON_MUTATING_ACTION_TYPES: ReadonlySet<Action['type']> = new Set(['REPLACE_STATE']);
@@ -159,6 +161,12 @@ export function reduceState(state: State, action: Action): State {
 
     case 'DELETE_EARN_RATE':
       return { ...state, earnRates: without(state.earnRates, action.id) };
+
+    case 'ADD_REWARD_CURRENCY':
+      return { ...state, rewardCurrencies: [...state.rewardCurrencies, action.rewardCurrency] };
+
+    case 'UPDATE_REWARD_CURRENCY':
+      return { ...state, rewardCurrencies: patchById<RewardCurrency>(state.rewardCurrencies, action.id, action.patch) };
 
     default:
       return state;
