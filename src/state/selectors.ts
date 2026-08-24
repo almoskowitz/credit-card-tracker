@@ -1,10 +1,16 @@
 import type { Benefit, Card, Msr, State } from './schema';
-import { daysLeft, ledgerKey, periodFor, resolveBenefitValue, type Period } from '../engine/period';
+import { daysLeft, ledgerKey, parseLocalDate, periodFor, resolveBenefitValue, type Period } from '../engine/period';
 import { evaluateMsr, sortMsrs, type MsrStatus } from '../engine/msr';
 import { cardBreakeven, portfolioBreakeven, type Breakeven, type PortfolioBreakeven } from '../engine/breakeven';
 
-export function cardsForProfile(state: State, profileId: string): Card[] {
-  return state.cards.filter((c) => c.profileId === profileId);
+function isClosedAsOf(closed: string | null, now: Date): boolean {
+  const d = parseLocalDate(closed);
+  return d !== null && d <= now;
+}
+
+/** Excludes cards closed on or before `now` — a closed card leaves every active view, though its historical redemptions stay in state (see `cardBreakevenFor`, which looks a card up directly and is unaffected). */
+export function cardsForProfile(state: State, profileId: string, now: Date = new Date()): Card[] {
+  return state.cards.filter((c) => c.profileId === profileId && !isClosedAsOf(c.closed, now));
 }
 
 export interface RunwayItem {
@@ -19,7 +25,7 @@ export interface RunwayItem {
 
 /** All benefits belonging to the active profile's cards, resolved for the current period. */
 export function runwayItems(state: State, profileId: string, now: Date = new Date()): RunwayItem[] {
-  const cardsById = new Map(cardsForProfile(state, profileId).map((c) => [c.id, c]));
+  const cardsById = new Map(cardsForProfile(state, profileId, now).map((c) => [c.id, c]));
   const items: RunwayItem[] = [];
   for (const benefit of state.benefits) {
     const card = cardsById.get(benefit.cardId);
@@ -71,7 +77,7 @@ export interface MsrWithStatus extends Msr, MsrStatus {}
 
 /** MSRs for the active profile's cards, risk-sorted per engine/msr.ts. */
 export function msrsForProfile(state: State, profileId: string, now: Date = new Date()): MsrWithStatus[] {
-  const cardIds = new Set(cardsForProfile(state, profileId).map((c) => c.id));
+  const cardIds = new Set(cardsForProfile(state, profileId, now).map((c) => c.id));
   const relevant = state.msrs.filter((m) => cardIds.has(m.cardId));
   return sortMsrs(relevant.map((m) => evaluateMsr(m, state.spend, now)));
 }
@@ -83,5 +89,5 @@ export function cardBreakevenFor(state: State, cardId: string, now: Date = new D
 }
 
 export function portfolioBreakevenForProfile(state: State, profileId: string, now: Date = new Date()): PortfolioBreakeven {
-  return portfolioBreakeven(cardsForProfile(state, profileId), state.benefits, state.redemptions, now);
+  return portfolioBreakeven(cardsForProfile(state, profileId, now), state.benefits, state.redemptions, now);
 }

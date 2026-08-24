@@ -21,11 +21,12 @@ export function effectiveRate(card: OptimizerCard, category: string): number {
 export function bestCardForCategory(
   cards: OptimizerCard[],
   category: string,
-): { card: OptimizerCard; rate: number } | null {
-  let best: { card: OptimizerCard; rate: number } | null = null;
+): { card: OptimizerCard; rate: number; fallback: boolean } | null {
+  let best: { card: OptimizerCard; rate: number; fallback: boolean } | null = null;
   for (const card of cards) {
     const rate = effectiveRate(card, category);
-    if (!best || rate > best.rate) best = { card, rate };
+    const fallback = !card.earnRates.some((r) => r.category === category);
+    if (!best || rate > best.rate) best = { card, rate, fallback };
   }
   return best;
 }
@@ -40,15 +41,20 @@ function annualSpendByCategory(spend: Spend): Record<string, number> {
   return totals;
 }
 
-export function optimalWallet(cards: OptimizerCard[], spend: Spend, size: number): OptimizerCard[] {
+export interface ScoredCard {
+  card: OptimizerCard;
+  score: number;
+}
+
+/** Same ranking as `optimalWallet`, with each card's score attached for display. */
+export function optimalWalletScored(cards: OptimizerCard[], spend: Spend, size: number): ScoredCard[] {
   const hasSpend = Object.keys(spend).length > 0;
-  const scored = hasSpend
-    ? scoreBySpend(cards, annualSpendByCategory(spend))
-    : scoreByRateSum(cards);
-  return scored
-    .sort((a, b) => b.score - a.score)
-    .slice(0, size)
-    .map((s) => s.card);
+  const scored = hasSpend ? scoreBySpend(cards, annualSpendByCategory(spend)) : scoreByRateSum(cards);
+  return scored.sort((a, b) => b.score - a.score).slice(0, size);
+}
+
+export function optimalWallet(cards: OptimizerCard[], spend: Spend, size: number): OptimizerCard[] {
+  return optimalWalletScored(cards, spend, size).map((s) => s.card);
 }
 
 function scoreBySpend(cards: OptimizerCard[], totals: Record<string, number>) {
