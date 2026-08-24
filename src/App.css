@@ -39,7 +39,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--sp-3);
-  padding: 12px 18px 12px;
+  padding: max(var(--safe-top), 12px) max(var(--safe-right), 18px) 12px max(var(--safe-left), 18px);
   background: color-mix(in srgb, var(--bg-0) 62%, transparent);
   -webkit-backdrop-filter: blur(20px) saturate(140%);
   backdrop-filter: blur(20px) saturate(140%);
