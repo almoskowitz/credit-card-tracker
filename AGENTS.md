@@ -1,5 +1,14 @@
 # Agent Instructions
 
+Credit Card Rewards Tracker — a single-user benefits tracker. Vite + React + TypeScript
+client, FastAPI + Postgres state service. Full architecture, dev workflow, and deploy
+steps are in `README.md`; codebase layering and conventions are in `CLAUDE.md`. Read both
+before making changes.
+
+Layering rule: the engine (`src/engine/`) and selectors are React-free, the store
+(`src/state/store.tsx`) is HTTP-free, and only `src/storage/api.ts` may call `fetch`.
+`npm test` (vitest) must stay green; `npm run build` must succeed before a deploy.
+
 This project uses **bd** (beads) for issue tracking. Run `bd prime` for full workflow context.
 
 > **Architecture in one line:** Issues live in a local Dolt database

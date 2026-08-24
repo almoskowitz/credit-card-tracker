@@ -4,56 +4,63 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Credit Card Rewards Tracker — a single-file React app for tracking credit card benefits, managing multiple profiles, and optimizing wallet strategy. No build process, no server, no dependencies to install.
+Credit Card Rewards Tracker — a single-user benefits tracker. Vite + React + TypeScript
+client, FastAPI + Postgres state service. See `README.md` for the full architecture,
+dev workflow, and deploy steps; this file covers conventions an agent needs to not break.
 
-## Development
+## Layering — the one rule that matters
 
-**Run the app:** Open `credit-card-tracker-full.html` directly in a browser. On Windows: `start credit-card-tracker-full.html`.
+```
+src/engine/    pure functions, no React, no dates library (period.ts, msr.ts, breakeven.ts, optimizer.ts)
+src/state/     schema.ts, actions.ts, store.tsx (reducer + connection guard), selectors.ts
+src/storage/   api.ts — the ONLY module allowed to call fetch('/api/...')
+src/catalog/   catalog.ts (copy-on-add), categories.ts, importer.ts
+src/ui/        components/ and views/ (Today, Wallet, Insights, Settings)
+server/        FastAPI: app.py (mounts), state.py (GET/PUT /api/state), db.py (asyncpg pool)
+```
 
-There is no build step, no test suite, no linter, and no package manager. The entire application is one self-contained HTML file (~1650 lines) that loads React 18 + Babel via CDN and compiles JSX in the browser.
+**The engine and selectors are React-free. The store is HTTP-free. Only `src/storage/`
+may speak to the API.** If you find yourself importing `fetch` or a status code outside
+`src/storage/api.ts`, or importing React inside `src/engine/`, stop — that's the layering
+rule breaking.
 
-**Testing is manual:** Verify in Chrome/Firefox/Safari, check for console errors, confirm data persists after refresh, and test modal open/close behavior.
+`src/state/store.tsx`'s reducer rejects mutating actions outright while
+`connection === 'unreachable'` (one check at the boundary, in `storeReducer`) — components
+never need to check connection state themselves before dispatching.
 
-## Architecture
+## Conventions
 
-### Single-file structure (`credit-card-tracker-full.html`)
+- **Tokens only.** Every color, font-size, spacing, and motion value lives in
+  `src/ui/tokens.css`. No other file under `src/ui/` may hold a color or font-size
+  literal — reference the CSS variable instead.
+- **Period-key stability.** `src/engine/period.ts` derives a period's `key` from its
+  `start` date (e.g. `2026-03` for calendar, `A2026-01-31` for anniversary). Changing how
+  a key is formatted invalidates every existing `redemptions` entry keyed
+  `<benefitId>|<periodKey>` — treat the key format as a migration, not a refactor.
+- **Catalog copy-on-add.** `copyCardFromCatalog()` in `src/catalog/catalog.ts` deep-copies
+  a catalog card into user state with fresh UUIDs on every entity. The catalog
+  (`data/cards.json`) is never read live again for a card the user already owns — `slug`
+  on the resulting `Card` is provenance only, never a lookup key.
+- **No localStorage data.** The only `localStorage` key is `card-tracker:view-prefs`
+  (`src/ui/viewPrefs.ts`) — the last tab and active profile, i.e. per-device view state.
+  All app data lives in the single `State` blob synced through `src/storage/api.ts`, and
+  there is no local write queue: an edit made while the server is unreachable is applied
+  in memory and lost if it isn't flushed before the tab closes (see `attemptRecovery` /
+  `handleSaveFailure` in `src/storage/api.ts`).
+- **`updatedAt` is an opaque string.** Never parse it into a `Date` on the client or the
+  server — it's compared for exact string equality only (`server/state.py`).
 
-The file is organized in this order:
-1. **CSS** (~670 lines) — All styles inline in a `<style>` tag. Glassmorphic dark theme using CSS variables (`:root`). Issuer-specific accent colors via `.issuer-*` classes.
-2. **Data** (`INITIAL_CARD_DATABASE`, `SPENDING_CATEGORIES`) — Large inline JSON blob defining ~24 pre-loaded credit cards with their periodic benefits and multipliers.
-3. **Utility functions** — `getCurrentMonth/Quarter/Half/Year`, `getPeriodKey`, `isCurrentPeriod` for period-based filtering.
-4. **`ProgressCircle` component** — Small SVG donut chart.
-5. **`App` component** (~900 lines) — Single monolithic component containing all state, logic, and rendering. Uses `useState` + `useEffect` for localStorage persistence.
+## Commands
 
-### Data model
+```bash
+npm test                  # vitest run — all suites (69 tests as of the v3 rebuild)
+npm run validate:catalog  # vitest run tests/catalog.test.ts
+npm run build             # vite build -> dist/
+npm run deploy             # build, then copy dist/* into server/static/
+```
 
-- **Profiles** have `id` and `name`. Cards reference profiles via `profileId`.
-- **Cards** (in wallet) have `id`, `profileId`, `cardName` (FK to database), `issuer`, `annualFee`, plus resolved `periodicBenefits` and `multipliers` from the database.
-- **`periodicBenefits`** — Each benefit has `frequency` (Monthly/Quarterly/Semi-Annual/Annual) and `period` (M1-M12, Q1-Q4, H1-H2, or omitted for Annual).
-- **`usedBenefits`** — Object keyed as `${cardId}-${benefitIndex}-${year}-${period}`. Naturally scoped per year.
-- **All state persists to `localStorage`** under keys: `profiles`, `cards`, `card-database`, `used-benefits`, `annual-spending`.
-
-### Key functions
-
-- `resolveCard(wc)` — Merges a wallet card with its database entry to get full benefit/multiplier data. Must be called before accessing `periodicBenefits`.
-- `calculateCardStats(card)` — Iterates ALL periodic benefits (not just current period) for YTD recovery totals.
-- `getTotalStats()` — Aggregates across all cards. Uses `stats.usedAnnualValue` for recovery, exposes `netCost`.
-- `calculateOptimalWallet(walletSize)` — Scores cards by spending-weighted multipliers when spending data exists; falls back to multiplier sum.
-- `isCurrentPeriod(benefit)` — Determines if a benefit is available in the current month/quarter/half/year.
-
-### Rendering structure
-
-The `App` component has three tab views rendered by:
-- `renderDashboard()` — Stats strip, HUD (collapsible benefit list sorted by urgency), card grid with expandable benefit tiles.
-- `renderDatabase()` — Card database management with add/edit forms.
-- `renderOptimizer()` — Spending input, best-card-per-category analysis, wallet recommendations (3/5/7 card).
-
-## Code Style
-
-- 2-space indentation
-- React functional components with hooks (no classes)
-- Inline styles mixed with CSS classes
-- `URGENCY_ORDER` constant: `{ Monthly: 0, Quarterly: 1, Semi-Annual: 2, Annual: 3 }`
+No linter is configured. TypeScript strict mode (`tsconfig.json`) is the only static
+check; `noUnusedLocals`/`noUnusedParameters` are on.
 
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:6cd5cc61 -->

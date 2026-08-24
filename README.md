@@ -1,212 +1,172 @@
-# Credit Card Rewards Tracker - Full Featured
+# Credit Card Rewards Tracker
 
-A comprehensive web application for tracking credit card benefits, managing multiple profiles, and optimizing your wallet strategy.
+A single-user credit-card benefits tracker. It answers three questions: what am I about
+to lose (statement credits with reset windows, minimum-spend requirements with
+deadlines), am I getting my annual fees back (per-card and portfolio break-even), and
+which card do I use for this (earn rates by category, optimal 3/5/7-card wallet).
 
-## 🎯 Features
+Primary use is one-handed on an iPhone, at night. Secondary use is a laptop browser for
+bulk editing and adding cards.
 
-### Core Functionality
-- **Profile Management** - Create profiles for multiple people (e.g., Andrew, Becca)
-- **Card Assignment** - Assign cards to profiles (same card can be used by multiple people)
-- **Benefit Tracking** - Track monthly, quarterly, semi-annual, and annual benefits
-- **Current Period Filtering** - Only shows benefits available in the current period
-- **Live Updates** - Clicking benefits updates all stats and charts in real-time
+**App URL:** `https://andrews-mac-studio-1.tail3683aa.ts.net:8443/`
 
-### Advanced Features
-- **Wallet Optimizer** - Analyzes spending patterns and recommends optimal card combinations
-- **Best Card Analysis** - Shows which card to use for each spending category
-- **Portfolio Recommendations** - Suggests 3-card, 5-card, and 7-card optimal wallets
-- **Card Database Management** - Add new cards and edit benefits directly in the app
-- **Persistent Storage** - All data saved automatically using browser storage
+## Architecture
 
-### Design
-- **Glassmorphic UI** - Beautiful frosted glass aesthetic with high contrast
-- **Responsive Layout** - Works on desktop, tablet, and mobile
-- **Real-time Charts** - SVG donut charts showing fee recovery progress
-- **Smooth Animations** - Polished interactions throughout
+A Vite + React + TypeScript client and a FastAPI + Postgres state service, split by a
+single rule: **only `src/storage/` may speak to the API.** Everything above it works in
+plain data.
 
-## 🚀 Quick Start
+```
+src/engine/     Pure functions, no React, no dates library — period.ts, msr.ts, breakeven.ts, optimizer.ts
+src/state/      schema.ts (State shape), actions.ts + store.tsx (reducer, HTTP-free), selectors.ts
+src/storage/    api.ts — the only module that calls fetch('/api/...')
+src/catalog/    catalog.ts (copy-on-add), categories.ts, importer.ts (paste/validate a card)
+src/ui/         components/ and views/ — Today, Wallet, Insights, Settings
+data/cards.json Seed catalog (24 cards) — read only when adding a card to a wallet
+server/         FastAPI app: app.py, state.py (GET/PUT /api/state), db.py (asyncpg pool)
+tests/          vitest — engine, importer, catalog, and selector tests
+docs/card-schema.md   Import format for catalog cards
+```
 
-### Option 1: Simple (No Installation)
-1. Download `credit-card-tracker.html`
-2. Open it in any modern web browser (Chrome, Firefox, Safari, Edge)
-3. Start using immediately - no server or compilation needed!
+The four tabs:
 
-### Option 2: Local Development
+- **Today** — MSR runway cards and the current-period benefit list, sorted by urgency.
+- **Wallet** — cards for the active profile, each with a fee-recovery bar and an
+  expandable benefit/MSR/earn-rate/cap detail sheet.
+- **Insights** — spend-by-category input, best-card-per-category, and 3/5/7-card wallet
+  recommendations.
+- **Settings** — profiles, connection status, last-synced time, and adding a card from
+  the catalog (search, paste, or blank form).
+
+There is no local data store and no third-party cloud sync of any kind. The client holds
+one `State` blob in memory, debounces edits 750ms, and PUTs the whole blob to the server.
+The server holds one row. There is no offline queue: an edit made while the server is
+unreachable is applied in memory and lost if it can't be flushed before the tab closes.
+Per-device view state only (last tab, active profile) lives in `localStorage` under
+`card-tracker:view-prefs` — never app data.
+
+## Development
+
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/credit-card-tracker.git
-cd credit-card-tracker
-
-# Open in browser
-open credit-card-tracker.html
-# OR on Windows: start credit-card-tracker.html
-# OR on Linux: xdg-open credit-card-tracker.html
+npm install
 ```
 
-## 📖 Usage Guide
+**Client, against a local server:**
 
-### Getting Started
-1. **Create a Profile**
-   - Click "Manage Profiles"
-   - Enter a name (e.g., "Andrew")
-   - Click "Add Profile"
-
-2. **Add a Card**
-   - Click "+ Add Card"
-   - Select your profile
-   - Choose a card from the database
-   - Card appears in your dashboard
-
-3. **Track Benefits**
-   - Click on a card to expand benefits
-   - Click any benefit tile to mark as used
-   - Watch the recovery percentage update in real-time
-
-### Managing the Database
-1. **Add New Card**
-   - Navigate to "Manage Database" section
-   - Enter card details (name, issuer, annual fee)
-   - Add benefits with frequency and values
-   - Add multipliers for optimization
-
-2. **Edit Benefits**
-   - Select a card from the database
-   - Click "Edit Benefits"
-   - Add, modify, or remove benefits
-   - Changes save automatically
-
-### Optimizing Your Wallet
-1. Go to "Optimize" tab
-2. Enter your annual spending by category
-3. View best card recommendations
-4. See suggested wallet combinations
-
-## 🗂️ Data Structure
-
-### Profiles
-```javascript
-{
-  id: "prof-123",
-  name: "Andrew"
-}
+```bash
+cd server
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+DATABASE_URL=postgres://<user>:<pass>@localhost:5432/sovereign_ai .venv/bin/uvicorn server.app:app --host 127.0.0.1 --port 8101
 ```
 
-### Cards
-```javascript
-{
-  id: "card-456",
-  profileId: "prof-123",
-  cardName: "Amex Platinum",
-  issuer: "American Express",
-  annualFee: 695,
-  periodicBenefits: [...],
-  multipliers: {...}
-}
+In a second terminal, from the repo root:
+
+```bash
+npm run dev
 ```
 
-### Benefits
-```javascript
-{
-  name: "Uber Cash",
-  type: "Dining",
-  frequency: "Monthly",
-  value: 15,
-  period: "M2"  // M1-M12, Q1-Q4, H1-H2, or omit for Annual
-}
+`vite.config.ts` proxies `/api` to `127.0.0.1:8101` in dev only — the production build is
+served directly by the FastAPI process (see Deploy below), so this proxy has no effect
+outside `npm run dev`.
+
+**Commands:**
+
+```bash
+npm test                  # vitest run — all suites
+npm run validate:catalog  # vitest run tests/catalog.test.ts — validates data/cards.json
+npm run build             # vite build -> dist/ (single self-contained HTML file)
+npm run deploy            # build, then copy dist/* into server/static/
 ```
 
-## 💾 Data Storage
+## The state service
 
-All data is stored locally in your browser using the `window.storage` API:
-- Profiles
-- Cards (your active cards)
-- Card Database (available cards)
-- Used Benefits (tracking)
-- Annual Spending (for optimization)
+FastAPI app in `server/`, bound to `127.0.0.1:8101` only — never `0.0.0.0`. No CORS
+middleware (the client is served same-origin), no `/docs` or `/redoc`.
 
-**Note:** Data persists between sessions but is browser-specific. Export your data if switching browsers.
-
-## 🎨 Customization
-
-The app uses CSS variables for easy theme customization. Edit these in the `<style>` section:
-
-```css
-:root {
-  --primary: #4f46e5;
-  --secondary: #7c3aed;
-  --accent: #ec4899;
-  --success: #10b981;
-}
+```
+GET  /api/health   -> 200 {"ok": true}                       (SELECT 1 against Postgres)
+GET  /api/state    -> 200 { updatedAt: string | null, state: State | null }
+PUT  /api/state    <- { updatedAt: string | null, state: State }
+                   -> 200 { updatedAt: string }
+                   -> 409 { updatedAt: string | null, state: State | null }
 ```
 
-## 🔧 Technical Details
+State lives in one row of the `app_state` table in the `sovereign_ai` Postgres database:
 
-**Built With:**
-- React 18 (via CDN)
-- Babel (for JSX compilation)
-- Pure CSS (no frameworks)
-- Browser Storage API
+```sql
+create table app_state (
+  key        text primary key,
+  value      jsonb not null,
+  updated_at timestamptz not null default now()
+);
+```
 
-**Browser Requirements:**
-- Modern browser with ES6+ support
-- Storage API support
-- SVG support
+The row key is the literal string `'card-tracker'`. `PUT` is optimistic-concurrency,
+single-statement (`UPDATE ... WHERE key = ... AND updated_at = $1 RETURNING updated_at`),
+so there is no read-then-write race:
 
-**No Build Process Required:**
-This is a single-file application that runs entirely in the browser. No Node.js, npm, webpack, or any build tools needed!
+- Non-null `updatedAt`, row updated → `200` with the new `updatedAt`.
+- Non-null `updatedAt`, no row matched → `409` with the server's current
+  `{updatedAt, state}` — the caller was stale. The rejected write is never retried; the
+  client rolls the optimistic change back to the server's copy.
+- Null `updatedAt` (client believes it's the first write), row already exists → `409`.
+- Null `updatedAt`, no row yet → `INSERT ... ON CONFLICT DO NOTHING RETURNING updated_at`.
 
-## 📊 Included Cards
+`updatedAt` is an opaque ISO-8601 string end to end — the server serializes it once and
+both sides compare it as a string, never parsed back into a date.
 
-The app comes pre-loaded with 24 popular credit cards:
-- Amex Platinum, Business Platinum, Gold, Business Gold
-- Chase Sapphire Reserve, Freedom Unlimited, Freedom
-- Ink Business Preferred, Cash, Unlimited
-- Hilton Honors Aspire, Surpass
-- Marriott Bonvoy Brilliant, Bold
-- World of Hyatt
-- Capital One Venture X
-- Citi Strata Premier
-- And more...
+Backups: `sovereign_ai` is already covered by the existing nightly `pg_dump`; no
+additional backup machinery was added for this table.
 
-## 🤝 Contributing
+## Operations
 
-Contributions welcome! To add new cards:
-1. Fork the repository
-2. Add card data to `INITIAL_CARD_DATABASE`
-3. Submit a pull request
+- **launchd label:** `com.llm.card-tracker`, plist at
+  `~/Library/LaunchAgents/com.llm.card-tracker.plist` (`RunAtLoad`, `KeepAlive`).
+  Load/reload: `launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.llm.card-tracker.plist`.
+- **Start script:** `llm-infrastructure/scripts/start_card_tracker.sh` sources
+  `llm-infrastructure/.env`, builds `DATABASE_URL`, then runs
+  `exec .venv/bin/uvicorn server.app:app --host 127.0.0.1 --port 8101`.
+- **Logs:** stdout/stderr both go to `llm-infrastructure/logs/card-tracker.log`.
+- **Exposure:** `tailscale serve --bg --https=8443 http://127.0.0.1:8101` — a second HTTPS
+  port (443 is already taken on this Mac Studio by another app), root-path served so
+  there's no base-href/PWA-scope juggling. App URL:
+  `https://andrews-mac-studio-1.tail3683aa.ts.net:8443/`.
+- **Health check:** `curl http://127.0.0.1:8101/api/health` should return `{"ok": true}`.
+  An entry for this endpoint lives in `llm-infrastructure/scripts/health_check.sh`.
+- **Backup coverage:** the nightly `sovereign_ai` `pg_dump` (existing infrastructure,
+  nothing card-tracker-specific).
 
-## 📝 License
+### Deploying a code change
 
-MIT License - feel free to use and modify!
+1. **Server change** — edit `server/*.py`, then restart the launchd job:
+   `launchctl kickstart -k gui/$(id -u)/com.llm.card-tracker`.
+2. **Client change** — `npm run deploy` (build + copy into `server/static/`). This is a
+   file copy; no restart needed — `server/static/index.html` is served with
+   `Cache-Control: no-cache` specifically so a stale copy is never mistaken for a working
+   deploy.
+3. **Schema change** — write a new migration file in `llm-infrastructure/scripts/`
+   (following the naming of `pg_migrate_20260824_card_tracker.sql`) and apply it by hand:
+   `docker exec -i <pg-container> psql -U <user> -d sovereign_ai < path/to/migration.sql`.
 
-## 🐛 Troubleshooting
+## Adding a card
 
-**Q: My benefits aren't showing**
-A: Make sure they're set for the current period (month/quarter/half/year)
+Three ways, all inside the app (Settings → Add Card):
 
-**Q: Cards disappeared**
-A: Check browser storage settings - ensure cookies/storage isn't being cleared
+1. **Search** the built-in catalog (`data/cards.json`, 24 cards) and add it to a profile.
+2. **Paste** a JSON object matching the catalog schema — validated client-side before
+   it's added.
+3. **Blank form** for a card not in the catalog.
 
-**Q: Optimizer shows "None"**
-A: Add multipliers to your cards in the database editor
+Adding a card deep-copies it into your state with fresh UUIDs on every entity; the
+catalog is never read live again for a card you already own. See
+[`docs/card-schema.md`](docs/card-schema.md) for the exact field reference, an annotated
+example, and a copy-paste prompt for formatting a benefits page into the schema with an
+LLM.
 
-**Q: Can I export my data?**
-A: Currently data is browser-local. Export feature coming soon!
+## Acceptance gate
 
-## 📮 Support
-
-For issues, questions, or suggestions:
-- Open an issue on GitHub
-- Contact: your-email@example.com
-
-## 🎯 Roadmap
-
-- [ ] Data export/import
-- [ ] PDF report generation
-- [ ] Historical tracking charts
-- [ ] Mobile app version
-- [ ] Multi-currency support
-
----
-
-**Made with ❤️ for credit card enthusiasts**
+A fresh clone must be able to build and deploy following only this document. Verified by
+cloning the repo into a scratch directory and running `npm install && npm run build`
+(server setup and `npm run deploy` are the same commands, run against the real server —
+not re-verified from a throwaway clone since that would touch the live database).
