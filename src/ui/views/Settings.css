@@ -1,0 +1,128 @@
+.settings-list {
+  margin: 18px 18px 0;
+}
+
+.li-static {
+  cursor: default;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.settings-panel {
+  margin: 0 18px;
+  padding: 14px 16px 16px;
+  border-radius: var(--r-lg);
+  background: var(--glass-1);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.settings-error {
+  margin: 12px 18px 0;
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  background: var(--red-dim);
+  color: var(--red);
+  font-size: var(--fs-13);
+}
+
+.settings-import-confirm {
+  margin-top: 12px;
+}
+.settings-import-confirm .s {
+  font-size: var(--fs-13);
+  color: var(--text-2);
+}
+.settings-import-summary {
+  font-size: var(--fs-17);
+  font-weight: 600;
+  color: var(--text-0);
+  margin: 8px 0 14px;
+}
+
+.settings-profiles {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.profile-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--target-min);
+}
+.profile-name {
+  background: none;
+  border: 0;
+  color: var(--text-1);
+  font-size: var(--fs-15);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  min-height: var(--target-min);
+}
+.profile-name.active {
+  color: var(--mint);
+}
+.profile-count {
+  font-size: var(--fs-13);
+  color: var(--text-2);
+}
+.profile-action {
+  margin-left: auto;
+  background: none;
+  border: 0;
+  color: var(--sky);
+  font-size: var(--fs-13);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  min-height: var(--target-min);
+  padding: 0 4px;
+}
+.profile-action.danger {
+  color: var(--red);
+  margin-left: 4px;
+}
+.profile-rename-input {
+  flex: 1;
+  min-height: var(--target-min);
+  padding: 0 10px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--white) 4%, transparent);
+  color: var(--text-0);
+  font-size: var(--fs-15);
+  font-family: inherit;
+}
+.settings-add-profile {
+  align-self: flex-start;
+}
+
+.vfoot {
+  text-align: center;
+  font-size: var(--fs-13);
+  color: var(--text-2);
+  margin: 22px 0 8px;
+}
+
+.schema-doc {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: var(--fs-13);
+  line-height: 1.5;
+  color: var(--text-1);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  margin: 0;
+  padding-bottom: 8px;
+}

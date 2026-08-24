@@ -5,6 +5,10 @@ import { load } from './storage/api';
 import { ToastProvider, useToast } from './ui/components/Toast';
 import { TabBar, type TabId } from './ui/components/TabBar';
 import { Today } from './ui/views/Today';
+import { Wallet } from './ui/views/Wallet';
+import { Insights } from './ui/views/Insights';
+import { Settings } from './ui/views/Settings';
+import { loadViewPrefs, saveViewPrefs } from './ui/viewPrefs';
 import './ui/tokens.css';
 import './App.css';
 
@@ -39,26 +43,23 @@ function ConnectionBanner() {
   );
 }
 
-function PlaceholderView({ title }: { title: string }) {
-  return (
-    <div className="hdr">
-      <div>
-        <h1>{title}</h1>
-        <div className="h-sub">Coming in a later Phase 4 task</div>
-      </div>
-    </div>
-  );
-}
-
 function AppShell() {
   const { store } = useStore();
-  const [tab, setTab] = useState<TabId>('today');
-  const [activeProfileId, setActiveProfileId] = useState<string>(() => store.data.profiles[0]?.id ?? '');
+  const [tab, setTab] = useState<TabId>(() => loadViewPrefs().tab);
+  const [activeProfileId, setActiveProfileId] = useState<string>(
+    () => loadViewPrefs().activeProfileId ?? store.data.profiles[0]?.id ?? '',
+  );
 
+  // A stored profile id that no longer exists (deleted, or from a stale export) falls back to
+  // the first profile rather than rendering an empty wallet or throwing.
   useEffect(() => {
     if (store.data.profiles.some((p) => p.id === activeProfileId)) return;
     setActiveProfileId(store.data.profiles[0]?.id ?? '');
   }, [store.data.profiles, activeProfileId]);
+
+  useEffect(() => {
+    saveViewPrefs({ tab, activeProfileId });
+  }, [tab, activeProfileId]);
 
   function cycleProfile() {
     const ids = store.data.profiles.map((p) => p.id);
@@ -72,9 +73,9 @@ function AppShell() {
       <ConnectionBanner />
       <div className="app-scroll">
         {tab === 'today' && <Today profileId={activeProfileId} onProfileTap={cycleProfile} />}
-        {tab === 'wallet' && <PlaceholderView title="Wallet" />}
-        {tab === 'insights' && <PlaceholderView title="Insights" />}
-        {tab === 'settings' && <PlaceholderView title="Settings" />}
+        {tab === 'wallet' && <Wallet profileId={activeProfileId} />}
+        {tab === 'insights' && <Insights profileId={activeProfileId} onProfileTap={cycleProfile} />}
+        {tab === 'settings' && <Settings activeProfileId={activeProfileId} onSetActiveProfile={setActiveProfileId} />}
       </div>
       <TabBar active={tab} onChange={setTab} />
     </div>

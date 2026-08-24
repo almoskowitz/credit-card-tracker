@@ -38,6 +38,11 @@ export function getConnectionStatus(): ConnectionStatus {
   return connection;
 }
 
+/** The server's `updatedAt` from the most recent successful GET or PUT — Settings' "last synced" display. */
+export function getLastSyncedAt(): string | null {
+  return knownUpdatedAt;
+}
+
 function setConnection(status: ConnectionStatus): void {
   if (connection === status) return;
   connection = status;

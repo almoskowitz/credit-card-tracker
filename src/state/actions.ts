@@ -3,6 +3,7 @@ import { ledgerKey } from '../engine/period';
 
 export type Action =
   | { type: 'REPLACE_STATE'; state: State }
+  | { type: 'IMPORT_STATE'; state: State }
   | { type: 'ADD_PROFILE'; profile: Profile }
   | { type: 'RENAME_PROFILE'; id: string; name: string }
   | { type: 'DELETE_PROFILE'; id: string }
@@ -55,6 +56,11 @@ function withoutRedemptionsFor(redemptions: State['redemptions'], benefitIds: Re
 export function reduceState(state: State, action: Action): State {
   switch (action.type) {
     case 'REPLACE_STATE':
+      return action.state;
+
+    // A user-initiated whole-blob import: unlike REPLACE_STATE, this IS a mutation — it goes
+    // through the connection guard and triggers exactly one PUT, same as any other edit.
+    case 'IMPORT_STATE':
       return action.state;
 
     case 'ADD_PROFILE':
