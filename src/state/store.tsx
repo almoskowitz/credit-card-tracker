@@ -1,6 +1,7 @@
-import { createContext, useContext, useReducer, type Dispatch, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useReducer, type Dispatch, type ReactNode } from 'react';
 import type { State } from './schema';
 import { NON_MUTATING_ACTION_TYPES, reduceState, type Action } from './actions';
+import { configureStorage, getConnectionStatus, save } from '../storage/api';
 
 export type ConnectionStatus = 'online' | 'unreachable';
 
@@ -42,12 +43,46 @@ interface StoreContextValue {
 
 const StoreContext = createContext<StoreContextValue | null>(null);
 
-export function StoreProvider({ initialState, children }: { initialState: State; children: ReactNode }) {
+export interface ToastHandler {
+  (message: string): void;
+}
+
+/**
+ * `initialState` is resolved by the caller before mounting -- `load()` then either the
+ * server's state or `defaultState()` -- so the reducer itself never performs I/O. Once
+ * mounted, this wires the storage shim's callbacks to dispatch and saves on every dirty
+ * state change; no component calls `save()` directly.
+ */
+export function StoreProvider({
+  initialState,
+  onToast,
+  children,
+}: {
+  initialState: State;
+  onToast?: ToastHandler;
+  children: ReactNode;
+}) {
   const [store, dispatch] = useReducer(storeReducer, {
     data: initialState,
-    connection: 'online',
+    connection: getConnectionStatus(),
     dirty: false,
   } satisfies StoreState);
+
+  useEffect(() => {
+    configureStorage({
+      onReplaceState: (state) => {
+        if (state) dispatch({ type: 'REPLACE_STATE', state });
+      },
+      onConnectionChange: (status) => dispatch({ type: '__SET_CONNECTION', status }),
+      onToast: (message) => onToast?.(message),
+    });
+  }, [onToast]);
+
+  useEffect(() => {
+    if (!store.dirty) return;
+    save(store.data);
+    dispatch({ type: '__ACK_SAVE' });
+  }, [store.data, store.dirty]);
 
   return <StoreContext.Provider value={{ store, dispatch }}>{children}</StoreContext.Provider>;
 }

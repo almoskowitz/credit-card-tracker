@@ -73,7 +73,7 @@ export function reduceState(state: State, action: Action): State {
       return { ...state, cards: [...state.cards, action.card] };
 
     case 'UPDATE_CARD':
-      return { ...state, cards: patchById(state.cards, action.id, action.patch) };
+      return { ...state, cards: patchById<Card>(state.cards, action.id, action.patch) };
 
     case 'DELETE_CARD': {
       const cardId = action.id;
@@ -93,7 +93,7 @@ export function reduceState(state: State, action: Action): State {
       return { ...state, benefits: [...state.benefits, action.benefit] };
 
     case 'UPDATE_BENEFIT':
-      return { ...state, benefits: patchById(state.benefits, action.id, action.patch) };
+      return { ...state, benefits: patchById<Benefit>(state.benefits, action.id, action.patch) };
 
     case 'DELETE_BENEFIT':
       return {
@@ -117,7 +117,7 @@ export function reduceState(state: State, action: Action): State {
       return { ...state, caps: [...state.caps, action.cap] };
 
     case 'UPDATE_CAP':
-      return { ...state, caps: patchById(state.caps, action.id, action.patch) };
+      return { ...state, caps: patchById<Cap>(state.caps, action.id, action.patch) };
 
     case 'DELETE_CAP':
       return { ...state, caps: without(state.caps, action.id) };
@@ -126,7 +126,7 @@ export function reduceState(state: State, action: Action): State {
       return { ...state, msrs: [...state.msrs, action.msr] };
 
     case 'UPDATE_MSR':
-      return { ...state, msrs: patchById(state.msrs, action.id, action.patch) };
+      return { ...state, msrs: patchById<Msr>(state.msrs, action.id, action.patch) };
 
     case 'DELETE_MSR':
       return { ...state, msrs: without(state.msrs, action.id) };
@@ -135,7 +135,7 @@ export function reduceState(state: State, action: Action): State {
       return { ...state, categories: [...state.categories, action.category] };
 
     case 'UPDATE_CATEGORY':
-      return { ...state, categories: patchById(state.categories, action.id, action.patch) };
+      return { ...state, categories: patchById<SpendCategory>(state.categories, action.id, action.patch) };
 
     case 'DELETE_CATEGORY':
       return { ...state, categories: without(state.categories, action.id) };
@@ -149,7 +149,7 @@ export function reduceState(state: State, action: Action): State {
       return { ...state, earnRates: [...state.earnRates, action.earnRate] };
 
     case 'UPDATE_EARN_RATE':
-      return { ...state, earnRates: patchById(state.earnRates, action.id, action.patch) };
+      return { ...state, earnRates: patchById<EarnRate>(state.earnRates, action.id, action.patch) };
 
     case 'DELETE_EARN_RATE':
       return { ...state, earnRates: without(state.earnRates, action.id) };
