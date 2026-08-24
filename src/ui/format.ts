@@ -1,3 +1,5 @@
+import type { BonusUnit } from '../state/schema';
+
 export function usd(n: number): string {
   const rounded = Math.round(n * 100) / 100;
   const hasCents = Math.abs(rounded % 1) > 0.001;
@@ -44,4 +46,11 @@ export function numberInputToValue(s: string): number | null {
   if (s.trim() === '') return null;
   const n = Number(s);
   return Number.isFinite(n) ? n : null;
+}
+
+/** Money-formats cash amounts; renders points/miles as a plain thousands-separated number with a unit suffix. */
+export function formatBonus(value: number, unit: BonusUnit = 'cash'): string {
+  if (unit === 'cash') return usd(value);
+  const suffix = unit === 'points' ? 'pts' : 'mi';
+  return `${Math.round(value).toLocaleString('en-US')} ${suffix}`;
 }

@@ -44,6 +44,8 @@ export interface Cap {
   periodKey: string;
 }
 
+export type BonusUnit = 'cash' | 'points' | 'miles';
+
 export interface Msr {
   id: string;
   cardId: string;
@@ -52,6 +54,7 @@ export interface Msr {
   deadline: string; // "YYYY-MM-DD"
   spent: number;
   bonusValue: number | null;
+  bonusUnit?: BonusUnit; // absent means "cash" — kept optional so old records don't break
   notes: string | null;
 }
 

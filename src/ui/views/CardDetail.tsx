@@ -11,20 +11,25 @@ import {
   type Cadence,
   type Period,
 } from '../../engine/period';
-import type { Benefit, Cap, Card, EarnRate, Msr } from '../../state/schema';
+import type { Benefit, BonusUnit, Cap, Card, EarnRate, Msr } from '../../state/schema';
 import { Sheet } from '../components/Sheet';
 import { ProgressBar, type ProgressVariant } from '../components/ProgressBar';
 import { TapToggle } from '../components/TapToggle';
 import { CATEGORIES, categoryName } from '../../catalog/categories';
 import type { Catalog, CatalogCard } from '../../catalog/catalog';
 import catalogData from '../../../data/cards.json';
-import { usd, pct, shortDate, monthYear, numberInputToValue } from '../format';
+import { usd, pct, shortDate, monthYear, numberInputToValue, formatBonus } from '../format';
 import '../shared.css';
 import './CardDetail.css';
 
 const CATALOG = catalogData as unknown as Catalog;
 const CADENCES: Cadence[] = ['monthly', 'quarterly', 'semiannual', 'annual'];
 const ANCHORS: Anchor[] = ['calendar', 'anniversary'];
+const BONUS_UNITS: { value: BonusUnit; label: string }[] = [
+  { value: 'cash', label: 'Cash' },
+  { value: 'points', label: 'Points' },
+  { value: 'miles', label: 'Miles' },
+];
 
 function barVariant(recoveryPct: number): ProgressVariant {
   if (recoveryPct >= 85) return 'mint';
@@ -479,6 +484,7 @@ function MsrRow({ msr, dispatch, expanded, onToggleExpand }: MsrRowProps) {
           <div className="bc">
             {usd(msr.spent)} of {usd(msr.requirement)}
             {deadline ? ` · due ${shortDate(deadline)}` : ''}
+            {msr.bonusValue != null ? ` · ${formatBonus(msr.bonusValue, msr.bonusUnit ?? 'cash')} bonus` : ''}
           </div>
         </div>
         <ChevronIcon />
@@ -499,13 +505,13 @@ function MsrRow({ msr, dispatch, expanded, onToggleExpand }: MsrRowProps) {
               <input type="number" inputMode="decimal" value={msr.spent} onChange={(e) => patch({ spent: numberInputToValue(e.target.value) ?? 0 })} />
             </label>
           </div>
+          <label className="editor-field">
+            <span>Deadline</span>
+            <input type="date" value={msr.deadline} onChange={(e) => patch({ deadline: e.target.value })} />
+          </label>
           <div className="editor-row2">
             <label className="editor-field">
-              <span>Deadline</span>
-              <input type="date" value={msr.deadline} onChange={(e) => patch({ deadline: e.target.value })} />
-            </label>
-            <label className="editor-field">
-              <span>Bonus value ($)</span>
+              <span>Bonus value</span>
               <input
                 type="number"
                 inputMode="decimal"
@@ -513,6 +519,16 @@ function MsrRow({ msr, dispatch, expanded, onToggleExpand }: MsrRowProps) {
                 placeholder="optional"
                 onChange={(e) => patch({ bonusValue: numberInputToValue(e.target.value) })}
               />
+            </label>
+            <label className="editor-field">
+              <span>Bonus unit</span>
+              <select value={msr.bonusUnit ?? 'cash'} onChange={(e) => patch({ bonusUnit: e.target.value as BonusUnit })}>
+                {BONUS_UNITS.map((u) => (
+                  <option key={u.value} value={u.value}>
+                    {u.label}
+                  </option>
+                ))}
+              </select>
             </label>
           </div>
           <button type="button" className="editor-delete" onClick={() => dispatch({ type: 'DELETE_MSR', id: msr.id })}>
@@ -645,6 +661,7 @@ function AddMsrForm({ catalogCard, cardId, dispatch, onDone }: AddMsrFormProps) 
   const [requirement, setRequirement] = useState('');
   const [deadline, setDeadline] = useState('');
   const [bonusValue, setBonusValue] = useState('');
+  const [bonusUnit, setBonusUnit] = useState<BonusUnit>('cash');
   const [touched, setTouched] = useState(false);
 
   const requirementNum = numberInputToValue(requirement);
@@ -663,6 +680,7 @@ function AddMsrForm({ catalogCard, cardId, dispatch, onDone }: AddMsrFormProps) 
         deadline,
         spent: 0,
         bonusValue: numberInputToValue(bonusValue),
+        bonusUnit,
         notes: null,
       },
     });
@@ -698,19 +716,31 @@ function AddMsrForm({ catalogCard, cardId, dispatch, onDone }: AddMsrFormProps) 
           <input type="number" inputMode="decimal" value={requirement} onChange={(e) => setRequirement(e.target.value)} />
         </label>
         <label className="editor-field">
-          <span>Bonus value ($)</span>
-          <input type="number" inputMode="decimal" value={bonusValue} onChange={(e) => setBonusValue(e.target.value)} placeholder="optional" />
+          <span>Deadline{touched && deadline === '' ? ' — required' : ''}</span>
+          <input
+            type="date"
+            className={touched && deadline === '' ? 'invalid' : ''}
+            value={deadline}
+            onChange={(e) => setDeadline(e.target.value)}
+          />
         </label>
       </div>
-      <label className="editor-field">
-        <span>Deadline{touched && deadline === '' ? ' — required' : ''}</span>
-        <input
-          type="date"
-          className={touched && deadline === '' ? 'invalid' : ''}
-          value={deadline}
-          onChange={(e) => setDeadline(e.target.value)}
-        />
-      </label>
+      <div className="editor-row2">
+        <label className="editor-field">
+          <span>Bonus value</span>
+          <input type="number" inputMode="decimal" value={bonusValue} onChange={(e) => setBonusValue(e.target.value)} placeholder="optional" />
+        </label>
+        <label className="editor-field">
+          <span>Bonus unit</span>
+          <select value={bonusUnit} onChange={(e) => setBonusUnit(e.target.value as BonusUnit)}>
+            {BONUS_UNITS.map((u) => (
+              <option key={u.value} value={u.value}>
+                {u.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
       <div className="editor-actions">
         <button type="button" className="chip ghost" onClick={onDone}>
           Cancel
