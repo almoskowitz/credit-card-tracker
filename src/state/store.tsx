@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useReducer, type Dispatch, type ReactNode } from 'react';
-import type { State } from './schema';
+import { defaultState, type State } from './schema';
 import { NON_MUTATING_ACTION_TYPES, reduceState, type Action } from './actions';
 import { configureStorage, getConnectionStatus, save } from '../storage/api';
 
@@ -70,8 +70,11 @@ export function StoreProvider({
 
   useEffect(() => {
     configureStorage({
+      // `state` is null when the server has never persisted a row -- still a real
+      // replace, not a no-op: a save that failed before that first row existed must roll
+      // back to nothing, the same as it would to the server's actual row otherwise.
       onReplaceState: (state) => {
-        if (state) dispatch({ type: 'REPLACE_STATE', state });
+        dispatch({ type: 'REPLACE_STATE', state: state ?? defaultState() });
       },
       onConnectionChange: (status) => dispatch({ type: '__SET_CONNECTION', status }),
       onToast: (message) => onToast?.(message),

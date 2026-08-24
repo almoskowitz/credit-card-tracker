@@ -38,7 +38,7 @@ function ConnectionBanner() {
   if (store.connection !== 'unreachable') return null;
   return (
     <div className="connection-banner" role="status">
-      Can&rsquo;t reach the server — changes won&rsquo;t be saved until it&rsquo;s back.
+      Can&rsquo;t reach the server — editing is paused until it&rsquo;s back.
     </div>
   );
 }

@@ -118,9 +118,24 @@ async function commit(keepalive: boolean): Promise<void> {
       return;
     }
 
-    handleUnreachable();
+    await handleSaveFailure();
   } catch {
-    handleUnreachable();
+    await handleSaveFailure();
+  }
+}
+
+/**
+ * A PUT failed to reach the server. The write is never retried or queued -- see the
+ * no-local-write-queue non-goal -- so the optimistic change already applied to local state
+ * must be undone rather than left to look "pending" until some later reconnect silently
+ * drops it. Try to roll back right away via the same re-GET the reconnect path uses; only
+ * fall back to the backoff loop if the server truly can't be reached at all.
+ */
+async function handleSaveFailure(): Promise<void> {
+  setConnection('unreachable');
+  const rolledBack = await attemptRecovery();
+  if (rolledBack) {
+    callbacks?.onToast("Couldn't save — change undone");
   }
 }
 
