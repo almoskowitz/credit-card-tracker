@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "credit_card_tracker",
+  "project_id": "b291278e-b435-4bf3-aa1c-055c86da8644"
+}
