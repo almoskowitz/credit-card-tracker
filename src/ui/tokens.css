@@ -90,11 +90,14 @@
   --safe-right: env(safe-area-inset-right, 0px);
 
   /* The one value that owns how much room the app leaves below its bottom-most
-     content — tab bar, sheets and toasts all sit on it. Deliberately a flat
-     value rather than a fraction of --safe-bottom (credit-card-tracker-knd):
-     the user wants a constant ~8pt visual margin, and a device-dependent term
-     here is what let the bottom of the app look different in different places. */
-  --bottom-gutter: 8px;
+     content — tab bar, sheets and toasts all sit on it.
+
+     Must clear the home indicator, which iOS draws over the app regardless of
+     our layout. On-device measurement (iPhone 17 Pro, standalone PWA): screen
+     874, viewport 812, --safe-bottom 34px; the indicator pill occupies roughly
+     the last 13px. A flat 8px gutter put the tab labels *underneath* it. The
+     floor stays 8px so non-notched devices don't get dead space. */
+  --bottom-gutter: max(var(--safe-bottom), 8px);
 
   /* .tabbar is `position: fixed`, so .app-scroll needs matching bottom padding
      to keep scrolled content clear of it. Sum of TabBar.css's actual box model

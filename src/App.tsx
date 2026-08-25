@@ -47,6 +47,32 @@ function ConnectionBanner() {
   );
 }
 
+/**
+ * iOS force-scrolls the document to reveal a focused input when the software
+ * keyboard covers it, and drags `position: fixed` chrome along with it — measured
+ * on-device: document scrollTop 341, .app-shell top -341, leaving the tab bar
+ * stranded mid-screen above the keyboard. Flag the keyboard so that chrome can
+ * hide instead of floating, matching what native apps do.
+ */
+function useKeyboardFlag() {
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const sync = () => {
+      const covered = window.innerHeight - vv.height;
+      document.documentElement.toggleAttribute('data-keyboard', covered > 120);
+    };
+    sync();
+    vv.addEventListener('resize', sync);
+    vv.addEventListener('scroll', sync);
+    return () => {
+      vv.removeEventListener('resize', sync);
+      vv.removeEventListener('scroll', sync);
+      document.documentElement.removeAttribute('data-keyboard');
+    };
+  }, []);
+}
+
 function AppShell() {
   const { store } = useStore();
   const [tab, setTab] = useState<TabId>(() => loadViewPrefs().tab);
@@ -64,6 +90,8 @@ function AppShell() {
   useEffect(() => {
     saveViewPrefs({ tab, activeProfileId });
   }, [tab, activeProfileId]);
+
+  useKeyboardFlag();
 
   function cycleProfile() {
     const ids = store.data.profiles.map((p) => p.id);

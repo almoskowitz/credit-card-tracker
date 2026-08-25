@@ -47,3 +47,10 @@
 .tab.active {
   color: var(--text-0);
 }
+
+/* While the software keyboard is up iOS drags fixed chrome up with its forced
+   document scroll, stranding the bar mid-screen (see useKeyboardFlag). Hide it
+   rather than let it float; the keyboard is the user's focus at that moment. */
+:root[data-keyboard] .tabbar {
+  display: none;
+}
