@@ -265,17 +265,17 @@
         {
           "category": "other",
           "rate": 2,
-          "notes": "Construction/Hardware; Electronics; Software/Cloud"
+          "notes": "U.S. construction/hardware suppliers; electronics retailers; software & cloud providers (up to $2M/yr combined across all 2x categories)"
         },
         {
           "category": "shipping",
           "rate": 2,
-          "notes": null
+          "notes": "U.S. shipping providers (up to $2M/yr combined across all 2x categories)"
         },
         {
           "category": "everything-else",
-          "rate": 2,
-          "notes": "Purchases $5k+; Everything Else"
+          "rate": 1,
+          "notes": "Base rate. Individual purchases of $5,000+ also earn 2x (up to $2M/yr combined across all 2x categories)."
         }
       ],
       "caps": [],
@@ -325,12 +325,17 @@
         {
           "category": "dining",
           "rate": 4,
-          "notes": null
+          "notes": "Restaurants worldwide; up to $50,000/yr, then 1x"
         },
         {
           "category": "supermarkets",
           "rate": 4,
-          "notes": null
+          "notes": "U.S. supermarkets; up to $25,000/yr, then 1x"
+        },
+        {
+          "category": "flights",
+          "rate": 3,
+          "notes": "Booked directly with airlines or via Amex Travel"
         },
         {
           "category": "everything-else",
@@ -375,14 +380,19 @@
       ],
       "earnRates": [
         {
-          "category": "other",
-          "rate": 4,
-          "notes": "Top 2 spend categories, automatic"
-        },
-        {
-          "category": "travel",
+          "category": "flights",
           "rate": 3,
           "notes": "Booked via Amex Travel"
+        },
+        {
+          "category": "hotels",
+          "rate": 3,
+          "notes": "Prepaid hotels booked via Amex Travel"
+        },
+        {
+          "category": "other",
+          "rate": 1,
+          "notes": "Automatically earns 4x on your top 2 of these categories each billing cycle: U.S. advertising (select media), U.S. electronics/software/cloud, U.S. restaurants, U.S. gas stations, U.S. transit (trains/taxis/rideshare/tolls/parking/buses/subway), U.S. wireless phone service -- up to $150,000 combined/yr, then 1x. Which 2 win depends on spend and isn't user-selectable, so not modeled as a guaranteed rate."
         },
         {
           "category": "everything-else",
@@ -771,23 +781,18 @@
         },
         {
           "category": "dining",
-          "rate": 4,
+          "rate": 2,
           "notes": null
         },
         {
-          "category": "travel",
+          "category": "flights",
           "rate": 2,
-          "notes": "Airline / car rental / cruise"
+          "notes": "Airline tickets booked directly with the airline"
         },
         {
           "category": "other",
           "rate": 2,
-          "notes": "Fitness / gym"
-        },
-        {
-          "category": "streaming",
-          "rate": 2,
-          "notes": null
+          "notes": "Local transit & commuting; fitness club/gym membership; Peloton membership & equipment"
         },
         {
           "category": "everything-else",
@@ -827,6 +832,11 @@
           "notes": "Booked via Capital One Travel; incl. rental cars"
         },
         {
+          "category": "flights",
+          "rate": 5,
+          "notes": "Booked via Capital One Travel; also vacation rentals"
+        },
+        {
           "category": "everything-else",
           "rate": 2,
           "notes": null
@@ -852,6 +862,31 @@
         }
       ],
       "earnRates": [
+        {
+          "category": "hotels",
+          "rate": 10,
+          "notes": "Booked via Citi Travel; also covers car rentals & attractions via Citi Travel. Hotels booked directly (not via Citi Travel) earn 3x."
+        },
+        {
+          "category": "flights",
+          "rate": 3,
+          "notes": "Air travel"
+        },
+        {
+          "category": "dining",
+          "rate": 3,
+          "notes": null
+        },
+        {
+          "category": "supermarkets",
+          "rate": 3,
+          "notes": null
+        },
+        {
+          "category": "gas",
+          "rate": 3,
+          "notes": "Includes EV charging stations"
+        },
         {
           "category": "everything-else",
           "rate": 1,
@@ -951,12 +986,22 @@
       "earnRates": [
         {
           "category": "hotels",
-          "rate": 10,
+          "rate": 6,
           "notes": "Marriott properties"
         },
         {
-          "category": "everything-else",
+          "category": "dining",
           "rate": 3,
+          "notes": null
+        },
+        {
+          "category": "flights",
+          "rate": 3,
+          "notes": "Booked directly with airlines"
+        },
+        {
+          "category": "everything-else",
+          "rate": 2,
           "notes": null
         }
       ],
@@ -1013,6 +1058,16 @@
       ],
       "earnRates": [
         {
+          "category": "flights",
+          "rate": 3,
+          "notes": "Alaska/Hawaiian purchases"
+        },
+        {
+          "category": "dining",
+          "rate": 3,
+          "notes": null
+        },
+        {
           "category": "everything-else",
           "rate": 1,
           "notes": null
@@ -1036,9 +1091,14 @@
       "benefits": [],
       "earnRates": [
         {
-          "category": "other",
+          "category": "travel",
           "rate": 5,
-          "notes": "Rotating quarterly 5% categories"
+          "notes": "Booked via Chase Travel"
+        },
+        {
+          "category": "dining",
+          "rate": 3,
+          "notes": null
         },
         {
           "category": "drugstores",
@@ -1046,9 +1106,9 @@
           "notes": null
         },
         {
-          "category": "dining",
-          "rate": 3,
-          "notes": null
+          "category": "other",
+          "rate": 1,
+          "notes": "5% rotating quarterly categories require activation, capped at $1,500/quarter (~$300/yr max); categories change each quarter (e.g. Q3 2026: gas stations/EV charging, public transit, select live entertainment, United Way) and aren't a fixed category, so not modeled as a guaranteed rate."
         },
         {
           "category": "everything-else",
@@ -1085,7 +1145,7 @@
         {
           "category": "rideshare",
           "rate": 2,
-          "notes": "Lyft only"
+          "notes": "Lyft only, through 9/30/27"
         },
         {
           "category": "everything-else",
@@ -1107,22 +1167,22 @@
         {
           "category": "office-supply",
           "rate": 5,
-          "notes": null
+          "notes": "Combined cap $25,000/yr with telecom, then 1%"
         },
         {
           "category": "telecom",
           "rate": 5,
-          "notes": null
+          "notes": "Combined cap $25,000/yr with office-supply, then 1%"
         },
         {
           "category": "gas",
-          "rate": 5,
-          "notes": null
+          "rate": 2,
+          "notes": "Combined cap $25,000/yr with dining, then 1%"
         },
         {
           "category": "dining",
           "rate": 2,
-          "notes": null
+          "notes": "Combined cap $25,000/yr with gas, then 1%"
         },
         {
           "category": "everything-else",
@@ -1144,27 +1204,27 @@
         {
           "category": "travel",
           "rate": 3,
-          "notes": null
+          "notes": "Combined cap $150,000/yr with shipping/telecom/advertising, then 1x"
         },
         {
           "category": "shipping",
           "rate": 3,
-          "notes": null
+          "notes": "Combined cap $150,000/yr with travel/telecom/advertising, then 1x"
         },
         {
           "category": "telecom",
           "rate": 3,
-          "notes": null
+          "notes": "Combined cap $150,000/yr with travel/shipping/advertising, then 1x"
         },
         {
           "category": "other",
           "rate": 3,
-          "notes": "Advertising"
+          "notes": "Advertising (social media & search engines); combined cap $150,000/yr with travel/shipping/telecom, then 1x"
         },
         {
           "category": "rideshare",
           "rate": 5,
-          "notes": "Lyft only"
+          "notes": "Lyft only, through 9/30/27"
         },
         {
           "category": "everything-else",
@@ -1183,6 +1243,11 @@
       "rewardCurrency": "cash",
       "benefits": [],
       "earnRates": [
+        {
+          "category": "rideshare",
+          "rate": 5,
+          "notes": "Lyft only, through 9/30/27"
+        },
         {
           "category": "everything-else",
           "rate": 1.5,
@@ -1203,7 +1268,7 @@
         {
           "category": "everything-else",
           "rate": 2,
-          "notes": "Everything (up to $50k); Over $50k"
+          "notes": "Up to $50,000/yr combined, then 1x"
         }
       ],
       "caps": [],
@@ -1225,7 +1290,7 @@
         {
           "category": "dining",
           "rate": 2,
-          "notes": "US restaurants only"
+          "notes": "Worldwide restaurants; takeout/delivery bonus is U.S. only"
         },
         {
           "category": "everything-else",
