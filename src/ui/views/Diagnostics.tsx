@@ -30,12 +30,18 @@ function collect(): [string, string][] {
   const rs = getComputedStyle(document.documentElement);
   return [
     ['display-mode', window.matchMedia('(display-mode: standalone)').matches ? 'standalone ✓' : 'browser'],
+    [
+      'navigator.standalone',
+      'standalone' in navigator ? `${Boolean((navigator as Navigator & { standalone?: boolean }).standalone)}` : 'n/a',
+    ],
     ['innerHeight', `${window.innerHeight}`],
+    ['document.clientHeight', `${document.documentElement.clientHeight}`],
     ['visualViewport.h', vv ? `${Math.round(vv.height)}` : 'n/a'],
     ['vv.scale', vv ? `${vv.scale.toFixed(3)}` : 'n/a'],
     ['vv.offsetTop', vv ? `${Math.round(vv.offsetTop)}` : 'n/a'],
     ['dpr', `${window.devicePixelRatio}`],
     ['screen', `${screen.width}×${screen.height}`],
+    ['screen.avail', `${screen.availWidth}×${screen.availHeight}`],
     ['safe-top', readEnv('safe-area-inset-top')],
     ['safe-bottom', readEnv('safe-area-inset-bottom')],
     ['--bottom-gutter', rs.getPropertyValue('--bottom-gutter').trim() || '(unset)'],
@@ -43,7 +49,8 @@ function collect(): [string, string][] {
     ['--app-100vh', rs.getPropertyValue('--app-100vh').trim() || '(unset ✓)'],
     ['.app-shell', shell ? rect('.app-shell') : 'not found'],
     ['.tabbar', bar ? rect('.tabbar') : 'not found'],
-    ['GAP below bar', `${Math.round(window.innerHeight - barBottom)} px`],
+    ['viewport gap below bar', `${Math.round(window.innerHeight - barBottom)} px`],
+    ['screen.h − innerHeight', `${Math.round(screen.height - window.innerHeight)} px`],
     ['doc scrollTop', `${Math.round(document.documentElement.scrollTop)}`],
   ];
 }
