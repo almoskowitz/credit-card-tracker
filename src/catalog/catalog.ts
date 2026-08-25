@@ -9,6 +9,8 @@ export interface CatalogBenefit {
   anchor: Anchor;
   category: string;
   valueOverrides?: Record<string, number>;
+  /** Annual spend that earns this benefit; present only on spend-gated certificates. */
+  unlockSpend?: number | null;
 }
 
 export interface CatalogEarnRate {
@@ -49,6 +51,28 @@ export interface CopiedCard {
 }
 
 /**
+ * One catalog benefit as a user-state benefit with a fresh UUID. A spend-gated certificate
+ * arrives switched off — it isn't earned until the spend happens, and the user flips it on.
+ */
+export function benefitFromCatalog(b: CatalogBenefit, cardId: string): Benefit {
+  const unlockSpend = b.unlockSpend ?? null;
+  return {
+    id: crypto.randomUUID(),
+    cardId,
+    name: b.name,
+    value: b.value,
+    displayValue: b.displayValue,
+    valueOverrides: b.valueOverrides ?? null,
+    cadence: b.cadence,
+    anchor: b.anchor,
+    category: b.category,
+    notes: null,
+    unlockSpend,
+    enabled: unlockSpend === null,
+  };
+}
+
+/**
  * Deep-copies a catalog card into user state with fresh UUIDs on every entity. The catalog
  * is never read live for an owned card again after this — `slug` on the resulting Card is
  * provenance only, not a lookup key. See design.md §1 "Copy-on-add".
@@ -69,18 +93,7 @@ export function copyCardFromCatalog(catalogCard: CatalogCard, profileId: string)
     rewardCurrency: catalogCard.rewardCurrency ?? null,
   };
 
-  const benefits: Benefit[] = catalogCard.benefits.map((b) => ({
-    id: crypto.randomUUID(),
-    cardId,
-    name: b.name,
-    value: b.value,
-    displayValue: b.displayValue,
-    valueOverrides: b.valueOverrides ?? null,
-    cadence: b.cadence,
-    anchor: b.anchor,
-    category: b.category,
-    notes: null,
-  }));
+  const benefits: Benefit[] = catalogCard.benefits.map((b) => benefitFromCatalog(b, cardId));
 
   const earnRates: EarnRate[] = catalogCard.earnRates.map((e) => ({
     id: crypto.randomUUID(),

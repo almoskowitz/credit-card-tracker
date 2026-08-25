@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Sheet } from './Sheet';
 import './NumericPad.css';
 
@@ -18,6 +18,12 @@ const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'back'];
 /** A bottom sheet with a large numeric pad — used for MSR spend logging and the redemption "Edit amount" flow. */
 export function NumericPad({ open, onClose, title, subtitle, confirmLabel, initialValue, onConfirm }: NumericPadProps) {
   const [entry, setEntry] = useState(() => (initialValue != null ? String(initialValue) : ''));
+
+  // The pad stays mounted while closed, so without this it reopens holding whatever the last
+  // subject left behind — a stale amount one tap away from being logged against a new benefit.
+  useEffect(() => {
+    if (open) setEntry(initialValue != null ? String(initialValue) : '');
+  }, [open, initialValue]);
 
   function reset() {
     setEntry(initialValue != null ? String(initialValue) : '');

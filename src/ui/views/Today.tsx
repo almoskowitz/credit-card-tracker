@@ -57,30 +57,44 @@ function Row({
   item,
   pending,
   onToggle,
+  onLogPartial,
 }: {
   item: RunwayItem;
   pending: boolean;
   onToggle: () => void;
+  onLogPartial: () => void;
 }) {
-  const { benefit, card, value, daysLeft, redeemed } = item;
+  const { benefit, card, value, daysLeft, redeemed, partial, redeemedAmount, remaining } = item;
   const visuallyDone = redeemed || pending;
   const showPill = !redeemed && daysLeft <= 31;
   const hot = daysLeft <= 7;
-  const displayValue = value !== null ? usd(value) : (benefit.displayValue ?? '—');
+  // A benefit with a dollar value can be spent down, so the headline number is what's left of
+  // it; one without (a certificate) is all-or-nothing and just shows its descriptive text.
+  const shown = redeemed ? redeemedAmount : (remaining ?? value);
+  const displayValue = shown !== null ? usd(shown) : (benefit.displayValue ?? '—');
+  const usedPct = partial && value ? Math.min(100, ((redeemedAmount ?? 0) / value) * 100) : 0;
 
   return (
-    <div className={`row${visuallyDone ? ' done' : ''}`}>
+    <div className={`row${visuallyDone ? ' done' : ''}${partial ? ' partial' : ''}`}>
       <span className="edge" style={cssVar('--acc', issuerVar(card.issuer))} />
       <div className="rmain">
         <div className="rname">{benefit.name}</div>
         <div className="rsub">
           <span className="w money">
-            {card.name} · ends {shortDate(item.period.end)}
+            {card.name} ·{' '}
+            {partial ? `${usd(redeemedAmount ?? 0)} of ${usd(value ?? 0)} used` : `ends ${shortDate(item.period.end)}`}
           </span>
           {showPill && <span className={`pill${hot ? ' hot' : ''}`}>{Math.max(daysLeft, 0)}d</span>}
         </div>
+        {partial && <ProgressBar value={usedPct} variant="ok" />}
       </div>
-      <div className="rval money">{displayValue}</div>
+      {value !== null && !redeemed ? (
+        <button type="button" className="rval money rval-log" onClick={onLogPartial} aria-label={`Log an amount against ${benefit.name}`}>
+          {displayValue}
+        </button>
+      ) : (
+        <div className="rval money">{displayValue}</div>
+      )}
       <TapToggle checked={visuallyDone} onToggle={onToggle} label="Mark used" disabled={pending && !redeemed} />
     </div>
   );
@@ -111,13 +125,14 @@ export function Today({ profileId, onProfileTap }: TodayProps) {
   const [doneOpen, setDoneOpen] = useState(false);
   const [msrPad, setMsrPad] = useState<MsrWithStatus | null>(null);
   const [editPad, setEditPad] = useState<RunwayItem | null>(null);
+  const [logPad, setLogPad] = useState<RunwayItem | null>(null);
   const timers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   const connection = store.connection;
   const profile = state.profiles.find((p) => p.id === profileId);
 
   const totalLeft = [...groups.endingThisWeek, ...groups.endingThisMonth, ...groups.laterThisPeriod].reduce(
-    (sum, item) => sum + (item.value ?? 0),
+    (sum, item) => sum + (item.remaining ?? 0),
     0,
   );
   const doneTotal = groups.done.reduce((sum, item) => sum + (item.redeemedAmount ?? 0), 0);
@@ -147,6 +162,8 @@ export function Today({ profileId, onProfileTap }: TodayProps) {
     const id = item.benefit.id;
 
     if (!item.redeemed) {
+      // The toggle always means "done with this one" — on a partly-used credit that tops the
+      // ledger up to the full value rather than logging the value a second time.
       const amount = item.value ?? 0;
       setPendingDone((prev) => new Set(prev).add(id));
       showToast(`Marked used · ${usd(amount)}`, {
@@ -162,6 +179,17 @@ export function Today({ profileId, onProfileTap }: TodayProps) {
       dispatch({ type: 'DELETE_REDEMPTION', benefitId: item.benefit.id, periodKey: item.period.key });
       showToast(`Undone · ${usd(item.redeemedAmount ?? 0)} back on the runway`);
     }
+  }
+
+  function handleLogPartial(item: RunwayItem, entered: number) {
+    // A credit only ever pays out what's left of it — spending $400 against a $300 airline
+    // credit recovers $300, so the ledger records the capped amount, not what was typed.
+    const amount = item.remaining !== null ? Math.min(entered, item.remaining) : entered;
+    if (amount <= 0) return;
+    dispatch({ type: 'LOG_REDEMPTION', benefitId: item.benefit.id, periodKey: item.period.key, amount });
+    const left = Math.max(0, (item.remaining ?? 0) - amount);
+    showToast(left > 0 ? `Logged ${usd(amount)} · ${usd(left)} left` : `Logged ${usd(amount)} · fully used`);
+    if (left === 0) setDoneOpen(true);
   }
 
   return (
@@ -202,18 +230,21 @@ export function Today({ profileId, onProfileTap }: TodayProps) {
         items={groups.endingThisWeek}
         pendingDone={pendingDone}
         onToggle={handleToggle}
+        onLogPartial={setLogPad}
       />
       <Section
         title="Ending this month"
         items={groups.endingThisMonth}
         pendingDone={pendingDone}
         onToggle={handleToggle}
+        onLogPartial={setLogPad}
       />
       <Section
         title="Later this period"
         items={groups.laterThisPeriod}
         pendingDone={pendingDone}
         onToggle={handleToggle}
+        onLogPartial={setLogPad}
       />
 
       {groups.done.length > 0 && (
@@ -230,7 +261,13 @@ export function Today({ profileId, onProfileTap }: TodayProps) {
           </button>
           <div className={`done-list${doneOpen ? ' open' : ''}`}>
             {groups.done.map((item) => (
-              <Row key={item.benefit.id} item={item} pending={false} onToggle={() => handleToggle(item)} />
+              <Row
+                key={item.benefit.id}
+                item={item}
+                pending={false}
+                onToggle={() => handleToggle(item)}
+                onLogPartial={() => setLogPad(item)}
+              />
             ))}
           </div>
         </>
@@ -262,6 +299,18 @@ export function Today({ profileId, onProfileTap }: TodayProps) {
           setEditPad(null);
         }}
       />
+
+      <NumericPad
+        open={logPad !== null}
+        onClose={() => setLogPad(null)}
+        title={logPad?.benefit.name ?? ''}
+        subtitle={logPad ? `${usd(logPad.remaining ?? 0)} left of ${usd(logPad.value ?? 0)}` : undefined}
+        confirmLabel="Log amount"
+        onConfirm={(amount) => {
+          if (logPad) handleLogPartial(logPad, amount);
+          setLogPad(null);
+        }}
+      />
     </div>
   );
 }
@@ -271,14 +320,16 @@ function Section({
   items,
   pendingDone,
   onToggle,
+  onLogPartial,
 }: {
   title: string;
   items: RunwayItem[];
   pendingDone: ReadonlySet<string>;
   onToggle: (item: RunwayItem) => void;
+  onLogPartial: (item: RunwayItem) => void;
 }) {
   if (items.length === 0) return null;
-  const total = items.reduce((sum, item) => sum + (item.value ?? 0), 0);
+  const total = items.reduce((sum, item) => sum + (item.remaining ?? 0), 0);
   return (
     <>
       <div className="sec-head">
@@ -293,6 +344,7 @@ function Section({
             item={item}
             pending={pendingDone.has(item.benefit.id)}
             onToggle={() => onToggle(item)}
+            onLogPartial={() => onLogPartial(item)}
           />
         ))}
       </div>

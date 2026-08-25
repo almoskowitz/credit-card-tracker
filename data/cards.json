@@ -559,6 +559,32 @@
           "cadence": "annual",
           "anchor": "calendar",
           "category": "travel"
+        },
+        {
+          "name": "Free Night Reward",
+          "value": 500,
+          "displayValue": "Any Hilton property",
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel"
+        },
+        {
+          "name": "Second Free Night Reward",
+          "value": 500,
+          "displayValue": "Any Hilton property",
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel",
+          "unlockSpend": 30000
+        },
+        {
+          "name": "Third Free Night Reward",
+          "value": 500,
+          "displayValue": "Any Hilton property",
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel",
+          "unlockSpend": 60000
         }
       ],
       "earnRates": [
@@ -589,18 +615,7 @@
         }
       ],
       "caps": [],
-      "spendThresholds": [
-        {
-          "label": "Second Free Night",
-          "requirement": 30000,
-          "anchor": "calendar"
-        },
-        {
-          "label": "Third Free Night",
-          "requirement": 60000,
-          "anchor": "calendar"
-        }
-      ]
+      "spendThresholds": []
     },
     {
       "slug": "hilton-honors-surpass",
@@ -616,6 +631,15 @@
           "cadence": "quarterly",
           "anchor": "calendar",
           "category": "travel"
+        },
+        {
+          "name": "Free Night Reward",
+          "value": 500,
+          "displayValue": "Any Hilton property",
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel",
+          "unlockSpend": 15000
         }
       ],
       "earnRates": [
@@ -648,11 +672,6 @@
       "caps": [],
       "spendThresholds": [
         {
-          "label": "Free Night Award",
-          "requirement": 15000,
-          "anchor": "calendar"
-        },
-        {
           "label": "Diamond Status",
           "requirement": 40000,
           "anchor": "calendar"
@@ -676,7 +695,7 @@
         },
         {
           "name": "Free Night Award",
-          "value": null,
+          "value": 595,
           "displayValue": "Up to 85k pts",
           "cadence": "annual",
           "anchor": "calendar",
@@ -715,7 +734,17 @@
       "issuer": "Chase",
       "annualFee": 0,
       "rewardCurrency": "marriott-bonvoy",
-      "benefits": [],
+      "benefits": [
+        {
+          "name": "Free Night Award",
+          "value": 245,
+          "displayValue": "Up to 35k pts",
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel",
+          "unlockSpend": 15000
+        }
+      ],
       "earnRates": [
         {
           "category": "hotels",
@@ -749,13 +778,7 @@
         }
       ],
       "caps": [],
-      "spendThresholds": [
-        {
-          "label": "Free Night Award",
-          "requirement": 15000,
-          "anchor": "calendar"
-        }
-      ]
+      "spendThresholds": []
     },
     {
       "slug": "world-of-hyatt",
@@ -766,11 +789,20 @@
       "benefits": [
         {
           "name": "Free Night Award",
-          "value": null,
+          "value": 255,
           "displayValue": "Cat 1-4",
           "cadence": "annual",
           "anchor": "calendar",
           "category": "travel"
+        },
+        {
+          "name": "Additional Free Night Award",
+          "value": 255,
+          "displayValue": "Cat 1-4",
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "travel",
+          "unlockSpend": 15000
         }
       ],
       "earnRates": [
@@ -801,13 +833,7 @@
         }
       ],
       "caps": [],
-      "spendThresholds": [
-        {
-          "label": "Additional Free Night",
-          "requirement": 15000,
-          "anchor": "calendar"
-        }
-      ]
+      "spendThresholds": []
     },
     {
       "slug": "venture-x",
@@ -960,7 +986,7 @@
         },
         {
           "name": "Free Night Award",
-          "value": null,
+          "value": 595,
           "displayValue": "Up to 85k pts",
           "cadence": "annual",
           "anchor": "calendar",
@@ -968,7 +994,7 @@
         },
         {
           "name": "Club Level Upgrade Certificates",
-          "value": null,
+          "value": 300,
           "displayValue": "3 Certificates",
           "cadence": "annual",
           "anchor": "calendar",
@@ -1049,11 +1075,20 @@
         },
         {
           "name": "Companion Certificate",
-          "value": null,
+          "value": 300,
           "displayValue": "25,000 pts",
           "cadence": "annual",
           "anchor": "calendar",
           "category": "travel"
+        },
+        {
+          "name": "Global 100K Companion Award",
+          "value": 300,
+          "displayValue": "From 100k pts",
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "flights",
+          "unlockSpend": 60000
         }
       ],
       "earnRates": [
@@ -1074,13 +1109,7 @@
         }
       ],
       "caps": [],
-      "spendThresholds": [
-        {
-          "label": "Global 100K Companion Award",
-          "requirement": 60000,
-          "anchor": "anniversary"
-        }
-      ]
+      "spendThresholds": []
     },
     {
       "slug": "chase-freedom",
@@ -1307,7 +1336,17 @@
       "issuer": "Citi",
       "annualFee": 99,
       "rewardCurrency": "aadvantage",
-      "benefits": [],
+      "benefits": [
+        {
+          "name": "Companion Certificate",
+          "value": 300,
+          "displayValue": "Domestic round-trip",
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "flights",
+          "unlockSpend": 30000
+        }
+      ],
       "earnRates": [
         {
           "category": "flights",
@@ -1336,13 +1375,7 @@
         }
       ],
       "caps": [],
-      "spendThresholds": [
-        {
-          "label": "Companion Certificate",
-          "requirement": 30000,
-          "anchor": "anniversary"
-        }
-      ]
+      "spendThresholds": []
     },
     {
       "slug": "aadvantage-aviator-red",
@@ -1350,7 +1383,17 @@
       "issuer": "Barclays",
       "annualFee": 99,
       "rewardCurrency": "aadvantage",
-      "benefits": [],
+      "benefits": [
+        {
+          "name": "Companion Certificate",
+          "value": 300,
+          "displayValue": "Domestic round-trip",
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "flights",
+          "unlockSpend": 20000
+        }
+      ],
       "earnRates": [
         {
           "category": "flights",
@@ -1364,13 +1407,7 @@
         }
       ],
       "caps": [],
-      "spendThresholds": [
-        {
-          "label": "Companion Certificate",
-          "requirement": 20000,
-          "anchor": "anniversary"
-        }
-      ]
+      "spendThresholds": []
     }
   ]
 }

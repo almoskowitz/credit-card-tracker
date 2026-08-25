@@ -14,6 +14,7 @@ export type Action =
   | { type: 'UPDATE_BENEFIT'; id: string; patch: Partial<Omit<Benefit, 'id' | 'cardId'>> }
   | { type: 'DELETE_BENEFIT'; id: string }
   | { type: 'SET_REDEMPTION'; benefitId: string; periodKey: string; amount: number }
+  | { type: 'LOG_REDEMPTION'; benefitId: string; periodKey: string; amount: number }
   | { type: 'DELETE_REDEMPTION'; benefitId: string; periodKey: string }
   | { type: 'ADD_CAP'; cap: Cap }
   | { type: 'UPDATE_CAP'; id: string; patch: Partial<Omit<Cap, 'id' | 'cardId'>> }
@@ -113,6 +114,13 @@ export function reduceState(state: State, action: Action): State {
     case 'SET_REDEMPTION': {
       const key = ledgerKey(action.benefitId, action.periodKey);
       return { ...state, redemptions: { ...state.redemptions, [key]: action.amount } };
+    }
+
+    // Adds to whatever is already logged for the period — the partial-redemption path, where
+    // a credit is spent down in several charges. SET_REDEMPTION still overwrites outright.
+    case 'LOG_REDEMPTION': {
+      const key = ledgerKey(action.benefitId, action.periodKey);
+      return { ...state, redemptions: { ...state.redemptions, [key]: (state.redemptions[key] ?? 0) + action.amount } };
     }
 
     case 'DELETE_REDEMPTION': {

@@ -7,6 +7,7 @@ import {
   ledgerKey,
   pastPeriods,
   defaultPastPeriodCount,
+  isScheduledPeriodKey,
   type Benefit,
   type Card,
 } from '../src/engine/period';
@@ -308,5 +309,44 @@ describe('pastPeriods', () => {
     const b = benefit('monthly', 'calendar');
     const periods = pastPeriods(b, undefined, local(2026, 8, 20), 2);
     expect(periods.map((p) => p.key)).toEqual(['2026-07', '2026-06']);
+  });
+});
+
+describe('isScheduledPeriodKey', () => {
+  it('accepts every key the benefit\'s own cadence produces', () => {
+    const b = benefit('quarterly', 'calendar');
+    for (const key of ['2026-01', '2026-04', '2026-07', '2026-10', '2019-04']) {
+      expect(isScheduledPeriodKey(b, undefined, key)).toBe(true);
+    }
+  });
+
+  it('rejects a monthly key left behind on a now-annual benefit', () => {
+    const b = benefit('annual', 'calendar');
+    expect(isScheduledPeriodKey(b, undefined, '2026-01')).toBe(true);
+    expect(isScheduledPeriodKey(b, undefined, '2026-08')).toBe(false);
+  });
+
+  it('rejects an anniversary key on a benefit that now anchors to the calendar', () => {
+    const b = benefit('annual', 'calendar');
+    expect(isScheduledPeriodKey(b, { anniversary: '2026-01-31' }, 'A2026-01-31')).toBe(false);
+  });
+
+  it('falls back to calendar keys when an anniversary-anchored card has no fee date', () => {
+    const b = benefit('annual', 'anniversary');
+    expect(isScheduledPeriodKey(b, { anniversary: null }, '2026-01')).toBe(true);
+    expect(isScheduledPeriodKey(b, { anniversary: null }, '2026-08')).toBe(false);
+  });
+
+  it('accepts an anniversary key that survives the Jan-31 clamp', () => {
+    const b = benefit('quarterly', 'anniversary');
+    const card: Card = { anniversary: '2026-01-31' };
+    expect(isScheduledPeriodKey(b, card, 'A2026-04-30')).toBe(true);
+    expect(isScheduledPeriodKey(b, card, 'A2026-04-15')).toBe(false);
+  });
+
+  it('rejects a malformed key outright', () => {
+    const b = benefit('monthly', 'calendar');
+    expect(isScheduledPeriodKey(b, undefined, '2026')).toBe(false);
+    expect(isScheduledPeriodKey(b, undefined, '2026-13')).toBe(false);
   });
 });

@@ -37,6 +37,16 @@ never need to check connection state themselves before dispatching.
   `start` date (e.g. `2026-03` for calendar, `A2026-01-31` for anniversary). Changing how
   a key is formatted invalidates every existing `redemptions` entry keyed
   `<benefitId>|<periodKey>` — treat the key format as a migration, not a refactor.
+- **Redemption amounts are cumulative, not flags.** `redemptions["<benefitId>|<periodKey>"]`
+  is how much of that period's value has been used. A benefit is done only once the amount
+  reaches its `value` (a `value: null` certificate is done on any entry) — `settleRedemption()` in
+  `src/state/selectors.ts` is the single place that decides — the runway and card detail both
+  call it, and a zero or negative entry counts as nothing used. `LOG_REDEMPTION` adds to the
+  running total; `SET_REDEMPTION` overwrites it.
+- **Benefits can be unearned.** `unlockSpend` marks a benefit as earned only after that much
+  annual spend (a free-night certificate), and `enabled: false` keeps it off the runway and
+  out of *both* sides of break-even. Both are backfilled by `normalizeState` for blobs
+  written before the fields existed, so read sites never guard for them.
 - **Catalog copy-on-add.** `copyCardFromCatalog()` in `src/catalog/catalog.ts` deep-copies
   a catalog card into user state with fresh UUIDs on every entity. The catalog
   (`data/cards.json`) is never read live again for a card the user already owns — `slug`
@@ -53,7 +63,7 @@ never need to check connection state themselves before dispatching.
 ## Commands
 
 ```bash
-npm test                  # vitest run — all suites (69 tests as of the v3 rebuild)
+npm test                  # vitest run — all suites (103 tests)
 npm run validate:catalog  # vitest run tests/catalog.test.ts
 npm run build             # vite build -> dist/
 npm run deploy             # build, then copy dist/* into server/static/

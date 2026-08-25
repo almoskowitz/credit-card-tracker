@@ -19,6 +19,14 @@ export function shortDate(d: Date): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+/** "Jan 1 – Dec 31 2025", or "Jan 31 2026 – Jan 30 2027" when the span crosses a year. */
+export function dateRange(start: Date, end: Date): string {
+  if (start.getFullYear() === end.getFullYear()) {
+    return `${shortDate(start)} – ${shortDate(end)} ${end.getFullYear()}`;
+  }
+  return `${shortDate(start)} ${start.getFullYear()} – ${shortDate(end)} ${end.getFullYear()}`;
+}
+
 export function daysInMonth(d: Date): number {
   return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
 }

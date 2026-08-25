@@ -255,6 +255,107 @@
   text-align: right;
 }
 
+.pp-note {
+  font-size: var(--fs-13);
+  color: var(--text-2);
+  margin-bottom: 8px;
+}
+.pp-clear-strays {
+  margin-left: 10px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.pp-row.stray {
+  background: var(--amber-dim);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--amber) 28%, transparent);
+}
+.pp-stray-amt {
+  flex: none;
+  font-size: var(--fs-15);
+  color: var(--text-1);
+}
+.pp-delete {
+  width: var(--target-min);
+  height: var(--target-min);
+  flex: none;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-2);
+  font-size: var(--fs-17);
+  line-height: 1;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.bl-wrap.off .bl .bn,
+.bl-wrap.off .bl .bv {
+  color: var(--text-2);
+}
+.bl-stray {
+  flex: none;
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: var(--r-pill);
+  background: var(--amber-dim);
+  color: var(--amber);
+  font-size: var(--fs-13);
+  font-weight: 700;
+  text-align: center;
+}
+
+.editor-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+.editor-toggle-lbl {
+  font-size: var(--fs-15);
+  color: var(--text-0);
+}
+.editor-toggle-sub {
+  font-size: var(--fs-13);
+  color: var(--text-2);
+  margin-top: 2px;
+}
+
+.cd-extra {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  min-height: var(--target-min);
+  padding: 8px 12px;
+  border-radius: var(--r-md);
+  border: 0;
+  background: color-mix(in srgb, var(--white) 4.5%, transparent);
+  box-shadow: inset 0 0 0 1px var(--border);
+  color: var(--text-0);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.cd-extra-name {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-15);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cd-extra-meta {
+  flex: none;
+  font-size: var(--fs-13);
+  color: var(--text-2);
+}
+.cd-extra-add {
+  flex: none;
+  font-size: var(--fs-13);
+  font-weight: 700;
+  color: var(--sky);
+}
+
 .cd-remove {
   width: 100%;
   margin-top: 18px;

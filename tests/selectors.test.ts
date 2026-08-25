@@ -8,6 +8,7 @@ import {
   msrsForProfile,
   portfolioBreakevenForProfile,
   runwayItems,
+  unscheduledEntries,
   type RunwayItem,
 } from '../src/state/selectors';
 
@@ -39,6 +40,8 @@ function makeBenefit(overrides: Partial<Benefit> = {}): Benefit {
     anchor: 'calendar',
     category: 'other',
     notes: null,
+    unlockSpend: null,
+    enabled: true,
     ...overrides,
   };
 }
@@ -86,12 +89,113 @@ describe('runwayItems', () => {
     const redeemedState = { ...state, redemptions: { [`benefit-1|${period.key}`]: 10 } };
     const [item] = runwayItems(redeemedState, 'profile-1', now);
     expect(item.redeemed).toBe(true);
+    expect(item.partial).toBe(false);
     expect(item.redeemedAmount).toBe(10);
+    expect(item.remaining).toBe(0);
+  });
+
+  it('leaves a partly-used credit unredeemed with the balance still to spend', () => {
+    const now = new Date(2026, 5, 15);
+    const state = baseState({
+      cards: [makeCard()],
+      benefits: [makeBenefit({ id: 'benefit-1', value: 300, cadence: 'annual' })],
+      redemptions: { 'benefit-1|2026-01': 75 },
+    });
+    const [item] = runwayItems(state, 'profile-1', now);
+    expect(item.redeemed).toBe(false);
+    expect(item.partial).toBe(true);
+    expect(item.remaining).toBe(225);
+  });
+
+  it('treats overspending a credit as done rather than a negative balance', () => {
+    const state = baseState({
+      cards: [makeCard()],
+      benefits: [makeBenefit({ id: 'benefit-1', value: 300, cadence: 'annual' })],
+      redemptions: { 'benefit-1|2026-01': 320 },
+    });
+    const [item] = runwayItems(state, 'profile-1', new Date(2026, 5, 15));
+    expect(item.redeemed).toBe(true);
+    expect(item.remaining).toBe(0);
+  });
+
+  it('treats a zero entry on a valued benefit as nothing used, not a partial', () => {
+    const state = baseState({
+      cards: [makeCard()],
+      benefits: [makeBenefit({ id: 'benefit-1', value: 300, cadence: 'annual' })],
+      redemptions: { 'benefit-1|2026-01': 0 },
+    });
+    const [item] = runwayItems(state, 'profile-1', new Date(2026, 5, 15));
+    expect(item.partial).toBe(false);
+    expect(item.redeemed).toBe(false);
+    expect(item.remaining).toBe(300);
+  });
+
+  it('never lets a negative entry inflate what is left to spend', () => {
+    const state = baseState({
+      cards: [makeCard()],
+      benefits: [makeBenefit({ id: 'benefit-1', value: 300, cadence: 'annual' })],
+      redemptions: { 'benefit-1|2026-01': -25 },
+    });
+    const [item] = runwayItems(state, 'profile-1', new Date(2026, 5, 15));
+    expect(item.remaining).toBe(300);
+    expect(item.partial).toBe(false);
+  });
+
+  it('finishes a value-less certificate on any logged entry', () => {
+    const state = baseState({
+      cards: [makeCard()],
+      benefits: [makeBenefit({ id: 'benefit-1', value: null, displayValue: 'Cat 1-4', cadence: 'annual' })],
+      redemptions: { 'benefit-1|2026-01': 0 },
+    });
+    const [item] = runwayItems(state, 'profile-1', new Date(2026, 5, 15));
+    expect(item.redeemed).toBe(true);
+    expect(item.remaining).toBeNull();
+  });
+
+  it('drops a benefit that has not been earned yet', () => {
+    const state = baseState({
+      cards: [makeCard()],
+      benefits: [
+        makeBenefit({ id: 'earned' }),
+        makeBenefit({ id: 'locked', unlockSpend: 15000, enabled: false }),
+      ],
+    });
+    expect(runwayItems(state, 'profile-1').map((i) => i.benefit.id)).toEqual(['earned']);
+  });
+});
+
+describe('unscheduledEntries', () => {
+  it('finds a monthly-era entry stranded on a now-annual benefit', () => {
+    const state = baseState({
+      cards: [makeCard()],
+      benefits: [makeBenefit({ id: 'b1', cadence: 'annual', anchor: 'anniversary' })],
+      redemptions: { 'b1|2026-01': 100, 'b1|2026-08': 100 },
+    });
+    expect(unscheduledEntries(state, 'b1')).toEqual([{ periodKey: '2026-08', amount: 100 }]);
+  });
+
+  it('leaves entries from periods the benefit still produces alone', () => {
+    const state = baseState({
+      cards: [makeCard()],
+      benefits: [makeBenefit({ id: 'b1', cadence: 'quarterly' })],
+      redemptions: { 'b1|2026-01': 50, 'b1|2026-04': 50, 'b1|2025-10': 50 },
+    });
+    expect(unscheduledEntries(state, 'b1')).toEqual([]);
+  });
+
+  it('ignores other benefits ledger entries', () => {
+    const state = baseState({
+      cards: [makeCard()],
+      benefits: [makeBenefit({ id: 'b1', cadence: 'annual' }), makeBenefit({ id: 'b2', cadence: 'monthly' })],
+      redemptions: { 'b2|2026-08': 25 },
+    });
+    expect(unscheduledEntries(state, 'b1')).toEqual([]);
   });
 });
 
 describe('groupRunway', () => {
-  function item(daysLeft: number, redeemed = false): RunwayItem {
+  function item(daysLeft: number, redeemed = false, used = 0): RunwayItem {
+    const amount = redeemed ? 10 : used;
     return {
       benefit: makeBenefit(),
       card: makeCard(),
@@ -99,7 +203,9 @@ describe('groupRunway', () => {
       value: 10,
       daysLeft,
       redeemed,
-      redeemedAmount: redeemed ? 10 : null,
+      partial: !redeemed && used > 0,
+      redeemedAmount: amount > 0 ? amount : null,
+      remaining: 10 - amount,
     };
   }
 
@@ -114,6 +220,12 @@ describe('groupRunway', () => {
     const groups = groupRunway([item(2, true)]);
     expect(groups.done).toHaveLength(1);
     expect(groups.endingThisWeek).toHaveLength(0);
+  });
+
+  it('keeps a partly-used item on the runway rather than filing it as done', () => {
+    const groups = groupRunway([item(2, false, 4)]);
+    expect(groups.done).toHaveLength(0);
+    expect(groups.endingThisWeek).toHaveLength(1);
   });
 
   it('sorts each active group soonest-first', () => {

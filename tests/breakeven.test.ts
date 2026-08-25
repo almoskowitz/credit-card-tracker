@@ -22,6 +22,49 @@ describe('cardBreakeven', () => {
     expect(cb.netCost).toBe(0);
   });
 
+  it('caps an over-logged credit at what that period was actually worth', () => {
+    const card: BreakevenCard = { id: 'c1', fee: 695 };
+    const benefits: BreakevenBenefit[] = [{ id: 'b1', cardId: 'c1', value: 300, cadence: 'annual' }];
+    const cb = cardBreakeven(card, benefits, { 'b1|2026-01': 400 }, now);
+    expect(cb.recovered).toBe(300);
+  });
+
+  it('caps against the per-period override, not the base value', () => {
+    const card: BreakevenCard = { id: 'c1', fee: 695 };
+    const benefits: BreakevenBenefit[] = [
+      { id: 'b1', cardId: 'c1', value: 15, cadence: 'monthly', valueOverrides: { M12: 20 } },
+    ];
+    const cb = cardBreakeven(card, benefits, { 'b1|2026-12': 20, 'b1|2026-11': 20 }, now);
+    expect(cb.recovered).toBe(35); // December's override allows 20; November still caps at 15
+  });
+
+  it('a negative entry cannot run recovery backwards', () => {
+    const card: BreakevenCard = { id: 'c1', fee: 100 };
+    const benefits: BreakevenBenefit[] = [{ id: 'b1', cardId: 'c1', value: 50, cadence: 'annual' }];
+    const cb = cardBreakeven(card, benefits, { 'b1|2026-01': -25 }, now);
+    expect(cb.recovered).toBe(0);
+  });
+
+  it('leaves a value-less certificate uncapped — its amount is the user estimate', () => {
+    const card: BreakevenCard = { id: 'c1', fee: 650 };
+    const benefits: BreakevenBenefit[] = [{ id: 'b1', cardId: 'c1', value: null, cadence: 'annual' }];
+    const cb = cardBreakeven(card, benefits, { 'b1|2026-01': 595 }, now);
+    expect(cb.recovered).toBe(595);
+    expect(cb.potential).toBe(0);
+  });
+
+  it('an unearned benefit counts on neither side of the meter', () => {
+    const card: BreakevenCard = { id: 'c1', fee: 550 };
+    const redemptions = { 'b1|2026-01': 100, 'b2|2026-01': 500 };
+    const benefits: BreakevenBenefit[] = [
+      { id: 'b1', cardId: 'c1', value: 100, cadence: 'annual' },
+      { id: 'b2', cardId: 'c1', value: 500, cadence: 'annual', enabled: false },
+    ];
+    const cb = cardBreakeven(card, benefits, redemptions, now);
+    expect(cb.recovered).toBe(100);
+    expect(cb.potential).toBe(100);
+  });
+
   it('a no-fee card does not divide by zero', () => {
     const card: BreakevenCard = { id: 'c1', fee: 0 };
     const redemptions = { 'b1|2026-01': 50 };

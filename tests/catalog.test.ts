@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { validateCatalogCard } from '../src/catalog/importer';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CATALOG_PATH = path.resolve(__dirname, '..', 'data', 'cards.json');
@@ -53,6 +54,26 @@ describe('data/cards.json schema v1', () => {
       });
     }
     expect(errors).toEqual([]);
+  });
+
+  it('every card also passes the importer validator the paste flow uses', () => {
+    const errors: string[] = [];
+    for (const card of catalog.cards) {
+      const result = validateCatalogCard(card);
+      if (!result.ok) errors.push(`${card.slug}: ${result.errors.join('; ')}`);
+    }
+    expect(errors).toEqual([]);
+  });
+
+  it('spend-gated certificates carry a positive unlockSpend', () => {
+    const gated = catalog.cards.flatMap((c: { benefits: Record<string, unknown>[] }) =>
+      c.benefits.filter((b) => 'unlockSpend' in b),
+    );
+    expect(gated.length).toBeGreaterThan(0);
+    for (const b of gated) {
+      expect(typeof b.unlockSpend).toBe('number');
+      expect(b.unlockSpend as number).toBeGreaterThan(0);
+    }
   });
 
   it('reports 24 cards validated', () => {

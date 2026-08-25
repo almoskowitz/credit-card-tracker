@@ -11,7 +11,7 @@ const CADENCE_OPTIONS = CADENCES.join('|');
 const ANCHOR_OPTIONS = ANCHORS.join('|');
 const CATEGORY_OPTIONS = () => Array.from(CATEGORY_SLUGS).join(', ');
 
-const BENEFIT_FIELDS = ['name', 'value', 'displayValue', 'cadence', 'anchor', 'category', 'valueOverrides'] as const;
+const BENEFIT_FIELDS = ['name', 'value', 'displayValue', 'cadence', 'anchor', 'category', 'valueOverrides', 'unlockSpend'] as const;
 const CARD_FIELDS = ['slug', 'name', 'issuer', 'annualFee', 'rewardCurrency', 'benefits', 'earnRates', 'caps', 'spendThresholds'] as const;
 const EARN_RATE_FIELDS = ['category', 'rate', 'notes'] as const;
 const SPEND_THRESHOLD_FIELDS = ['label', 'requirement', 'anchor'] as const;
@@ -89,6 +89,11 @@ function validateBenefitShape(value: unknown, path: string): { errors: ImportErr
     }
   }
 
+  const hasUnlockSpend = 'unlockSpend' in value && value.unlockSpend !== undefined && value.unlockSpend !== null;
+  if (hasUnlockSpend && (typeof value.unlockSpend !== 'number' || value.unlockSpend <= 0)) {
+    errors.push(`${field(path, 'unlockSpend')} must be a positive number|null`);
+  }
+
   if (errors.length > 0) return { errors, value: null };
 
   const benefit: CatalogBenefit = {
@@ -99,6 +104,7 @@ function validateBenefitShape(value: unknown, path: string): { errors: ImportErr
     anchor: value.anchor as CatalogBenefit['anchor'],
     category: value.category as string,
     ...(valueOverrides ? { valueOverrides } : {}),
+    ...(hasUnlockSpend ? { unlockSpend: value.unlockSpend as number } : {}),
   };
   return { errors: [], value: benefit };
 }

@@ -92,6 +92,12 @@ export function periodFor(benefit: Benefit, card: Card | null | undefined, now: 
   return calendarPeriod(benefit.cadence, now);
 }
 
+/** The override suffix for the period a ledger key names, or null when there isn't one. */
+export function periodSuffixForKey(cadence: Cadence, periodKey: string): string | null {
+  const start = dateOfPeriodKey(periodKey);
+  return start ? periodSuffix(cadence, start) : null;
+}
+
 function periodSuffix(cadence: Cadence, start: Date): string | null {
   if (cadence === 'monthly') return `M${start.getMonth() + 1}`;
   if (cadence === 'quarterly') return `Q${Math.floor(start.getMonth() / 3) + 1}`;
@@ -109,6 +115,25 @@ export function resolveBenefitValue(benefit: Benefit, period: Period): number | 
 
 export function ledgerKey(benefitId: string, periodKey: string): string {
   return `${benefitId}|${periodKey}`;
+}
+
+/** The date a period key names — the 1st for a calendar key, the exact start for an anniversary one. */
+function dateOfPeriodKey(periodKey: string): Date | null {
+  if (periodKey.startsWith('A')) return parseLocalDate(periodKey.slice(1));
+  return parseLocalDate(`${periodKey}-01`);
+}
+
+/**
+ * Whether `periodKey` is one this benefit's current cadence and anchor could produce. Editing
+ * a benefit's cadence or anchor leaves earlier ledger entries stranded under keys that no
+ * longer resolve — invisible in every period view, yet still counted by break-even. Re-deriving
+ * the key from the date it names is the exact test: a monthly `2026-08` entry on a benefit
+ * that is now annual canonicalizes to `2026-01` and fails.
+ */
+export function isScheduledPeriodKey(benefit: Benefit, card: Card | null | undefined, periodKey: string): boolean {
+  const date = dateOfPeriodKey(periodKey);
+  if (!date) return false;
+  return periodFor(benefit, card, date).key === periodKey;
 }
 
 const PAST_PERIOD_WINDOW: Record<Cadence, number> = { monthly: 12, quarterly: 8, semiannual: 4, annual: 3 };

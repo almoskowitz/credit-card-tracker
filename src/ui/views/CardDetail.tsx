@@ -1,6 +1,6 @@
 import { useState, type Dispatch } from 'react';
 import { useStore, type StoreAction } from '../../state/store';
-import { cardBreakevenFor } from '../../state/selectors';
+import { cardBreakevenFor, settleRedemption, unscheduledEntries, type LedgerEntry } from '../../state/selectors';
 import {
   ledgerKey,
   parseLocalDate,
@@ -11,14 +11,15 @@ import {
   type Cadence,
   type Period,
 } from '../../engine/period';
-import type { Benefit, BonusComponent, Cap, Card, EarnRate, Msr } from '../../state/schema';
+import type { Benefit, BonusComponent, Cap, Card, EarnRate, Msr, State } from '../../state/schema';
+import { benefitFromCatalog } from '../../catalog/catalog';
 import { Sheet } from '../components/Sheet';
 import { ProgressBar, type ProgressVariant } from '../components/ProgressBar';
 import { TapToggle } from '../components/TapToggle';
 import { CATEGORIES, categoryName } from '../../catalog/categories';
 import type { Catalog, CatalogCard } from '../../catalog/catalog';
 import catalogData from '../../../data/cards.json';
-import { usd, pct, shortDate, monthYear, numberInputToValue, formatBonus } from '../format';
+import { usd, pct, shortDate, monthYear, dateRange, numberInputToValue, formatBonus } from '../format';
 import '../shared.css';
 import './CardDetail.css';
 
@@ -43,11 +44,19 @@ function capitalize(s: string): string {
   return s.slice(0, 1).toUpperCase() + s.slice(1);
 }
 
-/** A human label for one period, tailored to how it maps to real dates for this benefit's anchor. */
+/** A redemption is an amount used; a negative one is meaningless and would run break-even backwards. */
+function nonNegative(n: number | null): number | null {
+  return n === null ? null : Math.max(0, n);
+}
+
+/**
+ * A human label for one period. Keyed off the period actually produced, not the benefit's
+ * requested anchor — an anniversary-anchored benefit on a card with no fee date falls back to
+ * calendar periods, and labelling those as date ranges gives every year the same "Jan 1 – Dec 31".
+ */
 function periodLabel(benefit: Benefit, period: Period): string {
-  if (benefit.anchor === 'anniversary') {
-    const inclusiveEnd = new Date(period.end.getTime() - 1);
-    return `${shortDate(period.start)} – ${shortDate(inclusiveEnd)}`;
+  if (period.key.startsWith('A')) {
+    return dateRange(period.start, new Date(period.end.getTime() - 1));
   }
   const year = period.start.getFullYear();
   if (benefit.cadence === 'monthly') return monthYear(period.start);
@@ -80,6 +89,7 @@ export function CardDetail({ cardId, open, onClose }: CardDetailProps) {
   const [expandedEarnRateId, setExpandedEarnRateId] = useState<string | null>(null);
   const [expandedCapId, setExpandedCapId] = useState<string | null>(null);
   const [addingMsr, setAddingMsr] = useState(false);
+  const [addingFromCatalog, setAddingFromCatalog] = useState(false);
   const [pastPeriodsBenefitId, setPastPeriodsBenefitId] = useState<string | null>(null);
 
   const card = cardId ? (state.cards.find((c) => c.id === cardId) ?? null) : null;
@@ -98,6 +108,10 @@ export function CardDetail({ cardId, open, onClose }: CardDetailProps) {
   const caps = state.caps.filter((c) => c.cardId === card.id);
   const be = cardBreakevenFor(state, card.id);
   const catalogCard = card.slug ? (CATALOG.cards.find((c) => c.slug === card.slug) ?? null) : null;
+  // Copy-on-add means a card added before a catalog entry gained a benefit never sees it —
+  // matching by name is enough to offer the difference without ever touching what's here.
+  const ownedNames = new Set(benefits.map((b) => b.name));
+  const catalogExtras = (catalogCard?.benefits ?? []).filter((b) => !ownedNames.has(b.name));
   const toBreakEven = Math.max(0, (card.fee ?? 0) - be.recovered);
   const opened = parseLocalDate(card.opened);
   const pastPeriodsBenefit = benefits.find((b) => b.id === pastPeriodsBenefitId) ?? null;
@@ -119,6 +133,8 @@ export function CardDetail({ cardId, open, onClose }: CardDetailProps) {
       anchor: 'calendar',
       category: 'other',
       notes: null,
+      unlockSpend: null,
+      enabled: true,
     };
     dispatch({ type: 'ADD_BENEFIT', benefit });
     setExpandedBenefitId(id);
@@ -191,7 +207,33 @@ export function CardDetail({ cardId, open, onClose }: CardDetailProps) {
           <button type="button" className="chip ghost" onClick={addBenefit}>
             + Add benefit
           </button>
+          {catalogExtras.length > 0 && (
+            <button type="button" className="chip ghost" onClick={() => setAddingFromCatalog((v) => !v)}>
+              + From catalog ({catalogExtras.length})
+            </button>
+          )}
         </div>
+
+        {addingFromCatalog && catalogExtras.length > 0 && (
+          <div className="editor">
+            <span className="editor-overrides-lbl">In the catalog, not on this card</span>
+            {catalogExtras.map((b) => (
+              <button
+                key={b.name}
+                type="button"
+                className="cd-extra"
+                onClick={() => dispatch({ type: 'ADD_BENEFIT', benefit: benefitFromCatalog(b, card.id) })}
+              >
+                <span className="cd-extra-name">{b.name}</span>
+                <span className="cd-extra-meta money">
+                  {b.value !== null ? usd(b.value) : (b.displayValue ?? '—')}
+                  {b.unlockSpend ? ` · needs ${usd(b.unlockSpend)} spend` : ''}
+                </span>
+                <span className="cd-extra-add">Add</span>
+              </button>
+            ))}
+          </div>
+        )}
 
         {addingMsr && (
           <AddMsrForm catalogCard={catalogCard} cardId={card.id} dispatch={dispatch} onDone={() => setAddingMsr(false)} />
@@ -314,7 +356,7 @@ export function CardDetail({ cardId, open, onClose }: CardDetailProps) {
       <PastPeriodsSheet
         benefit={pastPeriodsBenefit}
         cardAnniversary={card.anniversary}
-        redemptions={state.redemptions}
+        state={state}
         dispatch={dispatch}
         onClose={() => setPastPeriodsBenefitId(null)}
       />
@@ -325,7 +367,7 @@ export function CardDetail({ cardId, open, onClose }: CardDetailProps) {
 interface BenefitRowProps {
   benefit: Benefit;
   cardAnniversary: string | null;
-  state: { redemptions: Record<string, number> };
+  state: State;
   dispatch: Dispatch<StoreAction>;
   expanded: boolean;
   onToggleExpand: () => void;
@@ -336,18 +378,28 @@ function BenefitRow({ benefit, cardAnniversary, state, dispatch, expanded, onTog
   const now = new Date();
   const period = periodFor(benefit, { anniversary: cardAnniversary }, now);
   const value = resolveBenefitValue(benefit, period);
-  const redeemed = Object.prototype.hasOwnProperty.call(state.redemptions, ledgerKey(benefit.id, period.key));
-  const cadenceLabel = `${capitalize(benefit.cadence)} · ${benefit.anchor}`;
+  const key = ledgerKey(benefit.id, period.key);
+  const logged = Object.prototype.hasOwnProperty.call(state.redemptions, key) ? state.redemptions[key] : null;
+  const { redeemed, partial } = settleRedemption(value, logged);
+  const strayCount = unscheduledEntries(state, benefit.id).length;
+  const locked = benefit.unlockSpend !== null;
+  const off = benefit.enabled === false;
+  const cadenceLabel = off
+    ? `Not earned · needs ${usd(benefit.unlockSpend ?? 0)} spend`
+    : partial
+      ? `${usd(logged ?? 0)} of ${usd(value ?? 0)} used this period`
+      : `${capitalize(benefit.cadence)} · ${benefit.anchor}`;
   const displayValue = value !== null ? usd(value) : (benefit.displayValue ?? '—');
 
   return (
-    <div className="bl-wrap">
+    <div className={`bl-wrap${off ? ' off' : ''}`}>
       <button type="button" className="bl" onClick={onToggleExpand}>
-        <span className={`bd${redeemed ? ' on' : ''}`} />
+        <span className={`bd${redeemed && !off ? ' on' : ''}`} />
         <div className="bl-main">
           <div className="bn">{benefit.name}</div>
           <div className="bc">{cadenceLabel}</div>
         </div>
+        {strayCount > 0 && <span className="bl-stray" title="Ledger entries outside this benefit's schedule">{strayCount}</span>}
         <div className="bv money">{displayValue}</div>
         <ChevronIcon />
       </button>
@@ -357,6 +409,41 @@ function BenefitRow({ benefit, cardAnniversary, state, dispatch, expanded, onTog
             <span>Name</span>
             <input value={benefit.name} onChange={(e) => dispatch({ type: 'UPDATE_BENEFIT', id: benefit.id, patch: { name: e.target.value } })} />
           </label>
+
+          <label className="editor-field">
+            <span>Earned after ($ annual spend, blank = always)</span>
+            <input
+              type="number"
+              inputMode="decimal"
+              value={benefit.unlockSpend ?? ''}
+              placeholder="—"
+              onChange={(e) => {
+                const unlockSpend = numberInputToValue(e.target.value);
+                // Dropping the requirement grants the benefit outright; adding one to an
+                // already-on benefit leaves it on — only the user's toggle switches it off.
+                dispatch({
+                  type: 'UPDATE_BENEFIT',
+                  id: benefit.id,
+                  patch: unlockSpend === null ? { unlockSpend: null, enabled: true } : { unlockSpend },
+                });
+              }}
+            />
+          </label>
+
+          {locked && (
+            <div className="editor-toggle">
+              <div>
+                <div className="editor-toggle-lbl">Earned this year</div>
+                <div className="editor-toggle-sub">Off keeps it off the runway and out of break-even</div>
+              </div>
+              <TapToggle
+                checked={benefit.enabled !== false}
+                label="Earned"
+                onToggle={() => dispatch({ type: 'UPDATE_BENEFIT', id: benefit.id, patch: { enabled: off } })}
+              />
+            </div>
+          )}
+
           <div className="editor-row2">
             <label className="editor-field">
               <span>Value ($)</span>
@@ -462,7 +549,7 @@ function BenefitRow({ benefit, cardAnniversary, state, dispatch, expanded, onTog
               Delete benefit
             </button>
             <button type="button" className="chip ghost" onClick={onOpenPastPeriods}>
-              Past periods
+              {strayCount > 0 ? `Past periods · ${strayCount} stray` : 'Past periods'}
             </button>
           </div>
         </div>
@@ -780,7 +867,7 @@ function AddMsrForm({ catalogCard, cardId, dispatch, onDone }: AddMsrFormProps) 
 interface PastPeriodsSheetProps {
   benefit: Benefit | null;
   cardAnniversary: string | null;
-  redemptions: Record<string, number>;
+  state: State;
   dispatch: Dispatch<StoreAction>;
   onClose: () => void;
 }
@@ -789,12 +876,16 @@ interface PastPeriodsSheetProps {
  * A benefit's recent past periods (including ones before card.opened — pre-dating a card add
  * is intentional, not a bug), each togglable used/unused with an editable amount. Writes
  * through the same SET_REDEMPTION/DELETE_REDEMPTION ledger the live period uses, so recovery
- * numbers move immediately without any new state shape.
+ * numbers move immediately without any new state shape. Stray entries — logged under a period
+ * key the benefit's current cadence and anchor can no longer produce — get their own section,
+ * since they are invisible everywhere else while still counting toward break-even.
  */
-function PastPeriodsSheet({ benefit, cardAnniversary, redemptions, dispatch, onClose }: PastPeriodsSheetProps) {
+function PastPeriodsSheet({ benefit, cardAnniversary, state, dispatch, onClose }: PastPeriodsSheetProps) {
   const open = benefit !== null;
   const now = new Date();
+  const redemptions = state.redemptions;
   const periods = benefit ? pastPeriods(benefit, { anniversary: cardAnniversary }, now) : [];
+  const strays: LedgerEntry[] = benefit ? unscheduledEntries(state, benefit.id) : [];
 
   function amountFor(periodKey: string): number | null {
     const key = benefit ? ledgerKey(benefit.id, periodKey) : '';
@@ -848,26 +939,69 @@ function PastPeriodsSheet({ benefit, cardAnniversary, redemptions, dispatch, onC
             </button>
           </div>
 
+          {strays.length > 0 && (
+            <>
+              <div className="sh-lbl">
+                Stray entries
+                <button
+                  type="button"
+                  className="chip ghost pp-clear-strays"
+                  onClick={() => {
+                    for (const entry of strays) {
+                      dispatch({ type: 'DELETE_REDEMPTION', benefitId: benefit.id, periodKey: entry.periodKey });
+                    }
+                  }}
+                >
+                  Delete all
+                </button>
+              </div>
+              <div className="pp-note">
+                Logged under a period this benefit no longer has — left behind by a change of cadence or anchor. They
+                still count toward recovery until deleted.
+              </div>
+              <div className="pp-list">
+                {strays.map((entry) => (
+                  <div key={entry.periodKey} className="pp-row stray">
+                    <div className="pp-label">{entry.periodKey}</div>
+                    <div className="pp-stray-amt money">{usd(entry.amount)}</div>
+                    <button
+                      type="button"
+                      className="pp-delete"
+                      aria-label={`Delete stray entry for ${entry.periodKey}`}
+                      onClick={() => dispatch({ type: 'DELETE_REDEMPTION', benefitId: benefit.id, periodKey: entry.periodKey })}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className="sh-lbl">Past periods</div>
+            </>
+          )}
+
           <div className="pp-list">
             {periods.map((period) => {
               const amount = amountFor(period.key);
-              const used = amount !== null;
               const defaultAmount = resolveBenefitValue(benefit, period);
+              // The toggle tracks *fully* used, so tapping a partly-used period tops it up to
+              // the full value instead of silently discarding the amount already logged.
+              const { redeemed } = settleRedemption(defaultAmount, amount);
               return (
                 <div key={period.key} className="pp-row">
                   <div className="pp-label">{periodLabel(benefit, period)}</div>
                   <input
                     type="number"
                     inputMode="decimal"
+                    min={0}
                     className="money"
                     value={amount ?? ''}
                     placeholder={defaultAmount != null ? String(defaultAmount) : '—'}
-                    onChange={(e) => setAmount(period.key, numberInputToValue(e.target.value))}
+                    onChange={(e) => setAmount(period.key, nonNegative(numberInputToValue(e.target.value)))}
                   />
                   <TapToggle
-                    checked={used}
+                    checked={redeemed}
                     label="Mark used"
-                    onToggle={() => setAmount(period.key, used ? null : (defaultAmount ?? 0))}
+                    onToggle={() => setAmount(period.key, redeemed ? null : (defaultAmount ?? 0))}
                   />
                 </div>
               );

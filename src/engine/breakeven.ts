@@ -1,4 +1,4 @@
-import type { Cadence } from './period';
+import { periodSuffixForKey, type Cadence } from './period';
 
 export interface BreakevenBenefit {
   id: string;
@@ -6,6 +6,8 @@ export interface BreakevenBenefit {
   value: number | null;
   cadence: Cadence;
   valueOverrides?: Record<string, number> | null;
+  /** Only `false` excludes a benefit — omitted means an always-granted one, from before the field existed. */
+  enabled?: boolean;
 }
 
 export interface BreakevenCard {
@@ -43,17 +45,36 @@ function yearOfPeriodKey(periodKey: string): number {
   return Number(s.slice(0, 4));
 }
 
+/** What one period of this benefit was worth — the per-period override when there is one. */
+function valueForPeriodKey(benefit: BreakevenBenefit, periodKey: string): number | null {
+  const suffix = periodSuffixForKey(benefit.cadence, periodKey);
+  if (suffix && benefit.valueOverrides && suffix in benefit.valueOverrides) {
+    return benefit.valueOverrides[suffix];
+  }
+  return benefit.value;
+}
+
+/**
+ * Sums what the ledger actually recovered, clamped per entry to what that period was worth.
+ * The ledger holds a raw amount the user typed, so it can overshoot a credit (spending $320
+ * against a $300 one recovers $300, not $320) or come back negative; neither may move the
+ * meter past what the benefit could ever pay out. A value-less certificate has no ceiling —
+ * its amount IS the user's estimate of what they got.
+ */
 function recoveredForBenefits(
-  benefitIds: Set<string>,
+  benefits: BreakevenBenefit[],
   redemptions: Record<string, number>,
   year: number,
 ): number {
+  const byId = new Map(benefits.map((b) => [b.id, b]));
   let recovered = 0;
   for (const [ledgerKey, amount] of Object.entries(redemptions)) {
     const [benefitId, periodKey] = ledgerKey.split('|');
-    if (benefitIds.has(benefitId) && yearOfPeriodKey(periodKey) === year) {
-      recovered += amount;
-    }
+    const benefit = byId.get(benefitId);
+    if (!benefit || yearOfPeriodKey(periodKey) !== year) continue;
+    const ceiling = valueForPeriodKey(benefit, periodKey);
+    const used = Math.max(0, amount);
+    recovered += ceiling === null ? used : Math.min(used, ceiling);
   }
   return recovered;
 }
@@ -71,8 +92,10 @@ export function cardBreakeven(
   redemptions: Record<string, number>,
   now: Date = new Date(),
 ): Breakeven {
-  const cardBenefits = benefits.filter((b) => b.cardId === card.id);
-  const recovered = recoveredForBenefits(new Set(cardBenefits.map((b) => b.id)), redemptions, now.getFullYear());
+  // A cert not yet earned counts on neither side: it inflates `potential` while contributing
+  // nothing, and any amount logged before it was switched off shouldn't read as recovered.
+  const cardBenefits = benefits.filter((b) => b.cardId === card.id && b.enabled !== false);
+  const recovered = recoveredForBenefits(cardBenefits, redemptions, now.getFullYear());
   const potential = cardBenefits.reduce((sum, b) => sum + potentialAnnualValue(b), 0);
   return computeBreakeven(card.fee, recovered, potential);
 }

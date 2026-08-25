@@ -38,9 +38,18 @@ export interface Benefit {
   anchor: Anchor;
   category: string;
   notes: string | null;
+  /** Annual spend that earns this benefit (a free-night cert at $15k); null = granted outright. */
+  unlockSpend: number | null;
+  /** false = not earned / not tracked: leaves the runway and both sides of break-even. */
+  enabled: boolean;
 }
 
-export type Redemptions = Record<string, number>; // "<benefitId>|<periodKey>" -> amount
+/**
+ * "<benefitId>|<periodKey>" -> amount USED so far in that period, not a completion flag. A
+ * $75 charge against a $300 credit stores 75 and the credit stays on the runway with $225
+ * left; it counts as done only once the amount reaches the benefit's value.
+ */
+export type Redemptions = Record<string, number>;
 
 export interface Cap {
   id: string;
@@ -140,15 +149,24 @@ export function defaultRewardCurrencies(): RewardCurrency[] {
   return SEED_REWARD_CURRENCIES.map((c) => ({ ...c }));
 }
 
+/** A benefit stored before `unlockSpend`/`enabled` existed is an ordinary always-granted one. */
+function normalizeBenefit(benefit: Benefit): Benefit {
+  if (typeof benefit.enabled === 'boolean' && 'unlockSpend' in benefit) return benefit;
+  return { ...benefit, unlockSpend: benefit.unlockSpend ?? null, enabled: benefit.enabled ?? true };
+}
+
 /**
- * Backfills `rewardCurrencies` for state arriving raw from the server -- GET /api/state
- * returns whatever JSON blob is stored, unvalidated, so a row saved before this feature
- * shipped won't have the array at all. Called at every point server state enters the store
- * (initial load, 409 recovery, foreground refresh) so no read site has to guard for it.
+ * Backfills fields added after a state blob may have been written -- GET /api/state returns
+ * whatever JSON is stored, unvalidated, so a row saved before a feature shipped won't carry
+ * its fields. Called at every point server state enters the store (initial load, 409
+ * recovery, foreground refresh) so no read site has to guard for them.
  */
 export function normalizeState(state: State): State {
-  if (Array.isArray(state.rewardCurrencies)) return state;
-  return { ...state, rewardCurrencies: defaultRewardCurrencies() };
+  return {
+    ...state,
+    rewardCurrencies: Array.isArray(state.rewardCurrencies) ? state.rewardCurrencies : defaultRewardCurrencies(),
+    benefits: Array.isArray(state.benefits) ? state.benefits.map(normalizeBenefit) : state.benefits,
+  };
 }
 
 export function defaultState(): State {
@@ -210,7 +228,5 @@ export function validateState(data: unknown): State {
   if ('rewardCurrencies' in obj && !Array.isArray(obj.rewardCurrencies)) {
     throw new Error('State.rewardCurrencies must be an array');
   }
-  const rewardCurrencies = Array.isArray(obj.rewardCurrencies) ? (obj.rewardCurrencies as RewardCurrency[]) : defaultRewardCurrencies();
-
-  return { ...(obj as unknown as State), rewardCurrencies };
+  return normalizeState(obj as unknown as State);
 }
