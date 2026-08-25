@@ -156,3 +156,44 @@
   margin: 0;
   padding-bottom: 8px;
 }
+
+/* Temporary layout diagnostics — remove with Diagnostics.tsx once bottom layout is settled. */
+.diag-note {
+  font-size: var(--fs-13);
+  color: var(--text-2);
+  margin: 0 0 var(--sp-3);
+}
+.diag-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.diag-table th,
+.diag-table td {
+  text-align: left;
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: var(--fs-13);
+}
+.diag-table th {
+  color: var(--text-2);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.diag-table td {
+  color: var(--text-0);
+  font-weight: 650;
+  text-align: right;
+}
+.diag-input {
+  margin-top: var(--sp-4);
+  width: 100%;
+  min-height: var(--target-min);
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--white) 4%, transparent);
+  color: var(--text-0);
+  font-size: var(--fs-17);
+  font-family: inherit;
+}
