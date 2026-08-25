@@ -124,7 +124,7 @@
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--white) 4%, transparent);
   color: var(--text-0);
-  font-size: var(--fs-15);
+  font-size: var(--fs-17);
   font-family: inherit;
 }
 .bonus-remove {
@@ -174,7 +174,7 @@
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--white) 4%, transparent);
   color: var(--text-0);
-  font-size: var(--fs-15);
+  font-size: var(--fs-17);
   font-family: inherit;
 }
 
@@ -205,7 +205,7 @@
   background: none;
   border: 0;
   color: var(--text-0);
-  font-size: var(--fs-15);
+  font-size: var(--fs-17);
   font-family: inherit;
   min-height: var(--target-min);
   min-width: 0;
@@ -250,7 +250,7 @@
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--white) 4%, transparent);
   color: var(--text-0);
-  font-size: var(--fs-15);
+  font-size: var(--fs-17);
   font-family: inherit;
   text-align: right;
 }

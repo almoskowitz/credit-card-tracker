@@ -106,7 +106,7 @@
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--white) 4%, transparent);
   color: var(--text-0);
-  font-size: var(--fs-15);
+  font-size: var(--fs-17);
   font-family: ui-monospace, 'SF Mono', Menlo, monospace;
   resize: vertical;
 }
