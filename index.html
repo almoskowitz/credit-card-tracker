@@ -3,18 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <script>
-      (function () {
-        function setAppHeight() {
-          var h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
-          document.documentElement.style.setProperty('--app-100vh', h + 'px');
-        }
-        setAppHeight();
-        window.addEventListener('resize', setAppHeight);
-        window.addEventListener('orientationchange', setAppHeight);
-        window.addEventListener('pageshow', setAppHeight);
-      })();
-    </script>
     <title>Credit Card Rewards Tracker</title>
 
     <link rel="manifest" href="/manifest.webmanifest" />

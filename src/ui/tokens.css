@@ -89,16 +89,22 @@
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
 
+  /* The one value that owns how much room the app leaves below its bottom-most
+     content — tab bar, sheets and toasts all sit on it. Deliberately a flat
+     value rather than a fraction of --safe-bottom (credit-card-tracker-knd):
+     the user wants a constant ~8pt visual margin, and a device-dependent term
+     here is what let the bottom of the app look different in different places. */
+  --bottom-gutter: 8px;
+
   /* .tabbar is `position: fixed`, so .app-scroll needs matching bottom padding
      to keep scrolled content clear of it. Sum of TabBar.css's actual box model
      (measured via getBoundingClientRect, not assumed): 1px border-top +
      9px top padding + [.tab content: 3px+3px padding, 23px icon, 4px icon/label
      gap, 16px rendered line-height of the 13px label -- this stack is 49px
      total, taller than --target-min's 44px floor, so the min-height token
-     alone would undercount it] + the bottom safe-area padding from
-     credit-card-tracker-8li. */
+     alone would undercount it] + --bottom-gutter. */
   --tabbar-h: calc(
-    1px + 9px + 3px + 23px + 4px + 16px + 3px + 8px
+    1px + 9px + 3px + 23px + 4px + 16px + 3px + var(--bottom-gutter)
   );
 }
 

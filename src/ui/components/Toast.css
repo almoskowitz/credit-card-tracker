@@ -2,7 +2,7 @@
   position: fixed;
   left: var(--sp-4);
   right: var(--sp-4);
-  bottom: calc(72px + var(--safe-bottom) + var(--sp-3));
+  bottom: calc(var(--tabbar-h) + var(--sp-3));
   z-index: 70;
   display: flex;
   justify-content: center;

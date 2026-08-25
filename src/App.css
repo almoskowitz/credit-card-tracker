@@ -1,7 +1,17 @@
+/* The shell is `position: fixed; inset: 0` rather than a measured/`dvh` height so
+   that it is sized by the initial containing block — the exact same box that
+   `.tabbar`, `.sheet-wrap` and `.toast-host` (all `position: fixed`) resolve
+   against. Anything that moves one now moves all of them together, so no gap can
+   open between the end of the scroll area and the top of the bar. It also has no
+   viewport *unit* to settle and no JS measurement to go stale: an earlier build
+   wrote `visualViewport.height` into `--app-100vh`, which shrank the shell by the
+   height of the iOS keyboard (and by the zoom factor) while the fixed tab bar
+   stayed on the layout viewport — that mismatch was the drifting-bottom bug. */
 .app-shell {
+  position: fixed;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  height: var(--app-100vh, 100dvh);
   overflow: hidden;
 }
 
@@ -10,13 +20,17 @@
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  /* Keeps an overscroll bounce inside this list instead of rubber-banding the
+     whole page under the fixed chrome. */
+  overscroll-behavior-y: contain;
   padding-bottom: var(--tabbar-h);
 }
 
 .app-loading {
+  position: fixed;
+  inset: 0;
   display: grid;
   place-items: center;
-  height: 100dvh;
   color: var(--text-2);
   font-size: var(--fs-17);
 }
