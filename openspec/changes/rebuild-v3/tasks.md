@@ -465,7 +465,7 @@ devices.
 - [ ] **5.12 Publish via tailscale serve** —
   `tailscale serve --bg --https=8443 http://127.0.0.1:8101`.
   *Acceptance:* the app loads over a valid certificate at
-  `https://andrews-mac-studio-1.tail3683aa.ts.net:8443/`, and the OpenRouter dashboard
+  `https://<your-machine>.<your-tailnet>.ts.net:8443/`, and the OpenRouter dashboard
   still answers on 443.
   (depends: 5.11)
 

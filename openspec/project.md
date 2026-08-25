@@ -99,13 +99,13 @@ credit-card-tracker/
 | Service | launchd agent `~/Library/LaunchAgents/com.llm.<name>.plist` | `com.llm.house-api.plist` |
 | Logs | `llm-infrastructure/logs/<name>.log` | — |
 | Health | an entry in `llm-infrastructure/scripts/health_check.sh` | — |
-| Secrets | `/Users/amoskowitz/llm-infrastructure/.env`, read via the environment. Never in git. | — |
+| Secrets | `<infra-dir>/.env`, read via the environment. Never in git. | — |
 
 ## Deployment
 
 - Service: `127.0.0.1:8101` (loopback only — never `0.0.0.0`)
 - Public entry: `tailscale serve --bg --https=8443 http://127.0.0.1:8101`
-- App URL: `https://andrews-mac-studio-1.tail3683aa.ts.net:8443/`
+- App URL: `https://<your-machine>.<your-tailnet>.ts.net:8443/`
 - Port 443 is **already taken** by the OpenRouter dashboard. A second HTTPS port is used
   rather than a sub-path, because root-path serving means zero base/scope/manifest
   configuration and the `:8443` disappears behind the home-screen icon.

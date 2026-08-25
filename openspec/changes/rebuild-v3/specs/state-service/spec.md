@@ -201,7 +201,7 @@ implement no application-level authentication.
 - **GIVEN** the running service
 - **WHEN** a connection to port 8101 is attempted from another machine on the LAN
 - **THEN** it is refused
-- **AND** the same request through `https://andrews-mac-studio-1.tail3683aa.ts.net:8443/`
+- **AND** the same request through `https://<your-machine>.<your-tailnet>.ts.net:8443/`
   succeeds from a tailnet device
 
 #### Scenario: Docs endpoints are absent

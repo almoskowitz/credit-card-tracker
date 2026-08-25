@@ -695,7 +695,7 @@ Follow the Mac Studio conventions exactly.
    A **second HTTPS port, not a sub-path**: port 443 is already taken by the OpenRouter
    dashboard, and root-path serving means zero base-href, scope, or manifest-start-URL
    configuration. The `:8443` disappears behind the home-screen icon.
-   App URL: **`https://andrews-mac-studio-1.tail3683aa.ts.net:8443/`**
+   App URL: **`https://<your-machine>.<your-tailnet>.ts.net:8443/`**
 5. **Monitor** — add an entry to `llm-infrastructure/scripts/health_check.sh` probing
    `http://127.0.0.1:8101/api/health`. Then **verify** `pmset -g` reports the machine will
    not sleep. Check it; do not assume it. A sleeping Mac Studio means the app is dead from

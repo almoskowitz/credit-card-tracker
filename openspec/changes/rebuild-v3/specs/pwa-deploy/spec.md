@@ -35,7 +35,7 @@ use `viewport-fit=cover` so the layout extends into the safe areas.
 #### Scenario: The app installs and launches standalone
 
 - **GIVEN** an iPhone on the tailnet
-- **WHEN** the user opens `https://andrews-mac-studio-1.tail3683aa.ts.net:8443/` in Safari
+- **WHEN** the user opens `https://<your-machine>.<your-tailnet>.ts.net:8443/` in Safari
   and chooses Add to Home Screen
 - **THEN** the icon carries the app's artwork and name
 - **AND** launching from it opens with no Safari chrome — no address bar and no toolbar
@@ -98,7 +98,7 @@ port rather than under a sub-path.
 #### Scenario: The app answers at the root of port 8443
 
 - **GIVEN** the serve configuration active
-- **WHEN** `https://andrews-mac-studio-1.tail3683aa.ts.net:8443/` is opened from a tailnet
+- **WHEN** `https://<your-machine>.<your-tailnet>.ts.net:8443/` is opened from a tailnet
   device
 - **THEN** the client loads over a valid certificate
 - **AND** `/api/health` on the same host and port returns 200

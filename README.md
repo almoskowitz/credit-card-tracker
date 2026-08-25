@@ -8,7 +8,7 @@ which card do I use for this (earn rates by category, optimal 3/5/7-card wallet)
 Primary use is one-handed on an iPhone, at night. Secondary use is a laptop browser for
 bulk editing and adding cards.
 
-**App URL:** `https://andrews-mac-studio-1.tail3683aa.ts.net:8443/`
+**App URL:** `https://<your-machine>.<your-tailnet>.ts.net:8443/`
 
 ## Architecture
 
@@ -131,7 +131,7 @@ additional backup machinery was added for this table.
 - **Exposure:** `tailscale serve --bg --https=8443 http://127.0.0.1:8101` — a second HTTPS
   port (443 is already taken on this Mac Studio by another app), root-path served so
   there's no base-href/PWA-scope juggling. App URL:
-  `https://andrews-mac-studio-1.tail3683aa.ts.net:8443/`.
+  `https://<your-machine>.<your-tailnet>.ts.net:8443/`.
 - **Health check:** `curl http://127.0.0.1:8101/api/health` should return `{"ok": true}`.
   An entry for this endpoint lives in `llm-infrastructure/scripts/health_check.sh`.
 - **Backup coverage:** the nightly `sovereign_ai` `pg_dump` (existing infrastructure,
