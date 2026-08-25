@@ -6,7 +6,6 @@ import { validateState, type State } from '../../state/schema';
 import { getLastSyncedAt, retry } from '../../storage/api';
 import { numberInputToValue } from '../format';
 import cardSchemaMd from '../../../docs/card-schema.md?raw';
-import { Diagnostics } from './Diagnostics';
 import '../../App.css';
 import '../shared.css';
 import './Settings.css';
@@ -47,7 +46,6 @@ export function Settings({ activeProfileId, onSetActiveProfile }: SettingsProps)
   const [profilesOpen, setProfilesOpen] = useState(false);
   const [valuationsOpen, setValuationsOpen] = useState(false);
   const [schemaOpen, setSchemaOpen] = useState(false);
-  const [diagOpen, setDiagOpen] = useState(false);
   const [pendingImport, setPendingImport] = useState<{ state: State; summary: string } | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
 
@@ -203,13 +201,6 @@ export function Settings({ activeProfileId, onSetActiveProfile }: SettingsProps)
             <ChevronIcon />
           </span>
         </button>
-        <button type="button" className="li" onClick={() => setDiagOpen(true)}>
-          Layout diagnostics
-          <span className="r">
-            Temporary
-            <ChevronIcon />
-          </span>
-        </button>
       </div>
 
       <div className="vfoot">Card Tracker v3 · schema v2{lastSynced ? ` · last sync ${timeAgo(lastSynced)}` : ''}</div>
@@ -224,18 +215,6 @@ export function Settings({ activeProfileId, onSetActiveProfile }: SettingsProps)
           </button>
         </div>
         <pre className="schema-doc">{cardSchemaMd}</pre>
-      </Sheet>
-
-      <Sheet open={diagOpen} onClose={() => setDiagOpen(false)} ariaLabel="Layout diagnostics">
-        <div className="sheet-top">
-          <div>
-            <h2>Layout diagnostics</h2>
-          </div>
-          <button type="button" onClick={() => setDiagOpen(false)}>
-            Done
-          </button>
-        </div>
-        {diagOpen && <Diagnostics />}
       </Sheet>
     </div>
   );
