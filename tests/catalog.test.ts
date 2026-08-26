@@ -20,8 +20,8 @@ describe('data/cards.json schema v1', () => {
 
   const categorySlugs = new Set(catalog.categories.map((c: { slug: string }) => c.slug));
 
-  it('has 24 cards with unique kebab-case slugs', () => {
-    expect(catalog.cards).toHaveLength(24);
+  it('has 25 cards with unique kebab-case slugs', () => {
+    expect(catalog.cards).toHaveLength(25);
     const slugs = catalog.cards.map((c: { slug: string }) => c.slug);
     expect(new Set(slugs).size).toBe(slugs.length);
     for (const slug of slugs) {
@@ -76,8 +76,8 @@ describe('data/cards.json schema v1', () => {
     }
   });
 
-  it('reports 24 cards validated', () => {
+  it('reports 25 cards validated', () => {
     console.log(`validate:catalog — ${catalog.cards.length} cards validated, 0 unknown fields, 0 enum violations`);
-    expect(catalog.cards.length).toBe(24);
+    expect(catalog.cards.length).toBe(25);
   });
 });

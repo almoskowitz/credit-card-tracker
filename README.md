@@ -22,7 +22,7 @@ src/state/      schema.ts (State shape), actions.ts + store.tsx (reducer, HTTP-f
 src/storage/    api.ts — the only module that calls fetch('/api/...')
 src/catalog/    catalog.ts (copy-on-add), categories.ts, importer.ts (paste/validate a card)
 src/ui/         components/ and views/ — Today, Wallet, Insights, Settings
-data/cards.json Seed catalog (24 cards) — read only when adding a card to a wallet
+data/cards.json Seed catalog (25 cards) — read only when adding a card to a wallet
 server/         FastAPI app: app.py, state.py (GET/PUT /api/state), db.py (asyncpg pool)
 tests/          vitest — engine, importer, catalog, and selector tests
 docs/card-schema.md   Import format for catalog cards
@@ -153,7 +153,7 @@ additional backup machinery was added for this table.
 
 Three ways, all inside the app (Settings → Add Card):
 
-1. **Search** the built-in catalog (`data/cards.json`, 24 cards) and add it to a profile.
+1. **Search** the built-in catalog (`data/cards.json`, 25 cards) and add it to a profile.
 2. **Paste** a JSON object matching the catalog schema — validated client-side before
    it's added.
 3. **Blank form** for a card not in the catalog.

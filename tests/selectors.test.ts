@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { defaultState } from '../src/state/schema';
+import { defaultState, normalizeState } from '../src/state/schema';
 import type { Benefit, Card, Msr, State } from '../src/state/schema';
 import {
   cardsForProfile,
@@ -11,6 +11,7 @@ import {
   unscheduledEntries,
   type RunwayItem,
 } from '../src/state/selectors';
+import catalog from '../data/cards.json';
 
 function makeCard(overrides: Partial<Card> = {}): Card {
   return {
@@ -296,5 +297,25 @@ describe('breakeven selectors', () => {
     const result = portfolioBreakevenForProfile(state, 'profile-1', new Date(2026, 5, 1));
     expect(result.totalFees).toBe(695);
     expect(result.recovered).toBe(400);
+  });
+});
+
+describe('normalizeState reward currencies', () => {
+  it('adds a seed currency a stored blob predates without touching a tuned valuation', () => {
+    const stored = defaultState();
+    const tuned = stored.rewardCurrencies
+      .filter((c) => c.id !== 'bilt-rewards')
+      .map((c) => (c.id === 'world-of-hyatt' ? { ...c, centsPerPoint: 1.5 } : c));
+    const normalized = normalizeState({ ...stored, rewardCurrencies: tuned });
+    expect(normalized.rewardCurrencies.find((c) => c.id === 'bilt-rewards')?.name).toBe('Bilt Rewards');
+    expect(normalized.rewardCurrencies.find((c) => c.id === 'world-of-hyatt')?.centsPerPoint).toBe(1.5);
+  });
+
+  it('every catalog rewardCurrency resolves to a seeded currency', () => {
+    const ids = new Set(defaultState().rewardCurrencies.map((c) => c.id));
+    const referenced = (catalog.cards as { slug: string; rewardCurrency?: string | null }[])
+      .map((c) => c.rewardCurrency)
+      .filter((id): id is string => typeof id === 'string');
+    expect(referenced.filter((id) => !ids.has(id))).toEqual([]);
   });
 });

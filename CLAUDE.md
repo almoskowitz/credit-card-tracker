@@ -63,7 +63,7 @@ never need to check connection state themselves before dispatching.
 ## Commands
 
 ```bash
-npm test                  # vitest run — all suites (103 tests)
+npm test                  # vitest run — all suites (105 tests)
 npm run validate:catalog  # vitest run tests/catalog.test.ts
 npm run build             # vite build -> dist/
 npm run deploy             # build, then copy dist/* into server/static/

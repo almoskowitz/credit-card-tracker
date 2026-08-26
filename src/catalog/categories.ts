@@ -2,7 +2,7 @@
  * The closed 14-slug category taxonomy — identical to `data/cards.json`'s `categories[]`
  * and the field reference in `docs/card-schema.md`. Kept as its own tiny module so any
  * picker (earn rates, benefit category, blank-form) can import it without pulling in the
- * full 24-card catalog payload.
+ * full 25-card catalog payload.
  */
 export interface CategoryDef {
   slug: string;

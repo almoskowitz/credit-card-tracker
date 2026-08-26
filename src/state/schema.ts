@@ -142,6 +142,7 @@ const SEED_REWARD_CURRENCIES: readonly RewardCurrency[] = [
   { id: 'jetblue-trueblue', name: 'JetBlue TrueBlue', centsPerPoint: 1.3 },
   { id: 'atmos-rewards', name: 'Atmos Rewards', centsPerPoint: 1.4 },
   { id: 'aadvantage', name: 'American AAdvantage', centsPerPoint: 1.4 },
+  { id: 'bilt-rewards', name: 'Bilt Rewards', centsPerPoint: 2.0 },
 ];
 
 /** A fresh, independently-mutable copy of the seed reward-currency list. */
@@ -161,10 +162,24 @@ function normalizeBenefit(benefit: Benefit): Benefit {
  * its fields. Called at every point server state enters the store (initial load, 409
  * recovery, foreground refresh) so no read site has to guard for them.
  */
+/**
+ * The seed list plus whatever the user has, their edits winning on id. A catalog card names
+ * its currency by a stable seed id (`bilt-rewards`), so a state blob written before that seed
+ * existed would resolve the reference to nothing — appending the missing seeds keeps every
+ * catalog card addable without disturbing a valuation the user has already tuned.
+ */
+function withMissingSeedCurrencies(existing: RewardCurrency[]): RewardCurrency[] {
+  const byId = new Set(existing.map((c) => c.id));
+  const missing = SEED_REWARD_CURRENCIES.filter((c) => !byId.has(c.id)).map((c) => ({ ...c }));
+  return missing.length === 0 ? existing : [...existing, ...missing];
+}
+
 export function normalizeState(state: State): State {
   return {
     ...state,
-    rewardCurrencies: Array.isArray(state.rewardCurrencies) ? state.rewardCurrencies : defaultRewardCurrencies(),
+    rewardCurrencies: withMissingSeedCurrencies(
+      Array.isArray(state.rewardCurrencies) ? state.rewardCurrencies : defaultRewardCurrencies(),
+    ),
     benefits: Array.isArray(state.benefits) ? state.benefits.map(normalizeBenefit) : state.benefits,
   };
 }

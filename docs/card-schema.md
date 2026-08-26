@@ -36,6 +36,17 @@ this document disagree, that disagreement is a bug in the importer.
       "cadence": "annual",
       "anchor": "calendar",
       "category": "hotels"
+    },
+    {
+      "name": "Second Free Night Reward",
+      "value": 500,
+      "displayValue": "Any Hilton property",
+      "cadence": "annual",
+      "anchor": "calendar",
+      "category": "hotels",
+      "unlockSpend": 30000              // optional: annual spend that earns this benefit.
+                                         // Added switched OFF — the user toggles it on once
+                                         // the spend happens. Omit for always-granted perks.
     }
   ],
   "earnRates": [
@@ -67,6 +78,7 @@ this document disagree, that disagreement is a bug in the importer.
 | `benefits[].anchor` | enum | yes | `calendar` \| `anniversary` |
 | `benefits[].category` | slug | yes | One of the 14 category slugs |
 | `benefits[].valueOverrides` | object | no | Keys are period suffixes (`M1`-`M12`, `Q1`-`Q4`, `H1`-`H2`); values are numbers. Omit when there are no overrides. |
+| `benefits[].unlockSpend` | number | no | Annual spend that earns this benefit (a free-night certificate at $15k). Must be positive. Such a benefit is added switched off and stays out of the runway and break-even until the user toggles it on. Omit for always-granted benefits. |
 | `earnRates` | array | yes | May be empty |
 | `earnRates[].category` | slug | yes | One of the 14 category slugs |
 | `earnRates[].rate` | number | yes | Multiplier, e.g. `4` for 4x |

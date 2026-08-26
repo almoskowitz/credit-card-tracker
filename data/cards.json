@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updated": "2026-08-24",
+  "updated": "2026-08-25",
   "categories": [
     {
       "slug": "dining",
@@ -1408,6 +1408,71 @@
       ],
       "caps": [],
       "spendThresholds": []
+    },
+    {
+      "slug": "bilt-palladium",
+      "name": "Bilt Palladium",
+      "issuer": "Bilt",
+      "annualFee": 495,
+      "rewardCurrency": "bilt-rewards",
+      "benefits": [
+        {
+          "name": "Bilt Travel Hotel Credit",
+          "value": 200,
+          "displayValue": null,
+          "cadence": "semiannual",
+          "anchor": "calendar",
+          "category": "hotels"
+        },
+        {
+          "name": "Bilt Cash",
+          "value": 200,
+          "displayValue": null,
+          "cadence": "annual",
+          "anchor": "calendar",
+          "category": "other"
+        }
+      ],
+      "earnRates": [
+        {
+          "category": "dining",
+          "rate": 5,
+          "notes": "Bilt Dining partner restaurants (20,000+ locations)"
+        },
+        {
+          "category": "hotels",
+          "rate": 4,
+          "notes": "Booked via Bilt Travel Portal"
+        },
+        {
+          "category": "flights",
+          "rate": 3,
+          "notes": "Booked via Bilt Travel Portal"
+        },
+        {
+          "category": "rideshare",
+          "rate": 4,
+          "notes": "Lyft"
+        },
+        {
+          "category": "other",
+          "rate": 1.25,
+          "notes": "Rent, mortgage & HOA \u2014 up to 1.25x, no transaction fee, no cap"
+        },
+        {
+          "category": "everything-else",
+          "rate": 2,
+          "notes": null
+        }
+      ],
+      "caps": [],
+      "spendThresholds": [
+        {
+          "label": "Welcome Offer",
+          "requirement": 4000,
+          "anchor": "calendar"
+        }
+      ]
     }
   ]
 }

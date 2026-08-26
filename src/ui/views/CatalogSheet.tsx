@@ -29,7 +29,7 @@ interface CatalogSheetProps {
   profileId: string;
 }
 
-/** The Wallet "+" sheet — search the 24-card catalog, paste a card as JSON, or start blank. */
+/** The Wallet "+" sheet — search the 25-card catalog, paste a card as JSON, or start blank. */
 export function CatalogSheet({ open, onClose, profileId }: CatalogSheetProps) {
   const { dispatch } = useStore();
   const [tier, setTier] = useState<Tier>('search');
